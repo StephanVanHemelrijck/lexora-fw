@@ -2,5 +2,30 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./apps/mobile"
+    },
+    {
+      "path": "./apps/backend-e2e"
+    },
+    {
+      "path": "./apps/backend"
+    },
+    {
+      "path": "./libs/api-client"
+    },
+    {
+      "path": "./libs/auth"
+    },
+    {
+      "path": "./libs/styles"
+    },
+    {
+      "path": "./libs/types"
+    },
+    {
+      "path": "./libs/utils"
+    }
+  ]
 }

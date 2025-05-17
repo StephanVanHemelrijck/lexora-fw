@@ -1,0 +1,17 @@
+{
+  "name": "@lexora/auth",
+  "projectType": "library",
+  "root": "libs/auth",
+  "sourceRoot": "libs/auth/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/libs/auth",
+        "main": "libs/auth/src/index.ts",
+        "tsConfig": "libs/auth/tsconfig.lib.json"
+      }
+    }
+  },
+  "tags": []
+}

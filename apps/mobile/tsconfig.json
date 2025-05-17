@@ -1,0 +1,32 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@lexora/auth": ["../../libs/auth/src/index.ts"],
+      "@lexora/styles": ["../../libs/styles/src/index.ts"],
+      "@lexora/api-client": ["../../libs/api-client/src/index.ts"],
+      "@lexora/types": ["../../libs/types/src/index.ts"],
+      "@lexora/utils": ["../../libs/utils/src/index.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "references": [
+    {
+      "path": "../../libs/utils"
+    },
+    {
+      "path": "../../libs/types"
+    },
+    {
+      "path": "../../libs/api-client"
+    },
+    {
+      "path": "../../libs/styles"
+    },
+    {
+      "path": "../../libs/auth"
+    }
+  ]
+}

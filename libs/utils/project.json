@@ -1,0 +1,17 @@
+{
+  "name": "@lexora/utils",
+  "projectType": "library",
+  "root": "libs/utils",
+  "sourceRoot": "libs/utils/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/libs/utils",
+        "main": "libs/utils/src/index.ts",
+        "tsConfig": "libs/utils/tsconfig.lib.json"
+      }
+    }
+  },
+  "tags": []
+}

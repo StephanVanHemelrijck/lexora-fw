@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uid              String           @id @unique
+  nativeLanguage   String           @default("English")
+  assessmentsTaken UserAssessment[]
+}
+
+model Assessment {
+  id              String           @id @default(uuid())
+  language        String
+  questions       Json
+  createdAt       DateTime         @default(now())
+  userAssessments UserAssessment[]
+}
+
+model UserAssessment {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [uid])
+  userId String
+
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  assessmentId String
+
+  status      AssessmentStatus @default(PENDING)
+  score       Int?
+  level       String?
+  createdAt   DateTime         @default(now())
+  completedAt DateTime?
+}
+
+enum AssessmentStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+}

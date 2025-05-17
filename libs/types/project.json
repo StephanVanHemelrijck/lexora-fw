@@ -1,0 +1,17 @@
+{
+  "name": "@lexora/types",
+  "projectType": "library",
+  "root": "libs/types",
+  "sourceRoot": "libs/types/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/libs/types",
+        "main": "libs/types/src/index.ts",
+        "tsConfig": "libs/types/tsconfig.lib.json"
+      }
+    }
+  },
+  "tags": []
+}

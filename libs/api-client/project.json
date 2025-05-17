@@ -1,0 +1,17 @@
+{
+  "name": "@lexora/api-client",
+  "projectType": "library",
+  "root": "libs/api-client",
+  "sourceRoot": "libs/api-client/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/libs/api-client",
+        "main": "libs/api-client/src/index.ts",
+        "tsConfig": "libs/api-client/tsconfig.lib.json"
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,10 +1,20 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@lexora/api-client": ["libs/api-client/src/index.ts"],
+      "@lexora/auth": ["libs/auth/src/index.ts"],
+      "@lexora/backend/*": ["apps/backend/src/*"],
+      "@lexora/styles": ["libs/styles/src/index.ts"],
+      "@lexora/types": ["libs/types/src/index.ts"],
+      "@lexora/utils": ["libs/utils/src/index.ts"]
+    },
     "composite": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "lib": ["es2022"],
     "module": "nodenext",
     "moduleResolution": "nodenext",

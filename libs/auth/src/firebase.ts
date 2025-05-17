@@ -1,0 +1,25 @@
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { Platform } from 'react-native';
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: 'AIzaSyBHZvT9Ep0aBsHtERgqVyS0ylGW1mX3w7U',
+  authDomain: 'lexora-be481.firebaseapp.com',
+  projectId: 'lexora-be481',
+  // Add any additional config properties you need
+};
+
+// Initialize Firebase only once
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+
+// Initialize auth with persistence
+let auth: Auth;
+if (Platform.OS === 'web') {
+  auth = getAuth(app);
+} else {
+  auth = getAuth(app);
+}
+
+export { app, auth };
