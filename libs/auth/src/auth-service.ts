@@ -1,4 +1,4 @@
-import { auth } from './firebase';
+import { auth } from './firebase.ts';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -56,10 +56,13 @@ export const authService = {
       console.log(error);
     }
   },
+  logout: async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 
 export default authService;
-
-export const testAuth = () => {
-  console.log('does this work');
-};

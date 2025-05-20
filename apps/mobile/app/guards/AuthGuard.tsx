@@ -16,7 +16,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (!mounted) return;
     if (loading) return;
     if (!user) {
-      router.replace('/login');
+      router.replace('/boot');
     }
   }, [user, loading, router, mounted]);
 

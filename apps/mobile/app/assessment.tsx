@@ -22,7 +22,7 @@ import { MultipleChoiceQuestion } from '@/components/assessment/MultipleChoiceQu
 import { FillInTheBlankQuestion } from '@/components/assessment/FillInTheBlankQuestion';
 import WritingPromptQuestion from '@/components/assessment/WritingPromptQuestion';
 import ReadingComprehensionQuestion from '@/components/assessment/ReadingComprehensionQuestion';
-import { ProgressIndicator } from '@/components/assessment/ProgessIndicator';
+import { ProgressIndicator } from '@/components/ui/ProgessIndicator';
 import { Icon } from '@/components/ui/Icon';
 import { useRouter } from 'expo-router';
 
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.screenGutter,
     paddingHorizontal: Spacing.screenGutter,
   },
-  backButton: { padding: Spacing.s, paddingLeft: 0 },
+  backButton: { paddingRight: Spacing.s },
   progressWrapper: { flex: 1 },
   questionContainer: { flex: 1, justifyContent: 'flex-start' },
   nextButton: {

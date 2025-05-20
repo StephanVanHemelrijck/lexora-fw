@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { Button } from '@/components/ui/Button';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -109,20 +110,13 @@ export default function Register() {
         )}
       </TouchableOpacity>
 
-      <Text style={styles.forgotPasswordText}>FORGOT PASSWORD?</Text>
-
       {/* Divider Line */}
       <View style={styles.dividerContainer}>
         <View style={styles.divider} />
         <Text style={styles.dividerText}>OR</Text>
         <View style={styles.divider} />
       </View>
-
-      {/* Login Link */}
-      <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
-        <Text style={styles.registerText}>Already have an account?</Text>
-        <Text style={styles.joinText}>LOG IN</Text>
-      </TouchableOpacity>
+      <Button onPress={() => {}} text="SKIP FOR NOW" theme={'outline'} />
     </View>
   );
 }

@@ -11,17 +11,16 @@ export function ProgressIndicator({ current, total }: Props) {
   const progressPercentage = Math.round(progress * 100);
 
   return (
-    <View>
-      <View style={styles.barBackground}>
-        <View style={[styles.barFill, { width: `${progressPercentage}%` }]} />
-      </View>
+    <View style={styles.barBackground}>
+      <View style={[styles.barFill, { width: `${progressPercentage}%` }]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   barBackground: {
-    width: '100%',
+    flexGrow: 1,
+    maxHeight: 16,
     height: 16,
     borderRadius: BorderRadius.m,
     backgroundColor: Colors.textDark,

@@ -1,11 +1,15 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import { useAuth } from '@lexora/auth';
+import { authService, useAuth } from '@lexora/auth';
 import { useRouter } from 'expo-router';
 
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
+
+  const handleLogout = async () => {
+    await authService.logout();
+  };
 
   return (
     <View style={styles.container}>
@@ -16,6 +20,10 @@ export default function Home() {
         }}
       >
         <Text>Take Assessment</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleLogout}>
+        <Text>Logout</Text>
       </TouchableOpacity>
     </View>
   );
