@@ -1,15 +1,42 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, { useEffect } from 'react';
 import Mascot from '@/components/ui/Mascot';
 import {
+  BorderRadius,
   Colors,
   FontSizes,
   FontWeights,
   MascotSizes,
   Spacing,
 } from '@lexora/styles';
+import { api } from '@lexora/api-client';
+import { useLanguagesStore } from '@/stores/useLanguagesStore';
+import { Button } from '@/components/ui/Button';
+import { useOnboardingStore } from '@/stores/useOnboardingStore';
 
 export default function LanguageSelectionStep() {
+  const { languages, setLanguages } = useLanguagesStore();
+  const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
+
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      const res = await api.languages.getSupportedLanguages();
+      setLanguages(res);
+    };
+    fetchLanguages();
+  }, [setLanguages]);
+
+  const handleNextStep = () => {
+    if (!selectedLanguage) return;
+    nextStep();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.mascotWrapper}>
@@ -19,7 +46,43 @@ export default function LanguageSelectionStep() {
           size={MascotSizes.s}
         />
       </View>
+
       <Text style={styles.title}>Language Selection</Text>
+
+      <ScrollView
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+      >
+        {languages?.map((language) => {
+          const isSelected = language.id === selectedLanguage?.id;
+          return (
+            <TouchableOpacity
+              key={language.id}
+              onPress={() => setLanguage(language)}
+              style={[styles.rowCard, isSelected && styles.selected]}
+            >
+              <View style={styles.rowContent}>
+                <Text style={styles.emoji}>{language.flagEmoji}</Text>
+                <View style={styles.nameContainer}>
+                  <Text
+                    style={[styles.name, isSelected && styles.selectedText]}
+                  >
+                    {language.name}
+                  </Text>
+                  <Text style={styles.nativeName}>{language.nativeName}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      <Button
+        text="CONTINUE"
+        onPress={handleNextStep}
+        theme="purple"
+        disabled={!selectedLanguage}
+      />
     </View>
   );
 }
@@ -32,9 +95,49 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.l,
   },
   title: {
-    color: Colors.textLight,
     fontSize: FontSizes.h2,
     fontWeight: FontWeights.bold,
+    color: Colors.textLight,
     marginBottom: Spacing.l,
+  },
+  list: {
+    gap: Spacing.s,
+    paddingBottom: Spacing.xl,
+  },
+  rowCard: {
+    backgroundColor: Colors.inputBackground,
+    borderRadius: BorderRadius.m,
+    padding: Spacing.m,
+    width: '100%',
+  },
+  rowContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.m,
+  },
+  emoji: {
+    fontSize: FontSizes.h1,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: Spacing.s,
+  },
+  name: {
+    fontSize: FontSizes.body,
+    fontWeight: FontWeights.medium,
+    color: Colors.textLight,
+  },
+  nativeName: {
+    fontSize: FontSizes.caption,
+    color: Colors.disabled,
+  },
+  selected: {
+    borderColor: Colors.accent,
+    borderWidth: 2,
+    backgroundColor: `${Colors.accent}10`,
+  },
+  selectedText: {
+    color: Colors.accent,
   },
 });

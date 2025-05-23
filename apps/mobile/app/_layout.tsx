@@ -18,7 +18,7 @@ export default function RootLayout() {
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 70 : 0}
           >
             <StatusBar barStyle="dark-content" backgroundColor={Colors.main} />
             <Stack

@@ -21,35 +21,60 @@ import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 
 export default function CreateAccountStep() {
-  const { nextStep } = useOnboardingStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const { nextStep, displayName, email, password, setAccountInfo } =
+    useOnboardingStore();
 
-  const canSubmit = useMemo(() => {
-    return email.length > 0 && password.length > 0 && displayName.length > 0;
-  }, [email, password, displayName]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({
+    displayName: false,
+    email: false,
+    password: false,
+  });
+
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isPasswordValid = password.length >= 6;
+  const isDisplayNameValid = displayName.trim().length >= 3;
+
+  const canSubmit = isEmailValid && isPasswordValid && isDisplayNameValid;
+
+  const getValidationIcon = (isValid: boolean, show: boolean) => {
+    if (!show) return null;
+    return (
+      <Icon
+        library="Ionicons"
+        name={isValid ? 'checkmark-circle' : 'close-circle'}
+        size={FontSizes.h2}
+        color={isValid ? Colors.success : Colors.error}
+      />
+    );
+  };
 
   const handleCreateAccount = async () => {
     nextStep();
   };
 
-  // Determine password strength
   const passwordStrength = useMemo(() => {
     if (!password) return { label: '', color: '', level: 0 };
 
-    let level = 0;
-    if (password.length >= 6) level++;
-    if (/[A-Z]/.test(password)) level++;
-    if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) level++;
+    let score = 0;
+    if (password.length >= 8) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    if (password.length >= 12 && score >= 4) score += 1;
 
     const labels = ['Weak', 'Medium', 'Strong'];
     const colors = [Colors.error, Colors.warning, Colors.success];
 
+    let level = 0;
+    if (score >= 4) level = 3;
+    else if (score >= 2) level = 2;
+    else level = 1;
+
     return {
-      label: labels[Math.min(level - 1, 2)],
-      color: colors[Math.min(level - 1, 2)],
+      label: labels[level - 1],
+      color: colors[level - 1],
       level,
     };
   }, [password]);
@@ -66,12 +91,18 @@ export default function CreateAccountStep() {
 
       <Text style={styles.title}>Let&apos;s set up your account</Text>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, gap: Spacing.s }}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.inputGroup}>
-          {/* <Text style={styles.label}>Display Name</Text> */}
-          <View style={styles.inputWrapper}>
+          <View
+            style={[
+              styles.inputWrapper,
+              touched.displayName &&
+                !isDisplayNameValid &&
+                displayName !== '' && { borderColor: Colors.error },
+            ]}
+          >
             <Icon
               name="person"
               size={FontSizes.h2}
@@ -85,14 +116,40 @@ export default function CreateAccountStep() {
               keyboardType="default"
               autoCapitalize="none"
               value={displayName}
-              onChangeText={setDisplayName}
+              onChangeText={(value) =>
+                setAccountInfo({ displayName: value, email, password })
+              }
+              onBlur={() =>
+                setTouched((prev) => ({ ...prev, displayName: true }))
+              }
             />
+            {getValidationIcon(
+              isDisplayNameValid,
+              touched.displayName && displayName !== ''
+            )}
+          </View>
+          <View style={styles.errorWrapper}>
+            {touched.displayName &&
+              !isDisplayNameValid &&
+              displayName !== '' && (
+                <Text style={styles.errorText}>
+                  Display name must be at least 3 characters.
+                </Text>
+              )}
           </View>
         </View>
 
         <View style={styles.inputGroup}>
-          {/* <Text style={styles.label}>Email</Text> */}
-          <View style={styles.inputWrapper}>
+          <View
+            style={[
+              styles.inputWrapper,
+              touched.email &&
+                !isEmailValid &&
+                email !== '' && {
+                  borderColor: Colors.error,
+                },
+            ]}
+          >
             <Icon
               name="mail"
               size={FontSizes.h2}
@@ -106,14 +163,29 @@ export default function CreateAccountStep() {
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(value) =>
+                setAccountInfo({ displayName, email: value, password })
+              }
+              onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
             />
+            {getValidationIcon(isEmailValid, touched.email && email !== '')}
+          </View>
+          <View style={styles.errorWrapper}>
+            {touched.email && !isEmailValid && email !== '' && (
+              <Text style={styles.errorText}>Please enter a valid email.</Text>
+            )}
           </View>
         </View>
 
         <View style={styles.inputGroup}>
-          {/* <Text style={styles.label}>Password</Text>/ */}
-          <View style={styles.inputWrapper}>
+          <View
+            style={[
+              styles.inputWrapper,
+              touched.password &&
+                !isPasswordValid &&
+                password !== '' && { borderColor: Colors.error },
+            ]}
+          >
             <Icon
               library="MaterialIcons"
               name="lock"
@@ -126,7 +198,10 @@ export default function CreateAccountStep() {
               placeholderTextColor={Colors.disabled}
               secureTextEntry={!showPassword}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(value) =>
+                setAccountInfo({ displayName, email, password: value })
+              }
+              onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
               autoCapitalize="none"
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -137,6 +212,17 @@ export default function CreateAccountStep() {
                 color={Colors.disabled}
               />
             </TouchableOpacity>
+            {getValidationIcon(
+              isPasswordValid,
+              touched.password && password !== ''
+            )}
+          </View>
+          <View style={styles.errorWrapper}>
+            {touched.password && !isPasswordValid && password !== '' && (
+              <Text style={styles.errorText}>
+                Password must be at least 6 characters.
+              </Text>
+            )}
           </View>
 
           <View style={styles.strengthSection}>
@@ -151,7 +237,7 @@ export default function CreateAccountStep() {
                         backgroundColor:
                           passwordStrength.level === idx + 1
                             ? color
-                            : `${color}33`, // Only the matching segment is solid
+                            : `${color}33`,
                       },
                     ]}
                   />
@@ -186,15 +272,12 @@ export default function CreateAccountStep() {
             <Text style={styles.link}>Privacy Policy</Text>.
           </Text>
         </View>
-        {canSubmit ? (
-          <Button
-            text="CREATE ACCOUNT"
-            onPress={handleCreateAccount}
-            theme="purple"
-          />
-        ) : (
-          <Button text="CREATE ACCOUNT" disabled />
-        )}
+        <Button
+          text="CREATE ACCOUNT"
+          onPress={handleCreateAccount}
+          theme="purple"
+          disabled={!canSubmit}
+        />
       </View>
     </View>
   );
@@ -213,12 +296,8 @@ const styles = StyleSheet.create({
     fontWeight: FontWeights.bold,
     marginBottom: Spacing.l,
   },
-  label: {
-    color: Colors.accent,
-    fontSize: FontSizes.body,
-    fontWeight: FontWeights.medium,
-    marginBottom: Spacing.s,
-    marginLeft: Spacing.s,
+  scrollContent: {
+    paddingBottom: Spacing.l,
   },
   inputGroup: {
     marginBottom: Spacing.m,
@@ -231,6 +310,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.m,
     paddingHorizontal: Spacing.m,
     paddingVertical: Spacing.s,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   input: {
     flex: 1,
@@ -239,11 +320,18 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.s,
     maxHeight: 40,
   },
+  errorWrapper: {
+    // minHeight: 18,
+    marginLeft: Spacing.s,
+  },
+  errorText: {
+    color: Colors.error,
+    fontSize: FontSizes.caption,
+  },
   strengthSection: {
     marginTop: Spacing.s,
     marginBottom: Spacing.m,
   },
-
   strengthBarContainer: {
     flexDirection: 'row',
     height: 6,
@@ -251,43 +339,35 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.s,
     overflow: 'hidden',
   },
-
   strengthSegment: {
     flex: 1,
     marginHorizontal: 1,
     borderRadius: BorderRadius.s,
   },
-
   strengthLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: Spacing.s,
   },
-
   strengthLabel: {
     fontSize: FontSizes.caption,
     fontWeight: FontWeights.medium,
   },
-
   activeLabel: {
     color: Colors.accent,
   },
-
   inactiveLabel: {
     color: Colors.disabled,
   },
-
   termsWrapper: {
     marginBottom: Spacing.s,
   },
-
   termsText: {
     fontSize: FontSizes.caption,
     color: Colors.disabled,
     textAlign: 'center',
     lineHeight: 18,
   },
-
   link: {
     fontWeight: FontWeights.bold,
   },
