@@ -1,14 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React from 'react';
 import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
-import {
-  Colors,
-  FontSizes,
-  FontWeights,
-  MascotSizes,
-  Spacing,
-} from '@lexora/styles';
+import { MascotSizes } from '@lexora/styles';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 
 export default function StartConfirmationStep() {

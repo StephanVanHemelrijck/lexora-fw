@@ -2,25 +2,33 @@ import { auth } from './firebase.ts';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth';
 
 // Replace this with your backend API URL
 const API_URL = 'http://192.168.0.129:3000';
 
 export const authService = {
-  register: async (email: string, password: string) => {
+  register: async (email: string, password: string, displayName: string) => {
     console.log(`trying to register ${email}`);
     try {
       // Create user with Firebase
-      const createdUser = await createUserWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      console.log('User created:', createdUser);
+      const user = userCredential.user;
+
+      // Update user's display name
+      if (user) {
+        await updateProfile(user, { displayName }).catch((error) => {
+          console.error(error);
+        });
+      }
 
       // Get the user's UID and send it to the backend
-      const uid = createdUser.user.uid;
+      const uid = user.uid;
 
       // Make API call to your backend to store UID in the database
       const response = await fetch(`${API_URL}/auth/register`, {
@@ -43,7 +51,7 @@ export const authService = {
         console.error('Failed to store user in backend', responseData);
       }
 
-      return createdUser;
+      return user;
     } catch (error) {
       console.error('Registration failed:', error);
       return null;
