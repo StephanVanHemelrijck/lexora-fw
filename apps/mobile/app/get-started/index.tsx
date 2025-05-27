@@ -8,6 +8,7 @@ import PlacementStep from './steps/PlacementStep';
 import CreateAccountStep from './steps/CreateAccountStep';
 import WelcomeUserStep from './steps/WelcomeUserStep';
 import StartConfirmationStep from './steps/StartConfirmationStep';
+import SaveOnboardingStep from './steps/SaveOnboardingStep';
 
 const steps = [
   WelcomeStep, //
@@ -17,6 +18,7 @@ const steps = [
   WhyLearningStep, // Tell us why you want to learn
   RoutineStep, // Tell us how much you'd like to learn
   PlacementStep, // Do placement or start from scratch
+  SaveOnboardingStep,
   StartConfirmationStep, // Confirm start
 ];
 

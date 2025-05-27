@@ -1,15 +1,5 @@
 import { create } from 'zustand';
-import { Language } from '@lexora/types'; // or wherever you define your language model
-
-interface OnboardingSummary {
-  displayName: string;
-  email: string;
-  password: string;
-  selectedLanguage: Language | null;
-  learningReasons: string[];
-  routineMinutes: number;
-  startingOption: 'scratch' | 'placement' | null;
-}
+import { Language, OnboardingSummary } from '@lexora/types'; // or wherever you define your language model
 
 interface OnboardingState {
   // Step tracking

@@ -16,10 +16,12 @@
   },
   "license": "MIT",
   "scripts": {
-    "mobile:dev": "cd apps/mobile && npx expo start --clear"
+    "mobile:dev": "cd apps/mobile && npx expo start --clear",
+    "prisma:generate": "npx prisma generate",
+    "prisma:seed": "npx prisma db seed"
   },
   "prisma": {
-    "generate": "npx prisma generate --schema=apps/backend/prisma/schema.prisma",
+    "schema": "apps/backend/prisma/schema.prisma",
     "seed": "ts-node apps/backend/prisma/seed.ts"
   },
   "workspaces": [
