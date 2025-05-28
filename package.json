@@ -16,10 +16,12 @@
   },
   "license": "MIT",
   "scripts": {
-    "mobile:dev": "cd apps/mobile && npx expo start --clear"
+    "mobile:dev": "cd apps/mobile && npx expo start --clear",
+    "prisma:generate": "npx prisma generate",
+    "prisma:seed": "npx prisma db seed"
   },
   "prisma": {
-    "generate": "npx prisma generate --schema=apps/backend/prisma/schema.prisma",
+    "schema": "apps/backend/prisma/schema.prisma",
     "seed": "ts-node apps/backend/prisma/seed.ts"
   },
   "workspaces": [
@@ -43,6 +45,7 @@
     "expo-splash-screen": "~0.29.13",
     "expo-status-bar": "~2.0.0",
     "firebase": "^11.7.3",
+    "firebase-admin": "^13.4.0",
     "prisma": "^6.8.1",
     "react": "~18.3.1",
     "react-dom": "~18.3.1",

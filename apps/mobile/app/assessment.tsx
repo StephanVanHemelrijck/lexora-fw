@@ -79,9 +79,9 @@ export default function AssessmentScreen() {
 
   useEffect(() => {
     if (user?.uid) {
-      api.get(`/userAssessment/latest/${user.uid}`).then((res) => {
-        setAssessment(res.data.assessment);
-      });
+      // api.get(`/userAssessment/latest/${user.uid}`).then((res) => {
+      //   setAssessment(res.data.assessment);
+      // });
     }
   }, [user]);
 
@@ -126,10 +126,10 @@ export default function AssessmentScreen() {
 
   const handleSubmitAssessment = () => {
     const data = prepareSubmission();
-    api
-      .post('/userAssessment/submit', data)
-      .then(() => console.log('Submitted'))
-      .catch(console.error);
+    // api
+    //   .post('/userAssessment/submit', data)
+    //   .then(() => console.log('Submitted'))
+    //   .catch(console.error);
   };
 
   const renderQuestion = () => {

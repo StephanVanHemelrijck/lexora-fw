@@ -11,6 +11,28 @@ model User {
   uid              String           @id @unique
   nativeLanguage   String           @default("English")
   assessmentsTaken UserAssessment[]
+
+  languageJourneys LanguageJourney[]
+}
+
+model LanguageJourney {
+  id              String         @id @default(cuid())
+  uid             String
+  user            User           @relation(fields: [uid], references: [uid])
+  languageId      String
+  language        Language       @relation(fields: [languageId], references: [id])
+  learningReasons String[]
+  startingOption  StartingOption
+  placementLevel  String?
+  lastActivity    DateTime?
+  routineMinutes  Int
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+enum StartingOption {
+  scratch
+  placement
 }
 
 model Assessment {
@@ -54,4 +76,6 @@ model Language {
   rtl        Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  languageJourneys LanguageJourney[]
 }

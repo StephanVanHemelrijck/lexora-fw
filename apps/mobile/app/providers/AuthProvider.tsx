@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onIdTokenChanged } from 'firebase/auth';
-import { auth } from './firebase'; // adjust path if needed
-import { useAuthStore } from '@/stores/useAuthStore'; // adjust this path too
+import { auth } from '@lexora/auth';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 type AuthContextType = {
   user: User | null;
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [setAuth, clearAuth]);
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
