@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { OnboardingDto } from './dto/onboarding.dto';
+import { FirebaseAdminError } from '@lexora/types';
 
 @Injectable()
 export class AuthService {
@@ -35,6 +36,7 @@ export class AuthService {
       });
 
       firebaseUid = userRecord.uid;
+      const token = await this.firebase.auth.createCustomToken(firebaseUid);
 
       // Step 2: Ensure selected language exists
       const languageExists = await this.prisma.language.findUnique({
@@ -65,8 +67,24 @@ export class AuthService {
         this.prisma.languageJourney.create({ data: languageJourneyData }),
       ]);
 
-      return { message: 'Onboarding successful' };
-    } catch (error) {
+      // return object
+      const returnObject = {
+        message: 'Onboarding successful',
+        token,
+        user: {
+          uid: userData.uid,
+          nativeLanguageId: userData.nativeLanguageId,
+        },
+        languageJourney: {
+          languageId: languageJourneyData.languageId,
+          learningReasons: languageJourneyData.learningReasons,
+          routineMinutes: languageJourneyData.routineMinutes,
+          startingOption: languageJourneyData.startingOption,
+        },
+      };
+
+      return returnObject;
+    } catch (error: unknown) {
       // Cleanup Firebase user if it was created
       if (firebaseUid) {
         try {
@@ -80,7 +98,7 @@ export class AuthService {
       }
 
       // Firebase-specific error
-      const firebaseCode = (error as any)?.errorInfo?.code;
+      const firebaseCode = (error as FirebaseAdminError)?.errorInfo?.code;
       if (firebaseCode === 'auth/email-already-exists') {
         throw new BadRequestException('This email is already in use.');
       }
@@ -94,5 +112,25 @@ export class AuthService {
         'Onboarding failed. Please try again.'
       );
     }
+  }
+
+  async getMe(uid: string) {
+    const userRecord = await this.firebase.auth.getUser(uid);
+    const dbUser = await this.prisma.user.findUnique({
+      where: { uid },
+      include: { languageJourneys: true },
+    });
+
+    if (!dbUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    return {
+      uid,
+      email: userRecord.email,
+      displayName: userRecord.displayName,
+      nativeLanguage: dbUser.nativeLanguage,
+      languageJourneys: dbUser.languageJourneys,
+    };
   }
 }

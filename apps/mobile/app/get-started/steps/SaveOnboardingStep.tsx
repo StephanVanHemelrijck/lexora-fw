@@ -2,20 +2,20 @@ import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@lexora/api-client';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
-import {
-  FontSizes,
-  FontWeights,
-  Colors,
-  Spacing,
-  MascotSizes,
-} from '@lexora/styles';
+import { FontSizes, Colors, Spacing, MascotSizes } from '@lexora/styles';
 import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { authService } from '@lexora/auth';
 
 export default function SaveOnboardingStep() {
-  const { getOnboardingSummary, nextStep } = useOnboardingStore();
+  const { getOnboardingSummary, resetAll, password, email, displayName } =
+    useOnboardingStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const { setAuth } = useAuthStore();
 
   const saveOnboarding = useCallback(async () => {
     setLoading(true);
@@ -23,14 +23,33 @@ export default function SaveOnboardingStep() {
     const summary = getOnboardingSummary();
 
     try {
-      await api.onboarding.save(summary);
-      nextStep();
+      const res = await api.onboarding.save(summary);
+
+      resetAll(); // reset onboarding store
+      const credential = await authService.login(email, password);
+
+      const idToken = await credential.user.getIdToken();
+      console.log(idToken);
+      setAuth({
+        uid: res.user.uid,
+        email,
+        displayName,
+        idToken,
+        languageJourney: res.languageJourney,
+      });
+
+      router.push({
+        pathname: '/languages/[languageId]/lessons',
+        params: {
+          languageId: res.languageJourney.languageId,
+        },
+      });
     } catch (e: any) {
       setError(e.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
-  }, [getOnboardingSummary, nextStep]);
+  }, [getOnboardingSummary, router, password, email, resetAll, setAuth]);
 
   useEffect(() => {
     saveOnboarding();

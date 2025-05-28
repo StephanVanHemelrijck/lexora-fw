@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { OnboardingDto } from './dto/onboarding.dto';
+import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
 
 @Controller('auth')
 export class AuthController {
@@ -19,5 +20,11 @@ export class AuthController {
   async onboarding(@Body() dto: OnboardingDto) {
     const onboarding = await this.authService.handleOnboarding(dto);
     return onboarding;
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Get('me')
+  async getMe() {
+    return 'hi';
   }
 }

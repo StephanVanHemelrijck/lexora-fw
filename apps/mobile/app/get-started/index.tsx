@@ -18,8 +18,8 @@ const steps = [
   WhyLearningStep, // Tell us why you want to learn
   RoutineStep, // Tell us how much you'd like to learn
   PlacementStep, // Do placement or start from scratch
-  SaveOnboardingStep,
   StartConfirmationStep, // Confirm start
+  SaveOnboardingStep,
 ];
 
 export default function Index() {

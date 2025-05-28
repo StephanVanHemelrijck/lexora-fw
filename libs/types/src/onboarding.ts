@@ -1,5 +1,10 @@
 import { Language } from './language';
 
+export enum StartingOptions {
+  scratch = 'scratch',
+  placement = 'placement',
+}
+
 export interface OnboardingSummary {
   displayName: string;
   email: string;
@@ -7,7 +12,7 @@ export interface OnboardingSummary {
   selectedLanguage: Language | null;
   learningReasons: string[];
   routineMinutes: number;
-  startingOption: 'scratch' | 'placement' | null;
+  startingOption: StartingOptions;
 }
 
 export interface SaveOnboardingPayload {
@@ -17,7 +22,22 @@ export interface SaveOnboardingPayload {
   selectedLanguageId: string;
   learningReasons: string[];
   routineMinutes: number;
-  startingOption: 'scratch' | 'placement' | null;
+  startingOption: StartingOptions;
+}
+
+export interface SaveOnboardingResponse {
+  message: string;
+  token: string;
+  user: {
+    uid: string;
+    nativeLanguageId: string;
+  };
+  languageJourney: {
+    languageId: string;
+    learningReasons: string[];
+    routineMinutes: number;
+    startingOption: StartingOptions;
+  };
 }
 
 // map function

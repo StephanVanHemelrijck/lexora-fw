@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  UserCredential,
 } from 'firebase/auth';
 
 // Replace this with your backend API URL
@@ -57,11 +58,17 @@ export const authService = {
       return null;
     }
   },
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string): Promise<UserCredential> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      return credential;
     } catch (error) {
       console.log(error);
+      throw error;
     }
   },
   logout: async () => {

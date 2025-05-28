@@ -9,7 +9,7 @@ import {
   IsOptional,
 } from 'class-validator';
 
-enum StartingOption {
+export enum StartingOption {
   Scratch = 'scratch',
   Placement = 'placement',
 }
