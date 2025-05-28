@@ -59,6 +59,7 @@ export class AuthService {
         learningReasons: dto.learningReasons,
         routineMinutes: dto.routineMinutes,
         startingOption: dto.startingOption,
+        placementLevel: dto.startingOption == 'scratch' ? 'A1 ' : null,
       };
 
       // Step 4: Save to DB
