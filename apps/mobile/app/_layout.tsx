@@ -1,6 +1,5 @@
-import { AuthProvider } from '@lexora/auth';
 import { Stack } from 'expo-router';
-import AuthGuard from './guards/AuthGuard';
+import AuthGuard from '../guards/AuthGuard';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,27 +8,34 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Colors } from '@lexora/styles';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AuthProvider from '@/providers/AuthProvider';
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <AuthGuard>
-        <SafeAreaView style={styles.safe}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 70 : 0}
-          >
-            <StatusBar barStyle="dark-content" backgroundColor={Colors.main} />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-              }}
-            />
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-      </AuthGuard>
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <AuthGuard>
+          <SafeAreaView style={styles.safe}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={styles.container}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+            >
+              <StatusBar
+                barStyle="dark-content"
+                backgroundColor={Colors.main}
+              />
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                }}
+              />
+            </KeyboardAvoidingView>
+          </SafeAreaView>
+        </AuthGuard>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 
