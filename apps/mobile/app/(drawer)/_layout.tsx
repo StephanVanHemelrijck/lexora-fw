@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  ViewStyle,
 } from 'react-native';
 import {
   BorderRadius,
