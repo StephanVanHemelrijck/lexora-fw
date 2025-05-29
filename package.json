@@ -19,7 +19,7 @@
     "mobile:dev": "cd apps/mobile && npx expo start --clear",
     "prisma:generate": "npx prisma generate",
     "prisma:seed": "npx prisma db seed",
-    "dev": "nx serve backend"
+    "prod-backend": "pm2 start apps/backend/dist/main.js --name backend"
   },
   "prisma": {
     "schema": "apps/backend/prisma/schema.prisma",
