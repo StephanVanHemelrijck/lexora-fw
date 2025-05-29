@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@lexora/auth';
 import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
+import { useAuth } from '@/providers/AuthProvider';
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -16,7 +16,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (!mounted) return;
     if (loading) return;
     if (!user) {
-      router.replace('/boot');
+      router.replace('/');
     }
   }, [user, loading, router, mounted]);
 

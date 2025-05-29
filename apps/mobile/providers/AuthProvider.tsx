@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onIdTokenChanged } from 'firebase/auth';
-import { auth } from './firebase'; // adjust path if needed
 import { useAuthStore } from '@/stores/useAuthStore'; // adjust this path too
+import { auth } from '@lexora/auth';
 
 type AuthContextType = {
   user: User | null;
@@ -13,7 +13,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [setAuth, clearAuth]);
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
@@ -49,3 +49,5 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+export default AuthProvider;

@@ -1,43 +1,52 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect } from 'react';
-import { authService, useAuth } from '@lexora/auth';
+import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React from 'react';
+import {
+  Colors,
+  Spacing,
+  FontSizes,
+  FontWeights,
+  BorderRadius,
+} from '@lexora/styles';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { api } from '@lexora/api-client';
+import { Button } from '@/components/ui/Button';
 
-export default function Home() {
-  const { user } = useAuth();
+export default function Page() {
   const router = useRouter();
-  const { uid, languageJourney, displayName, idToken } = useAuthStore();
-
-  const handleLogout = async () => {
-    await authService.logout();
-  };
-
-  useEffect(() => {
-    console.log(uid);
-    console.log(displayName);
-    console.log(idToken);
-  }, [uid, languageJourney, displayName, idToken]);
-
-  useEffect(() => {
-    api.test.me(idToken).then((res) => console.log(res));
-  }, [idToken]);
 
   return (
     <View style={styles.container}>
-      <Text>Welcome to the Home Page, {user?.email}</Text>
-      <TouchableOpacity
-        onPress={() => {
-          router.push('/assessment');
-        }}
-      >
-        <Text>Take Assessment</Text>
-      </TouchableOpacity>
+      <View style={styles.top}>
+        <Image
+          source={require('../assets/images/logo-light.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.caption}>
+          Where{' '}
+          <Text style={{ color: Colors.accent, fontWeight: FontWeights.bold }}>
+            curiosity
+          </Text>{' '}
+          meets{' '}
+          <Text style={{ color: Colors.accent, fontWeight: FontWeights.bold }}>
+            conversation
+          </Text>
+          !
+        </Text>
+      </View>
 
-      <TouchableOpacity onPress={handleLogout}>
-        <Text>Logout</Text>
-      </TouchableOpacity>
+      <View style={styles.buttons}>
+        <Button
+          onPress={() => router.push('/get-started')}
+          text="GET STARTED"
+          theme="purple"
+        />
+
+        <Button
+          onPress={() => router.push('/login')}
+          text="I ALREADY HAVE AN ACCOUNT"
+          theme="outline"
+        />
+      </View>
     </View>
   );
 }
@@ -45,7 +54,55 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    padding: Spacing.screenGutter,
+    backgroundColor: Colors.main,
+    justifyContent: 'space-between',
+  },
+  top: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.m,
+  },
+  logo: {
+    width: 240,
+  },
+  caption: {
+    color: Colors.textLight,
+    fontSize: FontSizes.h2,
+    fontWeight: FontWeights.medium,
+    textAlign: 'center',
+  },
+  buttons: {
+    marginBottom: Spacing.xl,
+    alignItems: 'center',
+  },
+  getStarted: {
+    backgroundColor: Colors.accent,
+    paddingVertical: Spacing.m,
+    paddingHorizontal: Spacing.l,
+    borderRadius: BorderRadius.l,
+    marginBottom: Spacing.m,
+    width: '100%',
+    alignItems: 'center',
+  },
+  getStartedText: {
+    color: Colors.textDark,
+    fontSize: FontSizes.h3,
+    fontWeight: FontWeights.bold,
+  },
+  loginText: {
+    color: Colors.accent,
+    fontSize: FontSizes.h3,
+    fontWeight: FontWeights.bold,
+  },
+  login: {
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.border,
+    borderRadius: BorderRadius.l,
+    paddingVertical: Spacing.m,
+    paddingHorizontal: Spacing.l,
   },
 });

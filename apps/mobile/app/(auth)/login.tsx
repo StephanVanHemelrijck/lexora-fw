@@ -1,4 +1,4 @@
-import { authService, useAuth } from '@lexora/auth';
+import { authService } from '@lexora/auth';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -17,6 +17,7 @@ import {
   BorderRadius,
 } from '@lexora/styles';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -48,7 +49,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      router.replace('/');
+      router.push('/home');
     }
   }, [user, router]);
 
