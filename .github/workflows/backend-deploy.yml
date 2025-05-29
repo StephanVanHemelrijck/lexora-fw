@@ -1,0 +1,38 @@
+name: Deploy backend to Droplet
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run deployment script on Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 104.248.88.182
+          username: root
+          key: ${{ secrets.DMP_WEB_DROPLET_PRIVATE_KEY }}
+          port: 22
+          script: |
+            pwd
+            ./deploy-backend.sh
+
+      - name: Send Discord Notification on Success
+        if: success()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[Backend] Deployment completed :white_check_mark:'
+
+      - name: Send Discord Notification on Failure
+        if: failure()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[Backend] Deployment failed :x:'

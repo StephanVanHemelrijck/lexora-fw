@@ -58,5 +58,9 @@ cache/
 .cursor\rules\nx-rules.mdc
 .github\instructions\nx.instructions.md
 
+# Ignore env files
+.env
+**/.env
+
 # Ignore service account keys
 **/secrets/*.json
