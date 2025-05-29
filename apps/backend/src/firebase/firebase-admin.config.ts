@@ -1,20 +1,12 @@
 // apps/backend/src/firebase/firebase-admin.config.ts
 import * as admin from 'firebase-admin';
+import serviceAccount from '../secrets/lexora-be481-firebase-adminsdk-fbsvc-07a70221c8.json';
 
-const base64Key = process.env.FIREBASE_ADMIN_KEY_BASE64;
-if (!base64Key) {
-  throw new Error(
-    'Missing FIREBASE_ADMIN_KEY_BASE64 in environment variables.'
-  );
-}
-
-const serviceAccount = JSON.parse(
-  Buffer.from(base64Key, 'base64').toString('utf-8')
-);
+console.log('serviceAccount', serviceAccount);
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
   });
 }
 
