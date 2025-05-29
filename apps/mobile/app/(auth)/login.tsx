@@ -18,8 +18,11 @@ import {
 } from '@lexora/styles';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
+import { api } from '@lexora/api-client';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function Login() {
+  const { setAuth } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { user } = useAuth();
@@ -32,7 +35,13 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      await authService.login(email, password);
+      const credential = await authService.login(email, password);
+
+      const accessToken = await credential.user.getIdToken();
+      // fetch user from database to enrich the user zustand state
+      const user = await api.user.getMe(accessToken);
+
+      setAuth({ ...user, accessToken });
     } catch (e) {
       console.error(e);
       setError('Login failed. Please try again.');

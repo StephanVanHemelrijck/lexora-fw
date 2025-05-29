@@ -8,3 +8,10 @@ export interface Language {
   flagEmoji: string;
   rtl: boolean;
 }
+
+export interface LanguageJourney {
+  languageId: string;
+  learningReasons: string[];
+  routineMinutes: number;
+  startingOption: string;
+}

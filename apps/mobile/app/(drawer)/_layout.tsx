@@ -23,7 +23,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { Icon } from '@/components/ui/Icon';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
-  const { displayName, email } = useAuthStore();
+  const { user } = useAuthStore();
 
   const handleLogout = async () => {
     await authService.logout();
@@ -45,8 +45,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       <SafeAreaView style={styles.drawerContainer}>
         {/* User Info */}
         <View style={styles.userInfo}>
-          <Text style={styles.displayName}>{displayName}</Text>
-          <Text style={styles.mail}>{email}</Text>
+          <Text style={styles.displayName}>{user?.displayName}</Text>
+          <Text style={styles.mail}>{user?.email}</Text>
 
           <View style={styles.progressContainer}>
             <Text style={styles.level}>lvl 6.</Text>

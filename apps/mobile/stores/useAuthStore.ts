@@ -1,44 +1,16 @@
+import { User } from '@lexora/types';
 import { create } from 'zustand';
 
-interface LanguageJourney {
-  languageId: string;
-  learningReasons: string[];
-  routineMinutes: number;
-  startingOption: string;
-}
-
-interface AuthState {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  idToken: string;
-  languageJourney?: LanguageJourney;
-  setAuth: (user: Omit<AuthState, 'setAuth' | 'clearAuth'>) => void;
+interface AuthStore {
+  user: User | null;
+  setAuth: (user: User) => void;
   clearAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  uid: '',
-  email: null,
-  displayName: null,
-  idToken: '',
-  languageJourney: undefined,
+export const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
 
-  setAuth: (user) =>
-    set(() => ({
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      idToken: user.idToken,
-      languageJourney: user.languageJourney,
-    })),
+  setAuth: (user) => set(() => ({ user })),
 
-  clearAuth: () =>
-    set(() => ({
-      uid: '',
-      email: null,
-      displayName: null,
-      idToken: '',
-      languageJourney: undefined,
-    })),
+  clearAuth: () => set(() => ({ user: null })),
 }));

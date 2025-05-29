@@ -1,12 +1,19 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/providers/AuthProvider';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function Home() {
-  const { user } = useAuth();
+  // const { user } = useAuth();
+  const { user } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!user) return;
+    console.log(user);
+  }, [user]);
 
   return (
     <ScreenContainer>
@@ -18,6 +25,14 @@ export default function Home() {
           }}
         >
           <Text>Take Assessment</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            router.push('/languages/[languageId]/lessons');
+          }}
+        >
+          <Text>Language</Text>
         </TouchableOpacity>
       </View>
     </ScreenContainer>

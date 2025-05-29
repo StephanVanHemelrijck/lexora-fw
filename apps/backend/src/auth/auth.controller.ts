@@ -3,6 +3,15 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { OnboardingDto } from './dto/onboarding.dto';
 import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
+import { Request } from 'express';
+import { User } from '../decorators/user.decorator';
+import type { FirebaseUser } from '../types/firebase-user';
+
+interface FirebaseRequest extends Request {
+  user: {
+    uid: string;
+  };
+}
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +33,8 @@ export class AuthController {
 
   @UseGuards(FirebaseAuthGuard)
   @Get('me')
-  async getMe() {
-    return 'hi';
+  async getMe(@User() user: FirebaseUser) {
+    const res = await this.authService.getMe(user.uid);
+    return res;
   }
 }

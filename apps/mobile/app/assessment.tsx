@@ -13,7 +13,6 @@ import {
   FontWeights,
   Spacing,
 } from '@lexora/styles';
-import { useAuth } from '@lexora/auth';
 import { api } from '@lexora/api-client';
 import { Assessment, QuestionItem } from '@lexora/types';
 import { extractAndShuffleQuestions } from '@lexora/utils';
@@ -25,6 +24,7 @@ import ReadingComprehensionQuestion from '@/components/assessment/ReadingCompreh
 import { ProgressIndicator } from '@/components/ui/ProgessIndicator';
 import { Icon } from '@/components/ui/Icon';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function AssessmentScreen() {
   const router = useRouter();

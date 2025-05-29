@@ -7,5 +7,3 @@ export const languages = {
     return res.data;
   },
 };
-
-export default languages;

@@ -28,13 +28,13 @@ export default function SaveOnboardingStep() {
       resetAll(); // reset onboarding store
       const credential = await authService.login(email, password);
 
-      const idToken = await credential.user.getIdToken();
-      console.log(idToken);
+      const accessToken = await credential.user.getIdToken();
+      console.log(accessToken);
       setAuth({
         uid: res.user.uid,
         email,
         displayName,
-        idToken,
+        accessToken,
         languageJourney: res.languageJourney,
       });
 

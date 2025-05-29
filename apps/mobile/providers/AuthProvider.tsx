@@ -26,12 +26,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
 
       if (firebaseUser) {
-        const idToken = await firebaseUser.getIdToken();
+        const accessToken = await firebaseUser.getIdToken();
         setAuth({
           uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          idToken,
+          email: firebaseUser.email || '',
+          displayName: firebaseUser.displayName || '',
+          accessToken,
         });
       } else {
         clearAuth();
