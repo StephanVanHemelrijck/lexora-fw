@@ -18,7 +18,8 @@
   "scripts": {
     "mobile:dev": "cd apps/mobile && npx expo start --clear",
     "prisma:generate": "npx prisma generate",
-    "prisma:seed": "npx prisma db seed"
+    "prisma:seed": "npx prisma db seed",
+    "dev": "nx serve backend"
   },
   "prisma": {
     "schema": "apps/backend/prisma/schema.prisma",
