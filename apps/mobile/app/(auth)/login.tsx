@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'column',
     gap: Spacing.m,
+    marginBottom: Spacing.l,
   },
   inputWrapper: {
     flexDirection: 'row',

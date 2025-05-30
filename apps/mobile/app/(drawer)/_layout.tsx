@@ -118,6 +118,42 @@ export default function DrawerLayout() {
           },
         }}
       />
+      <Drawer.Screen
+        name="lessons/my-lessons"
+        options={{
+          title: 'My Lessons',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+          drawerItemStyle: {
+            borderRadius: BorderRadius.l,
+          },
+        }}
+      />
+      <Drawer.Screen
+        name="lessons/new-language"
+        options={{
+          drawerItemStyle: { display: 'none' },
+        }}
+      />
+      <Drawer.Screen
+        name="lessons/language/[languageId]"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          title: 'My Lessons',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+        }}
+      />
     </Drawer>
   );
 }
@@ -130,6 +166,7 @@ const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
     padding: Spacing.screenGutter,
+    paddingLeft: Spacing.s,
     justifyContent: 'space-between',
   },
   userInfo: {

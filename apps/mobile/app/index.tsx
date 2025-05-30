@@ -14,12 +14,6 @@ import { useAuthStore } from '@/stores/useAuthStore';
 export default function Page() {
   const router = useRouter();
 
-  const { user } = useAuthStore();
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -83,6 +77,7 @@ const styles = StyleSheet.create({
   buttons: {
     marginBottom: Spacing.xl,
     alignItems: 'center',
+    gap: Spacing.l,
   },
   getStarted: {
     backgroundColor: Colors.accent,
