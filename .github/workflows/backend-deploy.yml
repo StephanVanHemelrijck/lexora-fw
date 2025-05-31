@@ -1,4 +1,4 @@
-name: Deploy backend to Droplet
+name: Deploy backend & apk to Droplet
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run deployment script on Droplet
+      - name: Run backend deployment script on Droplet
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 104.248.88.182
@@ -36,3 +36,30 @@ jobs:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           message: '[Backend] Deployment failed :x:'
+
+      - name: Run apk deployment script on Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 104.248.88.182
+          username: root
+          key: ${{ secrets.DMP_WEB_DROPLET_PRIVATE_KEY }}
+          port: 22
+          script: |
+            pwd
+            ./deploy-apk.sh
+
+      - name: Send Discord Notification on Success
+        if: success()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[APK] Deployment completed :white_check_mark:'
+
+      - name: Send Discord Notification on Failure
+        if: failure()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[APK] Deployment failed :x:'
