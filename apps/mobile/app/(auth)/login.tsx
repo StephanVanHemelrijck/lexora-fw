@@ -38,12 +38,14 @@ export default function Login() {
       const credential = await authService.login(email, password);
 
       const accessToken = await credential.user.getIdToken();
+
       const user = await api.user.getMe(accessToken);
 
       setAuth({ ...user, accessToken });
     } catch (e) {
       console.error(e);
       setError('Login failed. Please try again.');
+      alert(e);
     } finally {
       setLoading(false);
     }
