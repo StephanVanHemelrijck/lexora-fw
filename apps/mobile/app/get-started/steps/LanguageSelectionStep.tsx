@@ -21,16 +21,8 @@ import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 
 export default function LanguageSelectionStep() {
-  const { languages, setLanguages } = useLanguagesStore();
+  const { languages } = useLanguagesStore();
   const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
-
-  useEffect(() => {
-    const fetchLanguages = async () => {
-      const res = await api.languages.getSupportedLanguages();
-      setLanguages(res);
-    };
-    fetchLanguages();
-  }, [setLanguages]);
 
   const handleNextStep = () => {
     if (!selectedLanguage) return;

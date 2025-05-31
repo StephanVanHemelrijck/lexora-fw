@@ -20,6 +20,7 @@ export class AuthService {
     return this.prisma.user.create({
       data: {
         uid: dto.uid,
+        dailyMinutes: dto.dailyMinutes,
       },
     });
   }
@@ -51,13 +52,13 @@ export class AuthService {
       const userData = {
         uid: firebaseUid,
         nativeLanguageId: dto.nativeLanguageId ?? undefined,
+        dailyMinutes: dto.routineMinutes,
       };
 
       const languageJourneyData = {
         uid: firebaseUid,
         languageId: dto.selectedLanguageId,
         learningReasons: dto.learningReasons,
-        routineMinutes: dto.routineMinutes,
         startingOption: dto.startingOption,
         placementLevel: dto.startingOption == 'scratch' ? 'A1 ' : null,
       };
@@ -75,11 +76,11 @@ export class AuthService {
         user: {
           uid: userData.uid,
           nativeLanguageId: userData.nativeLanguageId,
+          dailyMinutes: userData.dailyMinutes,
         },
         languageJourney: {
           languageId: languageJourneyData.languageId,
           learningReasons: languageJourneyData.learningReasons,
-          routineMinutes: languageJourneyData.routineMinutes,
           startingOption: languageJourneyData.startingOption,
         },
       };
@@ -119,7 +120,11 @@ export class AuthService {
     const userRecord = await this.firebase.auth.getUser(uid);
     const dbUser = await this.prisma.user.findUnique({
       where: { uid },
-      include: { languageJourneys: true },
+      include: {
+        languageJourneys: {
+          include: { language: true },
+        },
+      },
     });
 
     if (!dbUser) {
@@ -131,6 +136,7 @@ export class AuthService {
       email: userRecord.email,
       displayName: userRecord.displayName,
       nativeLanguage: dbUser.nativeLanguage,
+      dailyMinutes: dbUser.dailyMinutes,
       languageJourneys: dbUser.languageJourneys,
     };
   }

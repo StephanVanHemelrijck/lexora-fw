@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.m,
     borderRadius: BorderRadius.l,
     alignItems: 'center',
-    marginTop: Spacing.l,
   },
   textBase: {
     fontSize: FontSizes.h3,

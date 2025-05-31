@@ -38,7 +38,6 @@ export default function Login() {
       const credential = await authService.login(email, password);
 
       const accessToken = await credential.user.getIdToken();
-      // fetch user from database to enrich the user zustand state
       const user = await api.user.getMe(accessToken);
 
       setAuth({ ...user, accessToken });
@@ -115,8 +114,11 @@ export default function Login() {
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      <Button onPress={handleLogin} text="LOG IN" disabled={!canSignIn} />
-
+      {loading ? (
+        <Button onPress={() => {}} text="LOGGING IN..." disabled={true} />
+      ) : (
+        <Button onPress={handleLogin} text="LOG IN" disabled={!canSignIn} />
+      )}
       <Text style={styles.forgotPasswordText}>FORGOT PASSWORD?</Text>
     </View>
   );
@@ -144,6 +146,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'column',
     gap: Spacing.m,
+    marginBottom: Spacing.l,
   },
   inputWrapper: {
     flexDirection: 'row',

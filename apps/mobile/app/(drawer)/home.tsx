@@ -1,7 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/providers/AuthProvider';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
 import { useAuthStore } from '@/stores/useAuthStore';
 
