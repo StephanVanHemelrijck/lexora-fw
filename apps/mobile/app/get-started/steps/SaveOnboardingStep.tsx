@@ -29,13 +29,11 @@ export default function SaveOnboardingStep() {
       const credential = await authService.login(email, password);
 
       const accessToken = await credential.user.getIdToken();
-      console.log(accessToken);
       setAuth({
         uid: res.user.uid,
         email,
         displayName,
         accessToken,
-        languageJourney: res.languageJourney,
       });
 
       router.push({
@@ -49,7 +47,15 @@ export default function SaveOnboardingStep() {
     } finally {
       setLoading(false);
     }
-  }, [getOnboardingSummary, router, password, email, resetAll, setAuth]);
+  }, [
+    getOnboardingSummary,
+    router,
+    password,
+    email,
+    resetAll,
+    setAuth,
+    displayName,
+  ]);
 
   useEffect(() => {
     saveOnboarding();

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Language, OnboardingSummary } from '@lexora/types'; // or wherever you define your language model
+import { Language, OnboardingSummary, StartingOptions } from '@lexora/types'; // or wherever you define your language model
 
 interface OnboardingState {
   // Step tracking
@@ -37,8 +37,8 @@ interface OnboardingState {
   setRoutineMinutes: (minutes: number) => void;
 
   // Starting point
-  startingOption: 'scratch' | 'placement' | null;
-  setStartingOption: (option: 'scratch' | 'placement' | null) => void;
+  startingOption: StartingOptions | null;
+  setStartingOption: (option: StartingOptions | null) => void;
 
   // Reset all
   resetAll: () => void;

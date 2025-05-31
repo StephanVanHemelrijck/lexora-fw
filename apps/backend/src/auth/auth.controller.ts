@@ -1,17 +1,10 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { OnboardingDto } from './dto/onboarding.dto';
 import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
-import { Request } from 'express';
 import { User } from '../decorators/user.decorator';
 import type { FirebaseUser } from '../types/firebase-user';
-
-interface FirebaseRequest extends Request {
-  user: {
-    uid: string;
-  };
-}
 
 @Controller('auth')
 export class AuthController {

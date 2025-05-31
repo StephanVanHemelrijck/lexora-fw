@@ -12,6 +12,5 @@ export interface Language {
 export interface LanguageJourney {
   languageId: string;
   learningReasons: string[];
-  routineMinutes: number;
   startingOption: string;
 }

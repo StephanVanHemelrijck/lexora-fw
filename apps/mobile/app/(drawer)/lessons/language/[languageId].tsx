@@ -1,19 +1,35 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import React, { useEffect } from 'react';
-import { useNavigation } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import RadarChartComponent from '@/components/charts/RadarChart';
 import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
+import { useLanguagesStore } from '@/stores/useLanguagesStore';
+import { Language } from '@lexora/types';
 
 const dummyData = Array.from({ length: 10 }, (_, i) => ({ id: i }));
 
-export default function Language() {
+export default function Page() {
   const navigation = useNavigation();
+  const { languageId } = useLocalSearchParams<{ languageId: string }>();
+  const [language, setLanguage] = useState<Language | undefined>(undefined);
+  const { languages } = useLanguagesStore();
+
+  useEffect(() => {
+    const resolve = async () => {
+      const lang = await useLanguagesStore
+        .getState()
+        .getLanguageById(languageId);
+      setLanguage(lang);
+    };
+
+    resolve();
+  }, [languageId]);
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'My Lessons - Spanish',
+      title: `My Lessons - ${language?.name}`,
     });
   }, [navigation]);
 
@@ -22,7 +38,10 @@ export default function Language() {
       {/* Header */}
       <View style={styles.headerRow}>
         <View style={styles.languageInfo}>
-          <Text style={styles.languageTitle}>🇪🇸 Spanish</Text>
+          <Text style={styles.nativeLanguageName}>{language?.nativeName}</Text>
+          <Text style={styles.languageTitle}>
+            {language?.flagEmoji} {language?.name}
+          </Text>
           <Text style={styles.languageLevel}>A2 - Elementary</Text>
         </View>
         <RadarChartComponent size={150} />
@@ -90,12 +109,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  languageInfo: {
-    gap: Spacing.s,
-  },
   languageTitle: {
     fontSize: FontSizes.h2,
     fontWeight: FontWeights.bold,
+    color: Colors.textLight,
+    marginBottom: Spacing.s,
+  },
+  nativeLanguageName: {
+    fontSize: FontSizes.caption,
     color: Colors.textLight,
   },
   languageLevel: {

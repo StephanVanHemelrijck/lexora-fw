@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.main,
     padding: Spacing.m,
     borderRadius: BorderRadius.m,
-    minWidth: 300,
+    minWidth: 335,
   },
   contentRow: {
     flexDirection: 'row',

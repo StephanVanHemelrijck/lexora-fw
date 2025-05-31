@@ -1,25 +1,25 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ScrollView,
-} from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
 import DailyChallenge from '@/components/daily/DailyChallenge';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 import LessonCard from '@/components/lessons/LessonCard';
 import LanguageCard from '@/components/languages/LanguageCard';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function MyLessons() {
   const router = useRouter();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   return (
     <View style={styles.container}>
       <View style={styles.dailyGoalWrapper}>
-        <DailyChallenge />
+        <DailyChallenge current={0} goal={user!.dailyMinutes} />
       </View>
 
       {/* Upcoming Lessons */}
@@ -44,10 +44,17 @@ export default function MyLessons() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.languageCardListHorizontal}
         >
-          <LanguageCard onPress={() => router.push('/lessons/language/1')} />
-          <LanguageCard />
-          <LanguageCard />
-          <LanguageCard />
+          {user!.languageJourneys?.map((languageJourney) => (
+            <LanguageCard
+              key={languageJourney.languageId}
+              onPress={() => {
+                router.push({
+                  pathname: '/lessons/language/[languageId]',
+                  params: { languageId: languageJourney.languageId },
+                });
+              }}
+            />
+          ))}
         </ScrollView>
       </View>
       <View style={styles.buttonWrapper}>
@@ -68,6 +75,7 @@ export default function MyLessons() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingVertical: Spacing.xl,
     backgroundColor: Colors.surface,
     gap: Spacing.xl,
