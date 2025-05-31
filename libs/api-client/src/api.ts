@@ -7,3 +7,15 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      // Network error (no server response)
+      console.warn('Network error detected:', error.message);
+    }
+
+    return Promise.reject(error);
+  }
+);

@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { isAxiosError } from 'axios';
 
 export default function Login() {
   const { setAuth } = useAuthStore();
@@ -43,9 +44,26 @@ export default function Login() {
 
       setAuth({ ...user, accessToken });
     } catch (e) {
-      console.error(e);
-      setError('Login failed. Please try again.');
-      alert(e);
+      if (isAxiosError(e)) {
+        if (e.response) {
+          // Server responded with status code out of 2xx range
+          setError(
+            e.response.data?.message || 'Server Error. Please try again.'
+          );
+        } else if (e.request) {
+          // Request made but no response received
+          setError(
+            'No response from server. Please check your internet connection.'
+          );
+        } else {
+          // Something else happened
+          setError(`Error: ${e.message}`);
+        }
+      } else {
+        setError('An unexpected error occurred.');
+      }
+
+      alert(error); // Optional: only keep for dev/debugging
     } finally {
       setLoading(false);
     }
