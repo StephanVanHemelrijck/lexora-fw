@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-miunutes: 60
 
     steps:
       - name: Run backend deployment script on Droplet
