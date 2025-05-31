@@ -13,7 +13,7 @@ export default function MyLessons() {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    console.log(user);
+    console.log(user?.languageJourneys);
   }, [user]);
 
   return (

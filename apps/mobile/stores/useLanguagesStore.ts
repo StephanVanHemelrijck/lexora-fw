@@ -7,6 +7,7 @@ interface LanguagesState {
   isLoaded: boolean;
   fetchLanguages: () => Promise<void>;
   getLanguageById: (id: string) => Promise<Language | undefined>;
+  getLanguages: () => Promise<Language[]>;
 }
 
 export const useLanguagesStore = create<LanguagesState>((set, get) => ({
@@ -26,5 +27,13 @@ export const useLanguagesStore = create<LanguagesState>((set, get) => ({
     }
 
     return get().languages.find((lang) => lang.id === id);
+  },
+
+  getLanguages: async () => {
+    if (!get().isLoaded) {
+      await get().fetchLanguages();
+    }
+
+    return get().languages;
   },
 }));
