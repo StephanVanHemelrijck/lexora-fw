@@ -13,6 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   newArchEnabled: true,
   ios: {
     supportsTablet: true,
+    bundleIdentifier: 'com.anonymous.mobile',
   },
   android: {
     adaptiveIcon: {
