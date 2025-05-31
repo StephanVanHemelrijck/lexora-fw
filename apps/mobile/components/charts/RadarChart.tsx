@@ -4,6 +4,10 @@ import { RadarChart } from '@salmonco/react-native-radar-chart';
 import { Colors, FontSizes } from '@lexora/styles';
 
 export default function RadarChartComponent({ size = 100 }: { size?: number }) {
+  // ✅ Ensure the size is finite and positive
+  const safeSize = Number.isFinite(size) && size > 0 ? size : 100;
+  const isCompact = safeSize < 120;
+
   const skills = [
     { label: 'Grammar', value: 70 },
     { label: 'Vocab', value: 60 },
@@ -13,37 +17,28 @@ export default function RadarChartComponent({ size = 100 }: { size?: number }) {
   ];
 
   return (
-    <View style={styles.radar}>
+    <View style={{ width: safeSize, height: safeSize }}>
       <RadarChart
         data={skills}
         maxValue={100}
         gradientColor={{
-          startColor: '#ffffff00',
-          endColor: '#ffffff00',
+          startColor: 'rgba(255, 255, 255, 0)',
+          endColor: 'rgba(255, 255, 255, 0)',
           count: 1,
         }}
-        stroke={Array(5).fill('#ffffff00')}
-        strokeWidth={Array(5).fill(1)}
-        strokeOpacity={Array(5).fill(0)}
-        labelColor={size < 120 ? '#ffffff00' : Colors.textLight}
-        labelSize={size < 120 ? 0 : FontSizes.caption} // ✅ Safe fallback
-        labelDistance={1.05}
+        stroke={Array(skills.length).fill('rgba(255, 255, 255, 0)')}
+        strokeWidth={Array(skills.length).fill(1)}
+        strokeOpacity={Array(skills.length).fill(0)}
+        labelColor={isCompact ? 'rgba(255, 255, 255, 0)' : Colors.textLight}
+        labelSize={isCompact ? 0 : FontSizes.caption}
+        labelDistance={1}
         dataFillColor={Colors.accent}
         dataFillOpacity={0.6}
-        // divisionStrokeOpacity={0}
         dataStroke={Colors.accent}
         dataStrokeWidth={2}
         isCircle
-        size={size}
+        size={safeSize}
       />
     </View>
   );
 }
-
-const styles = {
-  radar: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-  },
-};

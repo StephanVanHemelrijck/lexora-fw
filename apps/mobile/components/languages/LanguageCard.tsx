@@ -9,23 +9,35 @@ import {
 } from '@lexora/styles';
 import RadarChartComponent from '../charts/RadarChart';
 
-export default function LanguageCard() {
-  return (
-    <View style={styles.card}>
-      <View style={styles.contentRow}>
-        {/* Chart (Left Column) */}
-        <View style={styles.chartWrapper}>
-          <RadarChartComponent size={100} />
-        </View>
+export interface LanguageCardProps {
+  onPress?: () => void;
+}
 
-        {/* Text + Buttons (Right Column) */}
-        <View style={styles.rightColumn}>
-          <Text style={styles.cardTitle}>Spanish</Text>
-          <Text style={styles.cardText}>A2 - Elementary</Text>
-          <Text style={styles.cardText}>11% Complete</Text>
+export default function LanguageCard({ onPress }: LanguageCardProps) {
+  const handleOnPress = () => {
+    if (onPress) {
+      onPress();
+    }
+  };
+
+  return (
+    <TouchableOpacity onPress={handleOnPress}>
+      <View style={styles.card}>
+        <View style={styles.contentRow}>
+          {/* Chart (Left Column) */}
+          <View style={styles.chartWrapper}>
+            <RadarChartComponent size={100} />
+          </View>
+
+          {/* Text + Buttons (Right Column) */}
+          <View style={styles.rightColumn}>
+            <Text style={styles.cardTitle}>Spanish</Text>
+            <Text style={styles.cardText}>A2 - Elementary</Text>
+            <Text style={styles.cardText}>11% Complete</Text>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -34,6 +46,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.main,
     padding: Spacing.m,
     borderRadius: BorderRadius.m,
+    minWidth: 300,
   },
   contentRow: {
     flexDirection: 'row',

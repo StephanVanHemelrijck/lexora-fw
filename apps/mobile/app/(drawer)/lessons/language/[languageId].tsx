@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  FlatList,
-  ViewToken,
-} from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import React, { useEffect } from 'react';
 import { useNavigation } from 'expo-router';
 import RadarChartComponent from '@/components/charts/RadarChart';

@@ -1,30 +1,34 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from 'react-native';
 import React from 'react';
 import DailyChallenge from '@/components/daily/DailyChallenge';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 import LessonCard from '@/components/lessons/LessonCard';
 import LanguageCard from '@/components/languages/LanguageCard';
 import { useRouter } from 'expo-router';
+import { Button } from '@/components/ui/Button';
 
 export default function MyLessons() {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      <DailyChallenge />
+      <View style={styles.dailyGoalWrapper}>
+        <DailyChallenge />
+      </View>
+
+      {/* Upcoming Lessons */}
       <View style={styles.lessonsWrapper}>
         <Text style={styles.upcomingLessonsTitle}>Upcoming Lessons</Text>
-        <TouchableOpacity
-          onPress={() => {
-            router.push({
-              pathname: '/lessons/language/[languageId]',
-              params: { languageId: '1' },
-            });
-          }}
-        >
-          <LessonCard />
-        </TouchableOpacity>
+        <LessonCard />
       </View>
+
+      {/* Languages Learning */}
       <View style={styles.languagesLearningWrapper}>
         <View style={styles.languagesLearnTextWrapper}>
           <Text style={styles.languagesLearningTitle}>Languages Learning</Text>
@@ -33,7 +37,30 @@ export default function MyLessons() {
             learn
           </Text>
         </View>
-        <LanguageCard />
+
+        {/* Scrollable list of LanguageCards (horizontal) */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.languageCardListHorizontal}
+        >
+          <LanguageCard onPress={() => router.push('/lessons/language/1')} />
+          <LanguageCard />
+          <LanguageCard />
+          <LanguageCard />
+        </ScrollView>
+      </View>
+      <View style={styles.buttonWrapper}>
+        <Button
+          text="LEARN A NEW LANGUAGE"
+          onPress={() => {
+            router.push({
+              pathname: '/lessons/language/[languageId]',
+              params: { languageId: '1' },
+            });
+          }}
+          theme="purple"
+        />
       </View>
     </View>
   );
@@ -41,24 +68,27 @@ export default function MyLessons() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: Spacing.screenGutter,
     paddingVertical: Spacing.xl,
     backgroundColor: Colors.surface,
     gap: Spacing.xl,
+  },
+  dailyGoalWrapper: {
+    paddingHorizontal: Spacing.screenGutter,
+  },
+  lessonsWrapper: {
+    gap: Spacing.m,
+    paddingHorizontal: Spacing.screenGutter,
   },
   upcomingLessonsTitle: {
     fontSize: FontSizes.h2,
     fontWeight: 'bold',
     color: Colors.accent,
   },
-  lessonsWrapper: {
-    gap: Spacing.l,
-  },
   languagesLearningWrapper: {
-    gap: Spacing.l,
+    gap: Spacing.m,
   },
   languagesLearnTextWrapper: {
+    paddingHorizontal: Spacing.screenGutter,
     gap: Spacing.s,
   },
   languagesLearningTitle: {
@@ -69,5 +99,14 @@ const styles = StyleSheet.create({
   languagesLearningText: {
     color: Colors.textLight,
     fontSize: FontSizes.body,
+    display: 'none',
+  },
+  languageCardListHorizontal: {
+    flexDirection: 'row',
+    gap: Spacing.m,
+    paddingHorizontal: Spacing.screenGutter,
+  },
+  buttonWrapper: {
+    paddingHorizontal: Spacing.screenGutter,
   },
 });
