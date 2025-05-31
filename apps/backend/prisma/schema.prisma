@@ -10,6 +10,7 @@ datasource db {
 model User {
   uid              String           @id @unique
   nativeLanguage   String           @default("English")
+  dailyMinutes     Int
   assessmentsTaken UserAssessment[]
 
   languageJourneys LanguageJourney[]
@@ -25,7 +26,6 @@ model LanguageJourney {
   startingOption  StartingOption
   placementLevel  String?
   lastActivity    DateTime?
-  routineMinutes  Int
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 }

@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Slider from '@react-native-community/slider';
 import Mascot from '@/components/ui/Mascot';
 import {
   Colors,
@@ -14,36 +13,19 @@ import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 
 const ROUTINE_OPTIONS = [
-  { label: 'Casual', emoji: '🚶', minutes: 5 },
+  { label: 'Very Light', emoji: '🧘', minutes: 5 },
+  { label: 'Casual', emoji: '🚶', minutes: 10 },
   { label: 'Regular', emoji: '🏃', minutes: 15 },
-  { label: 'Intensive', emoji: '🏋️', minutes: 30 },
-  { label: 'Hardcore', emoji: '🔥', minutes: 60 },
-  { label: 'Custom', emoji: '🛠️', minutes: -1 },
+  { label: 'Focused', emoji: '💪', minutes: 30 },
+  { label: 'Intense', emoji: '🔥', minutes: 45 },
+  { label: 'Hardcore', emoji: '⚡', minutes: 60 },
 ];
 
 export default function RoutineStep() {
   const { nextStep, routineMinutes, setRoutineMinutes } = useOnboardingStore();
-  const [customMinutes, setCustomMinutes] = useState(10);
-
-  const selectedMinutes = useMemo(() => {
-    const match = ROUTINE_OPTIONS.find((opt) => opt.minutes === routineMinutes);
-    return match ? routineMinutes : -1;
-  }, [routineMinutes]);
-
-  const isCustomSelected = selectedMinutes === -1;
-  const effectiveMinutes = isCustomSelected ? customMinutes : routineMinutes;
-
-  const handleSelect = (minutes: number) => {
-    if (minutes === -1) {
-      setRoutineMinutes(-1); // triggers custom slider
-    } else {
-      setRoutineMinutes(minutes);
-    }
-  };
 
   const handleNextStep = () => {
-    if (!effectiveMinutes) return;
-    setRoutineMinutes(effectiveMinutes);
+    if (!routineMinutes) return;
     nextStep();
   };
 
@@ -63,46 +45,29 @@ export default function RoutineStep() {
         {ROUTINE_OPTIONS.map(({ label, emoji, minutes }) => (
           <TouchableOpacity
             key={label}
-            onPress={() => handleSelect(minutes)}
+            onPress={() => setRoutineMinutes(minutes)}
             style={[
               styles.card,
-              selectedMinutes === minutes && styles.cardSelected,
+              routineMinutes === minutes && styles.cardSelected,
             ]}
           >
             <Text
               style={[
                 styles.cardText,
-                selectedMinutes === minutes && styles.cardTextSelected,
+                routineMinutes === minutes && styles.cardTextSelected,
               ]}
             >
-              {emoji} {label}
-              {minutes > 0 && ` – ${minutes} min`}
+              {emoji} {label} – {minutes} min
             </Text>
           </TouchableOpacity>
         ))}
-
-        {isCustomSelected && (
-          <View style={styles.sliderContainer}>
-            <Text style={styles.sliderLabel}>{customMinutes} min</Text>
-            <Slider
-              minimumValue={5}
-              maximumValue={120}
-              step={5}
-              value={customMinutes}
-              onValueChange={setCustomMinutes}
-              minimumTrackTintColor={Colors.accent}
-              maximumTrackTintColor={Colors.disabled}
-              thumbTintColor={Colors.accent}
-            />
-          </View>
-        )}
       </View>
 
       <Button
         onPress={handleNextStep}
         text="CONTINUE"
         theme="purple"
-        disabled={!effectiveMinutes}
+        disabled={!routineMinutes}
       />
     </View>
   );
@@ -144,15 +109,5 @@ const styles = StyleSheet.create({
   cardTextSelected: {
     color: Colors.accent,
     fontWeight: FontWeights.bold,
-  },
-  sliderContainer: {
-    marginTop: Spacing.m,
-    paddingHorizontal: Spacing.s,
-  },
-  sliderLabel: {
-    fontSize: FontSizes.caption,
-    color: Colors.accent,
-    textAlign: 'center',
-    marginBottom: Spacing.s,
   },
 });

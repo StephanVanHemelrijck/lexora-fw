@@ -1,5 +1,5 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import React, { useEffect } from 'react';
+import { View, Image, StyleSheet, Text } from 'react-native';
+import React from 'react';
 import {
   Colors,
   Spacing,
@@ -9,16 +9,9 @@ import {
 } from '@lexora/styles';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
-import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function Page() {
   const router = useRouter();
-
-  const { user } = useAuthStore();
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   return (
     <View style={styles.container}>
@@ -83,6 +76,7 @@ const styles = StyleSheet.create({
   buttons: {
     marginBottom: Spacing.xl,
     alignItems: 'center',
+    gap: Spacing.l,
   },
   getStarted: {
     backgroundColor: Colors.accent,

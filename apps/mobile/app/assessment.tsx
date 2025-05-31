@@ -13,7 +13,6 @@ import {
   FontWeights,
   Spacing,
 } from '@lexora/styles';
-import { api } from '@lexora/api-client';
 import { Assessment, QuestionItem } from '@lexora/types';
 import { extractAndShuffleQuestions } from '@lexora/utils';
 

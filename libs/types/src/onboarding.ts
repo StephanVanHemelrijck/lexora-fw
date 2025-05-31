@@ -12,7 +12,7 @@ export interface OnboardingSummary {
   selectedLanguage: Language | null;
   learningReasons: string[];
   routineMinutes: number;
-  startingOption: StartingOptions;
+  startingOption: StartingOptions | null;
 }
 
 export interface SaveOnboardingPayload {
@@ -22,7 +22,7 @@ export interface SaveOnboardingPayload {
   selectedLanguageId: string;
   learningReasons: string[];
   routineMinutes: number;
-  startingOption: StartingOptions;
+  startingOption: StartingOptions | null;
 }
 
 export interface SaveOnboardingResponse {
@@ -36,7 +36,7 @@ export interface SaveOnboardingResponse {
     languageId: string;
     learningReasons: string[];
     routineMinutes: number;
-    startingOption: StartingOptions;
+    startingOption: StartingOptions | null;
   };
 }
 

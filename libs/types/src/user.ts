@@ -5,5 +5,6 @@ export interface User {
   email: string;
   displayName: string;
   accessToken: string;
-  languageJourney?: LanguageJourney;
+  dailyMinutes: number;
+  languageJourneys?: LanguageJourney[];
 }
