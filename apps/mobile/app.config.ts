@@ -19,6 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
+    package: 'com.anonymous.mobile',
   },
   web: {
     bundler: 'metro',
