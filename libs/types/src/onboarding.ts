@@ -1,4 +1,5 @@
 import { Language } from './language';
+import { User } from './user';
 
 export enum StartingOptions {
   scratch = 'scratch',
@@ -27,17 +28,7 @@ export interface SaveOnboardingPayload {
 
 export interface SaveOnboardingResponse {
   message: string;
-  token: string;
-  user: {
-    uid: string;
-    nativeLanguageId: string;
-  };
-  languageJourney: {
-    languageId: string;
-    learningReasons: string[];
-    routineMinutes: number;
-    startingOption: StartingOptions | null;
-  };
+  user: User;
 }
 
 // map function

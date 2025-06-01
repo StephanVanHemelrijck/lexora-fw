@@ -28,10 +28,12 @@ export default function Page() {
   }, [languageId]);
 
   useEffect(() => {
+    if (!language?.name) return;
+
     navigation.setOptions({
       title: `My Lessons - ${language?.name}`,
     });
-  }, [navigation]);
+  }, [navigation, language]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
