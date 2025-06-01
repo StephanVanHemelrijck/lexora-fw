@@ -33,11 +33,16 @@ export default function LanguageSelectionStep() {
 
   useEffect(() => {
     const resolve = async () => {
-      console.log('getLanguages');
+      try {
+        console.log('getLanguages');
 
-      const langs = await api.languages.getSupportedLanguages();
+        const langs = await api.languages.getSupportedLanguages();
 
-      setLangauges(langs);
+        setLangauges(langs);
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
     };
 
     resolve();

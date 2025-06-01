@@ -3,7 +3,12 @@ import { Language } from '@lexora/types';
 
 export const languages = {
   getSupportedLanguages: async () => {
-    const res = await api.get<Language[]>('/languages/supported');
-    return res.data;
+    try {
+      const res = await api.get<Language[]>('/languages/supported');
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   },
 };
