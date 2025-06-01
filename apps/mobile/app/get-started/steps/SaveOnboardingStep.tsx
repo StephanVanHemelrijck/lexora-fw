@@ -44,7 +44,7 @@ export default function SaveOnboardingStep() {
 
       if (latestLanguageJourney) {
         router.push({
-          pathname: '/languages/[languageId]/lessons',
+          pathname: '/lessons/language/[languageId]',
           params: {
             languageId: latestLanguageJourney.languageId,
           },

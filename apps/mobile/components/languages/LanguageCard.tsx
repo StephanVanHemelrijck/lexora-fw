@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BorderRadius,
   Colors,
@@ -8,12 +8,36 @@ import {
   Spacing,
 } from '@lexora/styles';
 import RadarChartComponent from '../charts/RadarChart';
+import { Language } from '@lexora/types';
+import { useLanguagesStore } from '@/stores/useLanguagesStore';
 
 export interface LanguageCardProps {
   onPress?: () => void;
+  languageId: string;
 }
 
-export default function LanguageCard({ onPress }: LanguageCardProps) {
+export default function LanguageCard({
+  onPress,
+  languageId,
+}: LanguageCardProps) {
+  const [language, setLanguage] = useState<Language>();
+
+  const { getLanguageById } = useLanguagesStore();
+
+  useEffect(() => {
+    const resolve = async () => {
+      try {
+        const lang = await getLanguageById(languageId);
+        setLanguage(lang);
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    };
+
+    resolve();
+  }, [languageId, getLanguageById]);
+
   const handleOnPress = () => {
     if (onPress) {
       onPress();
@@ -31,7 +55,9 @@ export default function LanguageCard({ onPress }: LanguageCardProps) {
 
           {/* Text + Buttons (Right Column) */}
           <View style={styles.rightColumn}>
-            <Text style={styles.cardTitle}>Spanish</Text>
+            <Text style={styles.cardTitle}>
+              {language?.flagEmoji} {language?.name}
+            </Text>
             <Text style={styles.cardText}>A2 - Elementary</Text>
             <Text style={styles.cardText}>11% Complete</Text>
           </View>
