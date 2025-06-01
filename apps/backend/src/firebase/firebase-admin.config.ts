@@ -1,8 +1,14 @@
 // apps/backend/src/firebase/firebase-admin.config.ts
 import * as admin from 'firebase-admin';
-import serviceAccount from '../secrets/lexora-be481-firebase-adminsdk-fbsvc-07a70221c8.json';
+import * as fs from 'fs';
 
-console.log('serviceAccount', serviceAccount);
+const path = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+if (!path) {
+  throw new Error('Missing GOOGLE_APPLICATION_CREDENTIALS in env');
+}
+
+const serviceAccount = JSON.parse(fs.readFileSync(path, 'utf-8'));
 
 if (!admin.apps.length) {
   admin.initializeApp({
