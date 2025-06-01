@@ -19,7 +19,7 @@ export default function MyLessons() {
   return (
     <View style={styles.container}>
       <View style={styles.dailyGoalWrapper}>
-        <DailyChallenge current={0} goal={user!.dailyMinutes} />
+        <DailyChallenge current={0} goal={user?.dailyMinutes ?? 0} />
       </View>
 
       {/* Upcoming Lessons */}
@@ -44,7 +44,7 @@ export default function MyLessons() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.languageCardListHorizontal}
         >
-          {user!.languageJourneys?.map((languageJourney) => (
+          {user?.languageJourneys?.map((languageJourney) => (
             <LanguageCard
               key={languageJourney.languageId}
               onPress={() => {

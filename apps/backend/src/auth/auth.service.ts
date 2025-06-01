@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { OnboardingDto } from './dto/onboarding.dto';
-import { FirebaseAdminError } from '@lexora/types';
+import { FirebaseAdminError, SaveOnboardingResponse } from '@lexora/types';
 
 @Injectable()
 export class AuthService {
@@ -69,23 +69,30 @@ export class AuthService {
         this.prisma.languageJourney.create({ data: languageJourneyData }),
       ]);
 
-      // return object
-      const returnObject = {
-        message: 'Onboarding successful',
-        token,
-        user: {
-          uid: userData.uid,
-          nativeLanguageId: userData.nativeLanguageId,
-          dailyMinutes: userData.dailyMinutes,
+      const user = await this.prisma.user.findUnique({
+        where: { uid: firebaseUid },
+        include: {
+          languageJourneys: {
+            include: { language: true },
+          },
         },
-        languageJourney: {
-          languageId: languageJourneyData.languageId,
-          learningReasons: languageJourneyData.learningReasons,
-          startingOption: languageJourneyData.startingOption,
-        },
-      };
+      });
 
-      return returnObject;
+      if (!user) {
+        throw new InternalServerErrorException(
+          'Failed to fetch user after onboarding.'
+        );
+      }
+
+      return {
+        message: 'Onboarding completed successfully.',
+        user: {
+          ...user,
+          displayName: dto.displayName,
+          email: dto.email,
+          accessToken: token,
+        },
+      } satisfies SaveOnboardingResponse;
     } catch (error: unknown) {
       // Cleanup Firebase user if it was created
       if (firebaseUid) {

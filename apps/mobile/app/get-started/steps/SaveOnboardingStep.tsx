@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { authService } from '@lexora/auth';
 
 export default function SaveOnboardingStep() {
-  const { getOnboardingSummary, resetAll, password, email, displayName } =
+  const { getOnboardingSummary, resetAll, password, email } =
     useOnboardingStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,37 +25,37 @@ export default function SaveOnboardingStep() {
     try {
       const res = await api.onboarding.save(summary);
 
+      console.log('res user', res.user);
+
       resetAll(); // reset onboarding store
       const credential = await authService.login(email, password);
 
       const accessToken = await credential.user.getIdToken();
       setAuth({
+        accessToken: res.user.accessToken ?? accessToken,
+        dailyMinutes: res.user.dailyMinutes,
+        languageJourneys: res.user.languageJourneys,
         uid: res.user.uid,
-        email,
-        displayName,
-        accessToken,
+        email: res.user.email,
+        displayName: res.user.displayName,
       });
 
-      router.push({
-        pathname: '/languages/[languageId]/lessons',
-        params: {
-          languageId: res.languageJourney.languageId,
-        },
-      });
+      const latestLanguageJourney = res.user.languageJourneys?.[0];
+
+      if (latestLanguageJourney) {
+        router.push({
+          pathname: '/languages/[languageId]/lessons',
+          params: {
+            languageId: latestLanguageJourney.languageId,
+          },
+        });
+      }
     } catch (e: any) {
       setError(e.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
-  }, [
-    getOnboardingSummary,
-    router,
-    password,
-    email,
-    resetAll,
-    setAuth,
-    displayName,
-  ]);
+  }, [getOnboardingSummary, router, password, email, resetAll, setAuth]);
 
   useEffect(() => {
     saveOnboarding();

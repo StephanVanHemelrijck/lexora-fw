@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Mascot from '@/components/ui/Mascot';
 import {
   BorderRadius,
@@ -19,15 +19,29 @@ import { api } from '@lexora/api-client';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
 import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
+import { Language } from '@lexora/types';
 
 export default function LanguageSelectionStep() {
-  const { languages } = useLanguagesStore();
+  const { getLanguages } = useLanguagesStore();
   const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
+  const [languages, setLangauges] = useState<Language[]>([]);
 
   const handleNextStep = () => {
     if (!selectedLanguage) return;
     nextStep();
   };
+
+  useEffect(() => {
+    const resolve = async () => {
+      console.log('getLanguages');
+
+      const langs = await api.languages.getSupportedLanguages();
+
+      setLangauges(langs);
+    };
+
+    resolve();
+  }, [getLanguages]);
 
   return (
     <View style={styles.container}>
