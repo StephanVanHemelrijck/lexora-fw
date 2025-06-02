@@ -1,5 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserAssessment } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { Language, UserAssessment } from '@prisma/client';
 import { Answer, SubmitAssessmentDto } from './dto/submit-assessment.dto';
 import { QuestionItem } from '@lexora/types';
 import { AssessmentResult } from './interfaces/resultJson.interface';
@@ -7,6 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { AssessmentService } from '../assessment/assessment.service';
 import { GptService } from '../gpt/gpt.service';
+import { AssessmentJson } from '../assessment/interfaces/assessmentJson.interface';
 
 @Injectable()
 export class UserAssessmentService {
@@ -16,6 +21,47 @@ export class UserAssessmentService {
     private readonly assessmentService: AssessmentService,
     private readonly gptService: GptService
   ) {}
+
+  async getOrCreateUserAssessment(
+    uid: string,
+    languageId: string,
+    nativeLanguage = 'English'
+  ): Promise<UserAssessment> {
+    try {
+      const targetLanguage = await this.prisma.language.findFirst({
+        where: { id: languageId },
+      });
+
+      if (!targetLanguage) {
+        throw new BadRequestException('Language not found');
+      }
+
+      const existingUserAssessment = await this.prisma.userAssessment.findFirst(
+        {
+          where: { userId: uid, assessment: { languageId: languageId } },
+          include: { assessment: true },
+        }
+      );
+
+      if (existingUserAssessment) {
+        return existingUserAssessment;
+      }
+
+      const newAssessment = await this.generateNewAssessmentForUser(
+        uid,
+        targetLanguage,
+        nativeLanguage
+      );
+
+      if (!newAssessment) {
+        throw new BadRequestException('User assessment not found');
+      }
+
+      return newAssessment;
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
 
   /**
    * Get latest user assessment
@@ -134,5 +180,88 @@ ${JSON.stringify(annotatedQuestions)}
     //   level: result.level,
     //   feedback: result.feedback,
     // };
+  }
+
+  /**
+   * Helper method to generate a fresh assessment and assign it to user
+   * @param userId ID of the user
+   * @param targetLanguage Target language for the assessment
+   * @param nativeLanguage (optional) Default to 'English'
+   */
+  private async generateNewAssessmentForUser(
+    userId: string,
+    targetLanguage: Language,
+    nativeLanguage: string
+  ): Promise<UserAssessment> {
+    const prompt = `
+  You are a test generator.
+  
+  Create a ${targetLanguage.name} language test (A2–C2 level). Learner's native language: ${nativeLanguage}.
+  
+  Requirements:
+  - Total: 15 to 20 questions
+  - Structure:
+    - 5 vocabulary_multiple_choice
+    - 5 grammar_multiple_choice
+    - 3 fill_in_the_blank
+    - 1 reading_comprehension
+    - 1 writing_prompt
+  - Do not exceed 1 reading_comprehension and 1 writing_prompt
+  - Questions in ${nativeLanguage}, answers in ${targetLanguage}
+  - Keep content short and clear
+  
+  Return only a JSON array, no text, no comments. Each item must follow:
+  
+  { "type": "question_type", "data": { ... } }
+  
+  Allowed types:
+  - vocabulary_multiple_choice: { "question": "...", "options": ["A", "B", "C", "D"], "correct_answer": "A" }
+  - grammar_multiple_choice: same as above
+  - fill_in_the_blank: { "sentence": "... ____ ...", "correct_answers": ["..."], "hint": "...", "expected_translation": "..." }
+  - reading_comprehension: { "paragraph": "...", "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correct_answer": "A" } ] }
+  - writing_prompt: { "prompt": "...", "expected_length": "..." }
+  
+  Output only valid JSON array of 15–20 items.
+  `;
+
+    const gptResponse = await this.gptService.getGptResponse([
+      {
+        role: 'system',
+        content: 'You create only valid JSON formatted language tests.',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ]);
+
+    let cleanedGptResponse: AssessmentJson;
+
+    try {
+      cleanedGptResponse = JSON.parse(
+        this.gptService.cleanGptJsonResponse(gptResponse)
+      ) as AssessmentJson;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to parse assessment JSON');
+    }
+
+    const assessment = await this.prisma.assessment.create({
+      data: {
+        languageId: targetLanguage.id,
+        questions: cleanedGptResponse,
+      },
+    });
+
+    const userAssessment = await this.prisma.userAssessment.create({
+      data: {
+        userId,
+        assessmentId: assessment.id,
+        status: 'PENDING',
+      },
+      include: { assessment: true },
+    });
+
+    return userAssessment;
   }
 }

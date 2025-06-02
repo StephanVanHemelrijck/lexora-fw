@@ -53,7 +53,7 @@ export class AssessmentService {
 
     if (existingUserAssessment) {
       // If user has assessment, generate a new one (to prevent retaking same test)
-      return this.generateNewAssessmentForUser(userId, language);
+      return this.generateNewAssessmentForUser(userId, language, 'English');
     }
 
     // 2. No UserAssessment yet -> Try finding an existing Assessment
@@ -76,7 +76,7 @@ export class AssessmentService {
     }
 
     // 3. No assessments exist at all -> Generate a new one
-    return this.generateNewAssessmentForUser(userId, language);
+    return this.generateNewAssessmentForUser(userId, language, 'English');
   }
 
   /**
@@ -88,7 +88,7 @@ export class AssessmentService {
   private async generateNewAssessmentForUser(
     userId: string,
     targetLanguage: string,
-    nativeLanguage: string = 'English'
+    nativeLanguage: string
   ) {
     const prompt = `
 You are a test generator.

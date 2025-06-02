@@ -25,9 +25,6 @@ export default function SaveOnboardingStep() {
     try {
       const res = await api.onboarding.save(summary);
 
-      console.log('res user', res.user);
-
-      resetAll(); // reset onboarding store
       const credential = await authService.login(email, password);
 
       const accessToken = await credential.user.getIdToken();
@@ -43,6 +40,7 @@ export default function SaveOnboardingStep() {
       const latestLanguageJourney = res.user.languageJourneys?.[0];
 
       if (latestLanguageJourney) {
+        resetAll(); // reset onboarding store before redirect
         router.push({
           pathname: '/lessons/language/[languageId]',
           params: {
