@@ -40,7 +40,10 @@ export default function Page() {
 
         setLanguageJourney(journey);
 
-        if (journey?.startingOption === 'placement') {
+        if (
+          journey?.startingOption === 'placement' &&
+          !journey?.placementLevel
+        ) {
           router.replace({
             pathname: '/lessons/language/[languageId]/assessment',
             params: { languageId },

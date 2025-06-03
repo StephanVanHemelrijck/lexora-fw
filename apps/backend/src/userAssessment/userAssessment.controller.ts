@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserAssessmentService } from './userAssessment.service';
 import { UserAssessment } from '@prisma/client';
-import { SubmitAssessmentDto } from './dto/submit-assessment.dto';
+import type { SubmitAssessmentDto } from './dto/submit-assessment.dto';
 import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
 import { User } from '../decorators/user.decorator';
 import type { FirebaseUser } from '../types/firebase-user';

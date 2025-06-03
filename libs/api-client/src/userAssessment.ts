@@ -1,4 +1,4 @@
-import { UserAssessment } from '@lexora/types';
+import { SubmitAssessmentDto, UserAssessment } from '@lexora/types';
 import { api } from './api.ts';
 
 export const userAssessment = {
@@ -11,6 +11,21 @@ export const userAssessment = {
         }
       );
 
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+  submit: async (token: string, data: SubmitAssessmentDto) => {
+    try {
+      const res = await api.post<UserAssessment>(
+        `/user-assessment/submit`,
+        data,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       return res.data;
     } catch (err) {
       console.error(err);

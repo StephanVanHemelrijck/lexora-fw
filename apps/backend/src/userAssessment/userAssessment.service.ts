@@ -12,6 +12,7 @@ import { UserService } from '../user/user.service';
 import { AssessmentService } from '../assessment/assessment.service';
 import { GptService } from '../gpt/gpt.service';
 import { AssessmentJson } from '../assessment/interfaces/assessmentJson.interface';
+import { LanguageJourneyService } from '../languageJourney/languageJourney.service';
 
 @Injectable()
 export class UserAssessmentService {
@@ -19,7 +20,8 @@ export class UserAssessmentService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly assessmentService: AssessmentService,
-    private readonly gptService: GptService
+    private readonly gptService: GptService,
+    private readonly languageJourneyService: LanguageJourneyService
   ) {}
 
   async getOrCreateUserAssessment(
@@ -93,27 +95,31 @@ export class UserAssessmentService {
   }
 
   async submitAssessment(dto: SubmitAssessmentDto) {
-    // 1. Validate user and assessment
+    console.log('[BACKEND] from submit assessment', dto);
+
     const user = await this.userService.findByUid(dto.uid);
     const assessment = await this.assessmentService.getAssessmentById(
       dto.assessmentId
     );
     const originalQuestions = assessment.questions as unknown as QuestionItem[];
 
-    // 2. Sort and map user answers by original index
-    const answerMap = new Map<number, Answer>();
+    // Build a map of originalIndex -> user answer (string or object)
+    const answerMap = new Map<number, string | Record<number, string>>();
     for (const ans of dto.answers) {
-      answerMap.set(ans.originalIndex, ans.answer);
+      if ('answer' in ans) {
+        answerMap.set(ans.originalIndex, ans.answer);
+      } else {
+        answerMap.set(ans.originalIndex, ans.answers);
+      }
     }
 
-    // 3. Annotate questions with user answers
+    // Combine user answers with question data
     const annotatedQuestions = originalQuestions.map((question, index) => ({
       ...question,
       index,
       userAnswer: answerMap.get(index) ?? null,
     }));
 
-    // 4. Prepare GPT grading prompt
     const prompt = `
 You are an expert language evaluator.
 
@@ -139,7 +145,6 @@ Here is the data:
 ${JSON.stringify(annotatedQuestions)}
 `;
 
-    // 5. Send to GPT and parse result
     const gptResult = await this.gptService.getGptResponse([
       { role: 'system', content: 'You are an expert language evaluator.' },
       { role: 'user', content: prompt },
@@ -155,31 +160,35 @@ ${JSON.stringify(annotatedQuestions)}
       throw new Error('Grading failed. Please try again.');
     }
 
-    console.log(result);
+    console.log('GPT Result:', result);
 
-    // 6. (Optional) Persist result to database, mark assessment as completed, etc.
-    // await this.prisma.userAssessment.update({
-    //   where: { id: dto.assessmentId },
-    //   data: {
-    //     status: 'COMPLETED',
-    //     completedAt: new Date(),
-    //     score: result.graded.filter((q) => q.correct).length,
-    //     level: result.level,
-    //   },
-    // });
+    // Persist result to DB
+    const UA = await this.prisma.userAssessment.findFirst({
+      where: { userId: user.uid, assessmentId: assessment.id },
+    });
 
-    // 7. Return result (for summary screen)
-    // return {
-    //   summary: annotatedQuestions.map((q, i) => ({
-    //     index: i,
-    //     type: q.type,
-    //     question: q.data,
-    //     userAnswer: q.userAnswer,
-    //     correct: result.graded.find((g) => g.index === i)?.correct ?? false,
-    //   })),
-    //   level: result.level,
-    //   feedback: result.feedback,
-    // };
+    if (!UA) {
+      throw new BadRequestException('User assessment not found');
+    }
+
+    await this.prisma.userAssessment.update({
+      where: { id: UA.id },
+      data: {
+        status: 'COMPLETED',
+        completedAt: new Date(),
+        score: result.graded.filter((q) => q.correct).length,
+        level: result.level,
+      },
+    });
+
+    // update placement level in languagejourney table
+    await this.languageJourneyService.updatePlacementLevel(
+      user.uid,
+      assessment.languageId,
+      result.level.toString()
+    );
+
+    return result;
   }
 
   /**

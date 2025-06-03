@@ -7,5 +7,6 @@ import { PrismaModule } from '../prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [LanguageJourneyController],
   providers: [LanguageJourneyService],
+  exports: [LanguageJourneyService],
 })
 export class LanguageJourneyModule {}

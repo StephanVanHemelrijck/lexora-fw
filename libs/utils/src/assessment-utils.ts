@@ -5,7 +5,6 @@ export function extractAndShuffleQuestions(
 ): QuestionItem[] {
   const { questions } = assessment;
   const shuffledQuestions = shuffleQuestions(questions);
-  console.log('shuffledQuestions', shuffledQuestions);
   return shuffledQuestions;
 }
 

@@ -11,3 +11,21 @@ export interface UserAssessment {
   createdAt: Date;
   assessment: Assessment;
 }
+
+export interface SubmitAssessmentDto {
+  uid: string;
+  assessmentId: string;
+  answers: AnswerItem[];
+}
+
+export type AnswerItem = SimpleAnswer | ReadingAnswer;
+
+export interface SimpleAnswer {
+  originalIndex: number;
+  answer: string;
+}
+
+export interface ReadingAnswer {
+  originalIndex: number;
+  answers: Record<number, string>;
+}
