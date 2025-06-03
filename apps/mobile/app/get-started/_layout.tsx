@@ -7,7 +7,7 @@ import { Icon } from '@/components/ui/Icon';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 
 export default function OnboardingLayout() {
-  const { step, totalSteps, started, prevStep, setStarted } =
+  const { step, totalSteps, started, prevStep, setStarted, completed } =
     useOnboardingStore();
 
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function OnboardingLayout() {
   }, [step, setStarted]);
 
   const handlePrevious = () => {
-    if (step === 0) return router.back();
+    if (step === 0 && !completed) return router.back();
     prevStep();
   };
 

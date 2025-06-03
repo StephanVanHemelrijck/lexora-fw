@@ -21,6 +21,8 @@ export class UserAssessmentController {
     @User() user: FirebaseUser,
     @Param('languageId') languageId: string
   ): Promise<UserAssessment> {
+    console.log('[BACKEND] INSIDE getOrCreateUserAssessment');
+
     return this.userAssessmentService.getOrCreateUserAssessment(
       user.uid,
       languageId
