@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {
   BorderRadius,
@@ -13,22 +14,38 @@ import {
   FontWeights,
   Spacing,
 } from '@lexora/styles';
-import { Assessment, QuestionItem } from '@lexora/types';
 import { extractAndShuffleQuestions } from '@lexora/utils';
-
 import { MultipleChoiceQuestion } from '@/components/assessment/MultipleChoiceQuestion';
 import { FillInTheBlankQuestion } from '@/components/assessment/FillInTheBlankQuestion';
 import WritingPromptQuestion from '@/components/assessment/WritingPromptQuestion';
 import ReadingComprehensionQuestion from '@/components/assessment/ReadingComprehensionQuestion';
 import { ProgressIndicator } from '@/components/ui/ProgessIndicator';
 import { Icon } from '@/components/ui/Icon';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/providers/AuthProvider';
+import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLanguagesStore } from '@/stores/useLanguagesStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { api } from '@lexora/api-client';
+import {
+  Language,
+  QuestionItem,
+  UserAssessment,
+  SubmitAssessmentDto,
+  SimpleAnswer,
+  ReadingAnswer,
+  AnswerItem,
+} from '@lexora/types';
 
-export default function AssessmentScreen() {
+export default function AssessmentPage() {
   const router = useRouter();
-  const { user } = useAuth();
-  const [assessment, setAssessment] = useState<Assessment | null>(null);
+  const navigation = useNavigation();
+  const { languageId } = useLocalSearchParams<{ languageId: string }>();
+  const { user } = useAuthStore();
+  const { getLanguageById } = useLanguagesStore();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [language, setLanguage] = useState<Language>();
+  const [assessment, setAssessment] = useState<UserAssessment | null>(null);
   const [questions, setQuestions] = useState<QuestionItem[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [simpleAnswers, setSimpleAnswers] = useState<Record<number, string>>(
@@ -58,38 +75,31 @@ export default function AssessmentScreen() {
     return !!simpleAnswers[i]?.trim();
   }, [currentQuestion, currentQuestionIndex, simpleAnswers, readingAnswers]);
 
-  const answeredCount = useMemo(() => {
-    return questions.reduce((count, q, i) => {
-      if (q.type === 'reading_comprehension') {
-        const sub = readingAnswers[i];
-        if (
-          sub &&
-          Object.keys(sub).length === q.data.questions.length &&
-          Object.values(sub).every((a) => !!a)
-        ) {
-          return count + 1;
-        }
-      } else if (simpleAnswers[i]) {
-        return count + 1;
-      }
-      return count;
-    }, 0);
-  }, [questions, simpleAnswers, readingAnswers]);
+  useEffect(() => {
+    if (!languageId) return;
+    getLanguageById(languageId).then(setLanguage).catch(console.error);
+  }, [languageId, getLanguageById]);
 
   useEffect(() => {
-    if (user?.uid) {
-      // api.get(`/userAssessment/latest/${user.uid}`).then((res) => {
-      //   setAssessment(res.data.assessment);
-      // });
-    }
-  }, [user]);
+    if (!user || !language) return;
+    api.userAssessment
+      .getActiveOrCreate(user.accessToken, language.id)
+      .then(setAssessment)
+      .catch(console.error);
+  }, [user, language]);
 
   useEffect(() => {
-    if (assessment) {
-      setQuestions(extractAndShuffleQuestions(assessment));
+    if (assessment?.assessment?.questions) {
+      setQuestions(extractAndShuffleQuestions(assessment.assessment));
       setCurrentQuestionIndex(0);
     }
   }, [assessment]);
+
+  useEffect(() => {
+    if (language) {
+      navigation.setOptions({ title: `${language.name} - Assessment` });
+    }
+  }, [language, navigation]);
 
   const handleSimpleAnswer = (answer: string) => {
     setSimpleAnswers((prev) => ({ ...prev, [currentQuestionIndex]: answer }));
@@ -105,30 +115,48 @@ export default function AssessmentScreen() {
     }));
   };
 
-  const prepareSubmission = () => {
-    const answers = questions.map((q, i) => {
+  const prepareSubmission = (): SubmitAssessmentDto | null => {
+    if (!assessment || !user) return null;
+
+    const answers: AnswerItem[] = questions.map((q, i) => {
       if (q.type === 'reading_comprehension') {
         return {
           originalIndex: q.originalIndex,
           answers: readingAnswers[i] || {},
         };
       }
-      return { originalIndex: q.originalIndex, answer: simpleAnswers[i] };
+
+      return {
+        originalIndex: q.originalIndex,
+        answer: simpleAnswers[i] ?? '',
+      };
     });
 
     return {
-      assessmentId: assessment?.id,
-      uid: user?.uid,
+      assessmentId: assessment.assessmentId,
+      uid: user.uid,
       answers,
     };
   };
 
-  const handleSubmitAssessment = () => {
+  const handleSubmitAssessment = async () => {
     const data = prepareSubmission();
-    // api
-    //   .post('/userAssessment/submit', data)
-    //   .then(() => console.log('Submitted'))
-    //   .catch(console.error);
+    if (!data || !user || isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      await api.userAssessment.submit(user.accessToken, data);
+      // optionally navigate or show a confirmation here
+      router.push({
+        pathname: '/lessons/language/[languageId]',
+        params: { languageId },
+      });
+    } catch (error) {
+      console.error('Submission failed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderQuestion = () => {
@@ -176,9 +204,17 @@ export default function AssessmentScreen() {
     }
   };
 
+  if (!assessment) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <View style={[styles.topBar]}>
+      <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
             if (currentQuestionIndex > 0) {
@@ -233,11 +269,15 @@ export default function AssessmentScreen() {
             onPress={handleSubmitAssessment}
             style={[
               styles.nextButton,
-              !isCurrentQuestionAnswered && { opacity: 0.5 },
+              (!isCurrentQuestionAnswered || isSubmitting) && { opacity: 0.5 },
             ]}
-            disabled={!isCurrentQuestionAnswered}
+            disabled={!isCurrentQuestionAnswered || isSubmitting}
           >
-            <Text style={styles.nextButtonText}>SUBMIT</Text>
+            {isSubmitting ? (
+              <ActivityIndicator color={Colors.textDark} />
+            ) : (
+              <Text style={styles.nextButtonText}>SUBMIT</Text>
+            )}
           </TouchableOpacity>
         )}
       </View>

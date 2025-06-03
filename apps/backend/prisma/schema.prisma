@@ -37,7 +37,8 @@ enum StartingOption {
 
 model Assessment {
   id              String           @id @default(uuid())
-  language        String
+  languageId      String
+  language        Language         @relation(fields: [languageId], references: [id])
   questions       Json
   createdAt       DateTime         @default(now())
   userAssessments UserAssessment[]
@@ -78,4 +79,5 @@ model Language {
   updatedAt  DateTime @updatedAt
 
   languageJourneys LanguageJourney[]
+  Assessments      Assessment[]
 }

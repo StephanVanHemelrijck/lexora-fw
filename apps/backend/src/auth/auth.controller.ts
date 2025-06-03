@@ -5,6 +5,7 @@ import { OnboardingDto } from './dto/onboarding.dto';
 import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
 import { User } from '../decorators/user.decorator';
 import type { FirebaseUser } from '../types/firebase-user';
+import { getAuth } from 'firebase-admin/auth';
 
 @Controller('auth')
 export class AuthController {
