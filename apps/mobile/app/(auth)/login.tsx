@@ -74,11 +74,11 @@ export default function Login() {
     }
   }, [email, password]);
 
-  useEffect(() => {
-    if (user) {
-      router.push('/home');
-    }
-  }, [user, router]);
+  // useEffect(() => {
+  //   if (user) {
+  //     router.push('/home');
+  //   }
+  // }, [user, router]);
 
   return (
     <View style={styles.container}>

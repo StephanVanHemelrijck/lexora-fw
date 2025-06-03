@@ -18,7 +18,6 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (!user) {
       router.replace('/');
     }
-    if (user) router.replace('/(drawer)/home');
   }, [user, loading, router, mounted]);
 
   // If user is not logged in, redirect to login page

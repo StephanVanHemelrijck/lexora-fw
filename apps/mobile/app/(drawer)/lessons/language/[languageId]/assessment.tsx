@@ -82,6 +82,8 @@ export default function AssessmentPage() {
 
   useEffect(() => {
     if (!user || !language) return;
+    console.log('[ASSESSMENT]', user.accessToken);
+
     api.userAssessment
       .getActiveOrCreate(user.accessToken, language.id)
       .then(setAssessment)

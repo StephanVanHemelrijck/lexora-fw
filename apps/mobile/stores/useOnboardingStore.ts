@@ -6,10 +6,12 @@ interface OnboardingState {
   step: number;
   totalSteps: number;
   started: boolean;
+  completed: boolean;
 
   setStep: (step: number) => void;
   setStarted: (started: boolean) => void;
   setTotalSteps: (steps: number) => void;
+  setCompleted: (completed: boolean) => void;
   nextStep: () => void;
   prevStep: () => void;
   resetSteps: () => void;
@@ -51,6 +53,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
   step: 0,
   totalSteps: 0,
   started: false,
+  completed: false,
   setStep: (step) => set({ step }),
   setStarted: (started) => set({ started }),
   setTotalSteps: (steps) => set({ totalSteps: steps }),
@@ -68,6 +71,9 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
   // Language
   selectedLanguage: null,
   setLanguage: (language) => set({ selectedLanguage: language }),
+
+  // Completed
+  setCompleted: (completed) => set({ completed }),
 
   // Reasons
   learningReasons: [],

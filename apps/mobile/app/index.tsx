@@ -1,5 +1,5 @@
 import { View, Image, StyleSheet, Text } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Colors,
   Spacing,
@@ -9,9 +9,17 @@ import {
 } from '@lexora/styles';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function Page() {
   const router = useRouter();
+  const { user } = useAuthStore();
+
+  // useEffect(() => {
+  //   if (user) {
+  //     router.replace('/(drawer)/home');
+  //   }
+  // }, [user, router]);
 
   return (
     <View style={styles.container}>
