@@ -17,8 +17,13 @@ export const useLanguagesStore = create<LanguagesState>((set, get) => ({
   fetchLanguages: async () => {
     if (get().isLoaded) return;
 
-    const res = await api.languages.getSupportedLanguages(); // your backend fetch call
-    set({ languages: res, isLoaded: true });
+    try {
+      const res = await api.languages.getSupportedLanguages();
+      set({ languages: res, isLoaded: true });
+    } catch (err) {
+      console.error('[LanguagesStore] Failed to fetch languages', err);
+      set({ languages: [], isLoaded: false });
+    }
   },
 
   getLanguageById: async (id: string) => {

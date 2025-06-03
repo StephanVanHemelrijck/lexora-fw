@@ -15,7 +15,6 @@ import {
   MascotSizes,
   Spacing,
 } from '@lexora/styles';
-import { api } from '@lexora/api-client';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
 import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
@@ -24,7 +23,8 @@ import { Language } from '@lexora/types';
 export default function LanguageSelectionStep() {
   const { getLanguages } = useLanguagesStore();
   const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
-  const [languages, setLangauges] = useState<Language[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleNextStep = () => {
     if (!selectedLanguage) return;
@@ -32,27 +32,24 @@ export default function LanguageSelectionStep() {
   };
 
   useEffect(() => {
-    const resolve = async () => {
+    const loadLanguages = async () => {
       try {
-        console.log('getLanguages');
-
-        const langs = await api.languages.getSupportedLanguages();
-
-        setLangauges(langs);
+        const langs = await getLanguages();
+        setLanguages(langs);
       } catch (err) {
-        console.error(err);
-        throw err;
+        console.error('[LanguageSelection] Failed to load languages', err);
+        setError('Failed to load languages. Please try again.');
       }
     };
 
-    resolve();
+    loadLanguages();
   }, [getLanguages]);
 
   return (
     <View style={styles.container}>
       <View style={styles.mascotWrapper}>
         <Mascot
-          text="Pick the language you want to master!"
+          text={error ? error : 'Pick the language you want to master!'}
           direction="right"
           size={MascotSizes.s}
         />
