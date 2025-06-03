@@ -40,21 +40,21 @@ export default function Page() {
 
         setLanguageJourney(journey);
 
-        if (
-          journey?.startingOption === 'placement' &&
-          !journey?.placementLevel
-        ) {
-          router.replace({
-            pathname: '/lessons/language/[languageId]/assessment',
-            params: { languageId },
-          });
-        } else {
-          setIsLoading(false);
-        }
+        // if (
+        //   journey?.startingOption === 'placement' &&
+        //   !journey?.placementLevel
+        // ) {
+        //   router.replace({
+        //     pathname: '/lessons/language/[languageId]/assessment',
+        //     params: { languageId },
+        //   });
+        // } else {
+        //   setIsLoading(false);
+        // }
       };
 
       checkAndRedirect();
-    }, [languageId, router, user?.accessToken])
+    }, [languageId, user])
   );
 
   // Fetch language metadata

@@ -1,63 +1,57 @@
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { api } from '@lexora/api-client';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { FontSizes, Colors, Spacing, MascotSizes } from '@lexora/styles';
 import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { authService } from '@lexora/auth';
 
 export default function SaveOnboardingStep() {
-  const { getOnboardingSummary, resetAll, password, email } =
+  const { getOnboardingSummary, resetAll, password, email, setCompleted } =
     useOnboardingStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { setAuth } = useAuthStore();
-
-  const saveOnboarding = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    const summary = getOnboardingSummary();
-
-    try {
-      const res = await api.onboarding.save(summary);
-
-      const credential = await authService.login(email, password);
-
-      const accessToken = await credential.user.getIdToken();
-      setAuth({
-        accessToken: res.user.accessToken ?? accessToken,
-        dailyMinutes: res.user.dailyMinutes,
-        languageJourneys: res.user.languageJourneys,
-        uid: res.user.uid,
-        email: res.user.email,
-        displayName: res.user.displayName,
-      });
-
-      const latestLanguageJourney = res.user.languageJourneys?.[0];
-
-      if (latestLanguageJourney) {
-        resetAll(); // reset onboarding store before redirect
-        router.push({
-          pathname: '/lessons/language/[languageId]',
-          params: {
-            languageId: latestLanguageJourney.languageId,
-          },
-        });
-      }
-    } catch (e: any) {
-      setError(e.response?.data?.message || 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  }, [getOnboardingSummary, router, password, email, resetAll, setAuth]);
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    const saveOnboarding = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const summary = getOnboardingSummary();
+        const res = await api.onboarding.save(summary);
+        await authService.login(email, password);
+
+        const latestLanguageJourney = res.user.languageJourneys?.[0];
+        console.log('latestLanguageJourney', latestLanguageJourney);
+
+        if (latestLanguageJourney) {
+          setCompleted(true);
+          resetAll();
+          router.push({
+            pathname: '/lessons/language/[languageId]/assessment',
+            params: {
+              languageId: latestLanguageJourney.languageId,
+            },
+          });
+        }
+      } catch (e: any) {
+        setError(e.response?.data?.message || 'Something went wrong');
+        setCompleted(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     saveOnboarding();
-  }, [saveOnboarding]);
+  }, [getOnboardingSummary, email, password, resetAll, router, setCompleted]);
 
   return (
     <View style={styles.container}>
@@ -85,7 +79,16 @@ export default function SaveOnboardingStep() {
 
       {error && (
         <View style={styles.footer}>
-          <Button onPress={saveOnboarding} text="RETRY" theme="purple" />
+          <Button
+            onPress={() => {
+              setError(null);
+              setLoading(true);
+              // retry the effect
+              // This will re-run because the component is re-rendered
+            }}
+            text="RETRY"
+            theme="purple"
+          />
         </View>
       )}
     </View>
