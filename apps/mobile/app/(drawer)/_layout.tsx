@@ -141,10 +141,24 @@ export default function DrawerLayout() {
         }}
       />
       <Drawer.Screen
-        name="lessons/language/[languageId]"
+        name="lessons/language/[languageId]/index"
         options={{
           drawerItemStyle: { display: 'none' },
           title: 'My Lessons',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+        }}
+      />
+      <Drawer.Screen
+        name="lessons/language/[languageId]/assessment"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          title: 'My Lessons - Assessment',
           drawerActiveTintColor: Colors.accent,
           drawerInactiveTintColor: Colors.textLight,
           drawerInactiveBackgroundColor: Colors.main,

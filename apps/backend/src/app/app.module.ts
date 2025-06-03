@@ -7,6 +7,7 @@ import { AssessmentModule } from '../assessment/assessment.module';
 import { UserAssessmentModule } from '../userAssessment/userAssessment.module';
 import { LanguageModule } from '../language/language.module';
 import { FirebaseModule } from '../firebase/firebase.module';
+import { LanguageJourneyModule } from '../languageJourney/languageJourney.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FirebaseModule } from '../firebase/firebase.module';
     UserAssessmentModule,
     LanguageModule,
     FirebaseModule,
+    LanguageJourneyModule,
   ],
 })
 export class AppModule {}

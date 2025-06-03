@@ -1,6 +1,8 @@
 import { languages } from './language.ts';
+import { languageJourney } from './languageJourney.ts';
 import { onboarding } from './onboarding.ts';
 import { user } from './user.ts';
+import { userAssessment } from './userAssessment.ts';
 
 export * from './api.ts';
 
@@ -8,4 +10,6 @@ export const api = {
   languages,
   onboarding,
   user,
+  languageJourney,
+  userAssessment,
 };

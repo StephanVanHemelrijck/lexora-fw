@@ -21,6 +21,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { isAxiosError } from 'axios';
+import { FirebaseError } from 'firebase/app';
 
 export default function Login() {
   const { setAuth } = useAuthStore();
@@ -60,10 +61,8 @@ export default function Login() {
           setError(`Error: ${e.message}`);
         }
       } else {
-        setError('An unexpected error occurred.');
+        setError(`Error: ${e}`);
       }
-
-      alert(error); // Optional: only keep for dev/debugging
     } finally {
       setLoading(false);
     }
@@ -200,7 +199,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: FontSizes.body,
     textAlign: 'center',
-    marginTop: Spacing.m,
+    marginBottom: Spacing.l,
   },
   forgotPasswordText: {
     marginTop: Spacing.xl,

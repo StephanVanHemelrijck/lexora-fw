@@ -1,21 +1,66 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import RadarChartComponent from '@/components/charts/RadarChart';
 import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
-import { Language } from '@lexora/types';
+import { Language, LanguageJourney } from '@lexora/types';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { api } from '@lexora/api-client';
+import { useFocusEffect } from '@react-navigation/native';
 
 const dummyData = Array.from({ length: 10 }, (_, i) => ({ id: i }));
 
 export default function Page() {
   const navigation = useNavigation();
   const { languageId } = useLocalSearchParams<{ languageId: string }>();
-  const [language, setLanguage] = useState<Language | undefined>(undefined);
+  const [language, setLanguage] = useState<Language | undefined>();
+  const [languageJourney, setLanguageJourney] = useState<LanguageJourney>();
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
+  const router = useRouter();
 
+  useFocusEffect(
+    useCallback(() => {
+      const checkAndRedirect = async () => {
+        if (!user?.accessToken || !languageId) return;
+
+        const journey = await api.languageJourney.findByLanguageId(
+          user.accessToken,
+          languageId
+        );
+
+        setLanguageJourney(journey);
+
+        if (
+          journey?.startingOption === 'placement' &&
+          !journey?.placementLevel
+        ) {
+          router.replace({
+            pathname: '/lessons/language/[languageId]/assessment',
+            params: { languageId },
+          });
+        } else {
+          setIsLoading(false);
+        }
+      };
+
+      checkAndRedirect();
+    }, [languageId, router, user?.accessToken])
+  );
+
+  // Fetch language metadata
   useEffect(() => {
+    if (!languageId) return;
+
     const resolve = async () => {
       const lang = await useLanguagesStore
         .getState()
@@ -27,24 +72,36 @@ export default function Page() {
     resolve();
   }, [languageId]);
 
+  // Set drawer title
   useEffect(() => {
     if (!language?.name) return;
 
     navigation.setOptions({
-      title: `My Lessons - ${language?.name}`,
+      title: `My Lessons - ${language.name}`,
     });
   }, [navigation, language]);
+
+  // Loading screen during redirect
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <View style={styles.languageInfo}>
+        <View>
           <Text style={styles.nativeLanguageName}>{language?.nativeName}</Text>
           <Text style={styles.languageTitle}>
             {language?.flagEmoji} {language?.name}
           </Text>
-          <Text style={styles.languageLevel}>A2 - Elementary</Text>
+          <Text style={styles.languageLevel}>
+            {languageJourney?.placementLevel ?? 'N/A'}
+          </Text>
         </View>
         <RadarChartComponent size={150} />
       </View>
@@ -73,7 +130,6 @@ export default function Page() {
         </View>
       </View>
 
-      {/* AI Practice */}
       <Button text="PRACTICE WITH AI" onPress={() => {}} theme="purple" />
 
       {/* Completed Modules */}
@@ -151,9 +207,15 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
   },
   scrollableCardList: {
-    maxHeight: 260, // roughly fits 3 LessonCards with spacing
+    maxHeight: 260,
   },
   scrollView: {
     gap: Spacing.m,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

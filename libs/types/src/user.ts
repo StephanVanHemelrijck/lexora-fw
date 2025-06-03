@@ -1,4 +1,4 @@
-import { LanguageJourney } from './language';
+import { LanguageJourney } from './languageJourney';
 
 export interface User {
   uid: string;
