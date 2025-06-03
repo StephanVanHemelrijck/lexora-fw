@@ -9,16 +9,19 @@ import {
 } from '@lexora/styles';
 import { UserAssessment } from '@lexora/types';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function AssessmentPage() {
   const { user } = useAuthStore();
   const { languageId } = useLocalSearchParams<{ languageId: string }>();
   const [userAssessment, setUserAssessment] = useState<UserAssessment>();
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!user || !languageId) return;
+    if (!user || !languageId || hasFetchedRef.current) return;
+
+    hasFetchedRef.current = true;
 
     console.log('[ASSESSMENT: UID]', user.uid);
     console.log('[ASSESSMENT: LANGUAGE_ID]', languageId);
@@ -28,7 +31,10 @@ export default function AssessmentPage() {
     api.userAssessment
       .getActiveOrCreate(user.accessToken, languageId)
       .then(setUserAssessment)
-      .catch(console.error);
+      .catch((err) => {
+        console.error('[ASSESSMENT]: Failed', err);
+        hasFetchedRef.current = false; // optionally allow retry
+      });
 
     console.log('[ASSESSMENT]: Fetched assessment');
   }, [user, languageId]);

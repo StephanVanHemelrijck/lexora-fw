@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Mascot from '@/components/ui/Mascot';
 import {
   BorderRadius,
@@ -15,16 +15,16 @@ import {
   MascotSizes,
   Spacing,
 } from '@lexora/styles';
-import { useLanguagesStore } from '@/stores/useLanguagesStore';
 import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { Language } from '@lexora/types';
+import { api } from '@lexora/api-client';
 
 export default function LanguageSelectionStep() {
-  const { getLanguages } = useLanguagesStore();
   const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   const handleNextStep = () => {
     if (!selectedLanguage) return;
@@ -32,18 +32,17 @@ export default function LanguageSelectionStep() {
   };
 
   useEffect(() => {
-    const loadLanguages = async () => {
-      try {
-        const langs = await getLanguages();
-        setLanguages(langs);
-      } catch (err) {
-        console.error('[LanguageSelection] Failed to load languages', err);
-        setError('Failed to load languages. Please try again.');
-      }
-    };
+    if (hasFetched.current) return;
+    hasFetched.current = true;
 
-    loadLanguages();
-  }, [getLanguages]);
+    api.languages
+      .getSupportedLanguages()
+      .then(setLanguages)
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  }, []);
 
   return (
     <View style={styles.container}>

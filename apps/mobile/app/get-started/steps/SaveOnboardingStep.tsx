@@ -25,12 +25,12 @@ export default function SaveOnboardingStep() {
       setError(null);
 
       try {
+        console.log('saving onboarding');
         const summary = getOnboardingSummary();
         const res = await api.onboarding.save(summary);
         await authService.login(email, password);
 
         const latestLanguageJourney = res.user.languageJourneys?.[0];
-        console.log('latestLanguageJourney', latestLanguageJourney);
 
         if (latestLanguageJourney) {
           setCompleted(true);

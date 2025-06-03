@@ -10,9 +10,4 @@ export class UserController {
   getAllUsers(): Promise<User[]> {
     return this.userService.getAllUsers();
   }
-
-  @Get('test')
-  test(): string {
-    return 'Hi from backend';
-  }
 }

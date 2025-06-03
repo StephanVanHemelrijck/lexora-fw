@@ -8,6 +8,7 @@ import { UserAssessmentModule } from '../userAssessment/userAssessment.module';
 import { LanguageModule } from '../language/language.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { LanguageJourneyModule } from '../languageJourney/languageJourney.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -21,5 +22,6 @@ import { LanguageJourneyModule } from '../languageJourney/languageJourney.module
     FirebaseModule,
     LanguageJourneyModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
