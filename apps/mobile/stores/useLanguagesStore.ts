@@ -36,7 +36,15 @@ export const useLanguagesStore = create<LanguagesState>((set, get) => ({
 
   getLanguages: async () => {
     if (!get().isLoaded) {
-      await get().fetchLanguages();
+      try {
+        await get().fetchLanguages();
+      } catch (err) {
+        console.error(
+          '[LanguagesStore] fetchLanguages failed inside getLanguages',
+          err
+        );
+        return []; // fallback so your UI doesn't crash
+      }
     }
 
     return get().languages;
