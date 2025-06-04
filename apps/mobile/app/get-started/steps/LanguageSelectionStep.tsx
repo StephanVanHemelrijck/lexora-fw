@@ -18,13 +18,15 @@ import {
 import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { Language } from '@lexora/types';
-import { api } from '@lexora/api-client';
+import { api, apiClient } from '@lexora/api-client';
 
 export default function LanguageSelectionStep() {
   const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [error, setError] = useState<string | null>(null);
   const hasFetched = useRef(false);
+
+  const [url, setUrl] = useState('');
 
   const handleNextStep = () => {
     if (!selectedLanguage) return;
@@ -35,6 +37,10 @@ export default function LanguageSelectionStep() {
     if (hasFetched.current) return;
     hasFetched.current = true;
 
+    const apiUrl = apiClient.defaults.baseURL;
+    if (!apiUrl) return;
+    setUrl(apiUrl);
+
     api.languages
       .getSupportedLanguages()
       .then(setLanguages)
@@ -42,7 +48,7 @@ export default function LanguageSelectionStep() {
         console.error(err);
         setError(err.message);
       });
-  }, []);
+  }, [url]);
 
   return (
     <View style={styles.container}>
@@ -55,6 +61,7 @@ export default function LanguageSelectionStep() {
       </View>
 
       <Text style={styles.title}>Language Selection</Text>
+      <Text>{url ? url : 'No URL found'}</Text>
 
       <ScrollView
         contentContainerStyle={styles.list}

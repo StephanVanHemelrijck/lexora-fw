@@ -12,6 +12,8 @@ export class LanguageController {
 
   @Get('supported')
   async getSupportedLanguages() {
+    console.log('[BACKEND] INSIDE getSupportedLanguages');
+
     return this.languagesService.findAllSupported();
   }
 }

@@ -1,10 +1,10 @@
 import { LanguageJourney } from '@lexora/types';
-import { api } from './api.ts';
+import { apiClient } from './api.ts';
 
 export const languageJourney = {
   findByLanguageId: async (token: string, languageId: string) => {
     try {
-      const res = await api.get<LanguageJourney>(
+      const res = await apiClient.get<LanguageJourney>(
         `/language-journeys/language/${languageId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
