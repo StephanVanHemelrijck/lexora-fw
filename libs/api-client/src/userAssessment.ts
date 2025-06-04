@@ -1,10 +1,10 @@
 import { SubmitAssessmentDto, UserAssessment } from '@lexora/types';
-import { api } from './api.ts';
+import { apiClient } from './api.ts';
 
 export const userAssessment = {
   getActiveOrCreate: async (token: string, languageId: string) => {
     try {
-      const res = await api.get<UserAssessment>(
+      const res = await apiClient.get<UserAssessment>(
         `/user-assessment/active-or-create/${languageId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -19,7 +19,7 @@ export const userAssessment = {
   },
   submit: async (token: string, data: SubmitAssessmentDto) => {
     try {
-      const res = await api.post<UserAssessment>(
+      const res = await apiClient.post<UserAssessment>(
         `/user-assessment/submit`,
         data,
         {

@@ -10,6 +10,8 @@ export class LanguageService {
   }
 
   async findAllSupported() {
+    console.log('[BACKEND] INSIDE findAllSupported');
+
     return this.prisma.language.findMany({ where: { isEnabled: true } });
   }
 }
