@@ -11,47 +11,59 @@ import { authService } from '@lexora/auth';
 export default function SaveOnboardingStep() {
   const { getOnboardingSummary, resetAll, password, email, setCompleted } =
     useOnboardingStore();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const router = useRouter();
-  const hasRun = useRef(false);
+  const hasStarted = useRef(false);
+  const isProcessing = useRef(false);
+
+  const saveOnboarding = async () => {
+    if (isProcessing.current) return;
+    isProcessing.current = true;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('[SAVE] Onboarding started');
+      const summary = getOnboardingSummary();
+      const res = await api.onboarding.save(summary);
+      await authService.login(email, password);
+
+      const latestLanguageJourney = res.user.languageJourneys?.[0];
+
+      if (latestLanguageJourney) {
+        setCompleted(true);
+        resetAll();
+        router.replace({
+          pathname: '/lessons/language/[languageId]/assessment',
+          params: {
+            languageId: latestLanguageJourney.languageId,
+          },
+        });
+      }
+    } catch (e: any) {
+      console.error('[SAVE] Error during onboarding', e);
+      setError(e.response?.data?.message || 'Something went wrong');
+      setCompleted(false);
+    } finally {
+      setLoading(false);
+      isProcessing.current = false;
+    }
+  };
 
   useEffect(() => {
-    if (hasRun.current) return;
-    hasRun.current = true;
-
-    const saveOnboarding = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const summary = getOnboardingSummary();
-        const res = await api.onboarding.save(summary);
-        await authService.login(email, password);
-
-        const latestLanguageJourney = res.user.languageJourneys?.[0];
-        console.log('latestLanguageJourney', latestLanguageJourney);
-
-        if (latestLanguageJourney) {
-          setCompleted(true);
-          resetAll();
-          router.push({
-            pathname: '/lessons/language/[languageId]/assessment',
-            params: {
-              languageId: latestLanguageJourney.languageId,
-            },
-          });
-        }
-      } catch (e: any) {
-        setError(e.response?.data?.message || 'Something went wrong');
-        setCompleted(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (hasStarted.current) return;
+    hasStarted.current = true;
     saveOnboarding();
-  }, [getOnboardingSummary, email, password, resetAll, router, setCompleted]);
+  }, []);
+
+  const handleRetry = () => {
+    hasStarted.current = false; // allow re-attempt
+    saveOnboarding();
+  };
 
   return (
     <View style={styles.container}>
@@ -79,16 +91,7 @@ export default function SaveOnboardingStep() {
 
       {error && (
         <View style={styles.footer}>
-          <Button
-            onPress={() => {
-              setError(null);
-              setLoading(true);
-              // retry the effect
-              // This will re-run because the component is re-rendered
-            }}
-            text="RETRY"
-            theme="purple"
-          />
+          <Button onPress={handleRetry} text="RETRY" theme="purple" />
         </View>
       )}
     </View>

@@ -40,7 +40,7 @@ export class UserAssessmentService {
 
       const existingUserAssessment = await this.prisma.userAssessment.findFirst(
         {
-          where: { userId: uid, assessment: { languageId: languageId } },
+          where: { userId: uid, assessment: { languageId } },
           include: { assessment: true },
         }
       );
@@ -61,22 +61,17 @@ export class UserAssessmentService {
 
       return newAssessment;
     } catch (e) {
+      console.error('[getOrCreateUserAssessment] Error:', e);
       throw new InternalServerErrorException(e);
     }
   }
 
-  /**
-   * Get latest user assessment
-   * @param uid - user id
-   * @returns  user assessment
-   */
   async getLatestUserAssessment(uid: string): Promise<UserAssessment> {
     if (!uid) {
       throw new BadRequestException('uid is required');
     }
 
     const user = await this.userService.findByUid(uid);
-
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -95,41 +90,38 @@ export class UserAssessmentService {
   }
 
   async submitAssessment(dto: SubmitAssessmentDto) {
-    console.log('[BACKEND] from submit assessment', dto);
+    try {
+      console.log('[BACKEND] from submit assessment', dto);
 
-    const user = await this.userService.findByUid(dto.uid);
-    const assessment = await this.assessmentService.getAssessmentById(
-      dto.assessmentId
-    );
-    const originalQuestions = assessment.questions as unknown as QuestionItem[];
+      const user = await this.userService.findByUid(dto.uid);
+      const assessment = await this.assessmentService.getAssessmentById(
+        dto.assessmentId
+      );
+      const originalQuestions =
+        assessment.questions as unknown as QuestionItem[];
 
-    // Build a map of originalIndex -> user answer (string or object)
-    const answerMap = new Map<number, string | Record<number, string>>();
-    for (const ans of dto.answers) {
-      if ('answer' in ans) {
-        answerMap.set(ans.originalIndex, ans.answer);
-      } else {
-        answerMap.set(ans.originalIndex, ans.answers);
+      const answerMap = new Map<number, string | Record<number, string>>();
+      for (const ans of dto.answers) {
+        if ('answer' in ans) {
+          answerMap.set(ans.originalIndex, ans.answer);
+        } else {
+          answerMap.set(ans.originalIndex, ans.answers);
+        }
       }
-    }
 
-    // Combine user answers with question data
-    const annotatedQuestions = originalQuestions.map((question, index) => ({
-      ...question,
-      index,
-      userAnswer: answerMap.get(index) ?? null,
-    }));
+      const annotatedQuestions = originalQuestions.map((question, index) => ({
+        ...question,
+        index,
+        userAnswer: answerMap.get(index) ?? null,
+      }));
 
-    const prompt = `
+      const prompt = `
 You are an expert language evaluator.
-
-You will receive a list of assessment questions and the answers provided by a user. Each item includes:
+You will receive a list of assessment questions and the answers provided by a user.
+Each item includes:
 - type: question type
 - data: original question
 - userAnswer: what the user answered
-
-For each, indicate if the answer is correct.
-At the end, assign a CEFR level (A1–C2) and include brief feedback.
 
 Return only JSON in this format:
 {
@@ -145,93 +137,113 @@ Here is the data:
 ${JSON.stringify(annotatedQuestions)}
 `;
 
-    const gptResult = await this.gptService.getGptResponse([
-      { role: 'system', content: 'You are an expert language evaluator.' },
-      { role: 'user', content: prompt },
-    ]);
+      const gptResult = await this.gptService.getGptResponse([
+        { role: 'system', content: 'You are an expert language evaluator.' },
+        { role: 'user', content: prompt },
+      ]);
 
-    let result: AssessmentResult;
-    try {
-      result = JSON.parse(
-        this.gptService.cleanGptJsonResponse(gptResult)
-      ) as AssessmentResult;
-    } catch (error) {
-      console.error('Failed to parse GPT response', error);
-      throw new Error('Grading failed. Please try again.');
+      let result: AssessmentResult;
+      try {
+        result = JSON.parse(
+          this.gptService.cleanGptJsonResponse(gptResult)
+        ) as AssessmentResult;
+      } catch (error) {
+        console.error('Failed to parse GPT response', error);
+        throw new InternalServerErrorException(
+          'Grading failed. Please try again.'
+        );
+      }
+
+      console.log('GPT Result:', result);
+
+      const UA = await this.prisma.userAssessment.findFirst({
+        where: { userId: user.uid, assessmentId: assessment.id },
+      });
+
+      if (!UA) {
+        throw new BadRequestException('User assessment not found');
+      }
+
+      await this.prisma.userAssessment.update({
+        where: { id: UA.id },
+        data: {
+          status: 'COMPLETED',
+          completedAt: new Date(),
+          score: result.graded.filter((q) => q.correct).length,
+          level: result.level,
+        },
+      });
+
+      await this.languageJourneyService.updatePlacementLevel(
+        user.uid,
+        assessment.languageId,
+        result.level.toString()
+      );
+
+      return result;
+    } catch (err) {
+      console.error('[submitAssessment] Unexpected error:', err);
+      throw new InternalServerErrorException(
+        'Something went wrong while submitting the assessment.'
+      );
     }
-
-    console.log('GPT Result:', result);
-
-    // Persist result to DB
-    const UA = await this.prisma.userAssessment.findFirst({
-      where: { userId: user.uid, assessmentId: assessment.id },
-    });
-
-    if (!UA) {
-      throw new BadRequestException('User assessment not found');
-    }
-
-    await this.prisma.userAssessment.update({
-      where: { id: UA.id },
-      data: {
-        status: 'COMPLETED',
-        completedAt: new Date(),
-        score: result.graded.filter((q) => q.correct).length,
-        level: result.level,
-      },
-    });
-
-    // update placement level in languagejourney table
-    await this.languageJourneyService.updatePlacementLevel(
-      user.uid,
-      assessment.languageId,
-      result.level.toString()
-    );
-
-    return result;
   }
 
-  /**
-   * Helper method to generate a fresh assessment and assign it to user
-   * @param userId ID of the user
-   * @param targetLanguage Target language for the assessment
-   * @param nativeLanguage (optional) Default to 'English'
-   */
   private async generateNewAssessmentForUser(
     userId: string,
     targetLanguage: Language,
     nativeLanguage: string
   ): Promise<UserAssessment> {
-    const prompt = `
-  You are a test generator.
-  
-  Create a ${targetLanguage.name} language test (A2–C2 level). Learner's native language: ${nativeLanguage}.
-  
-  Requirements:
-  - Total: 15 to 20 questions
-  - Structure:
-    - 5 vocabulary_multiple_choice
-    - 5 grammar_multiple_choice
-    - 3 fill_in_the_blank
-    - 1 reading_comprehension
-    - 1 writing_prompt
-  - Do not exceed 1 reading_comprehension and 1 writing_prompt
-  - Questions in ${nativeLanguage}, answers in ${targetLanguage}
-  - Keep content short and clear
-  
-  Return only a JSON array, no text, no comments. Each item must follow:
-  
-  { "type": "question_type", "data": { ... } }
-  
-  Allowed types:
-  - vocabulary_multiple_choice: { "question": "...", "options": ["A", "B", "C", "D"], "correct_answer": "A" }
-  - grammar_multiple_choice: same as above
-  - fill_in_the_blank: { "sentence": "... ____ ...", "correct_answers": ["..."], "hint": "...", "expected_translation": "..." }
-  - reading_comprehension: { "paragraph": "...", "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correct_answer": "A" } ] }
-  - writing_prompt: { "prompt": "...", "expected_length": "..." }
-  
-  Output only valid JSON array of 15–20 items.
-  `;
+    const prompt = `You are a test generator. Create a language test for learning ${targetLanguage.name}. The user's native language is English.
+
+Generate exactly 18 questions total.
+
+Allowed types:
+- "grammar_multiple_choice": one question + 4 options + correct_answer
+- "vocabulary_multiple_choice": same format
+- "reading_comprehension": short paragraph, 1 question + 4 options + correct_answer
+- "listening_comprehension": a realistic short sentence or dialogue as "text_prompt" that can be read aloud using TTS. Avoid using phrases like "You will hear...". Include "question", "options" (4), and "correct_answer".
+- "speaking_repetition": a single sentence to repeat
+
+Return a JSON array of 18 items. Each item must include a "type" field and follow one of the formats below:
+
+{
+  "type": "grammar_multiple_choice",
+  "question": "Which sentence is correct?",
+  "options": ["...", "...", "...", "..."],
+  "correct_answer": "..."
+}
+
+{
+  "type": "vocabulary_multiple_choice",
+  "question": "What does 'joyful' mean?",
+  "options": ["...", "...", "...", "..."],
+  "correct_answer": "..."
+}
+
+{
+  "type": "reading_comprehension",
+  "paragraph": "...",
+  "question": "...",
+  "options": ["...", "...", "...", "..."],
+  "correct_answer": "..."
+}
+
+{
+  "type": "listening_comprehension",
+  "text_prompt": "Anna called her friend to say she'll be 10 minutes late.",
+  "question": "How late will Anna be?",
+  "options": ["5 minutes", "10 minutes", "15 minutes", "20 minutes"],
+  "correct_answer": "10 minutes"
+}
+
+{
+  "type": "speaking_repetition",
+  "prompt": "Repeat: 'I would like a cup of coffee, please.'"
+}
+
+Shuffle the order of questions. Randomize correct answer positions. Ensure valid JSON — no extra comments or text.
+`;
 
     const gptResponse = await this.gptService.getGptResponse([
       {
@@ -244,21 +256,13 @@ ${JSON.stringify(annotatedQuestions)}
       },
     ]);
 
-    let cleanedGptResponse: AssessmentJson;
-
-    try {
-      cleanedGptResponse = JSON.parse(
-        this.gptService.cleanGptJsonResponse(gptResponse)
-      ) as AssessmentJson;
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException('Failed to parse assessment JSON');
-    }
+    const parsed: AssessmentJson = JSON.parse(gptResponse);
+    console.log('Parsed GPT Response:', parsed);
 
     const assessment = await this.prisma.assessment.create({
       data: {
         languageId: targetLanguage.id,
-        questions: cleanedGptResponse,
+        questions: parsed,
       },
     });
 

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Mascot from '@/components/ui/Mascot';
 import {
   BorderRadius,
@@ -15,16 +15,16 @@ import {
   MascotSizes,
   Spacing,
 } from '@lexora/styles';
-import { api } from '@lexora/api-client';
-import { useLanguagesStore } from '@/stores/useLanguagesStore';
 import { Button } from '@/components/ui/Button';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { Language } from '@lexora/types';
+import { api } from '@lexora/api-client';
 
 export default function LanguageSelectionStep() {
-  const { getLanguages } = useLanguagesStore();
   const { nextStep, setLanguage, selectedLanguage } = useOnboardingStore();
-  const [languages, setLangauges] = useState<Language[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   const handleNextStep = () => {
     if (!selectedLanguage) return;
@@ -32,27 +32,23 @@ export default function LanguageSelectionStep() {
   };
 
   useEffect(() => {
-    const resolve = async () => {
-      try {
-        console.log('getLanguages');
+    if (hasFetched.current) return;
+    hasFetched.current = true;
 
-        const langs = await api.languages.getSupportedLanguages();
-
-        setLangauges(langs);
-      } catch (err) {
+    api.languages
+      .getSupportedLanguages()
+      .then(setLanguages)
+      .catch((err) => {
         console.error(err);
-        throw err;
-      }
-    };
-
-    resolve();
-  }, [getLanguages]);
+        setError(err.message);
+      });
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.mascotWrapper}>
         <Mascot
-          text="Pick the language you want to master!"
+          text={error ? error : 'Pick the language you want to master!'}
           direction="right"
           size={MascotSizes.s}
         />
