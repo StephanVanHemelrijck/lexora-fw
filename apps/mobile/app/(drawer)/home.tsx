@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log('[HOME]', user?.accessToken);
-  }, [user]);
+  }, [user?.accessToken]);
 
   return (
     <ScreenContainer>

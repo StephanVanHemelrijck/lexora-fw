@@ -8,4 +8,10 @@ export const user = {
     });
     return res.data;
   },
+  getUsers: async (token: string) => {
+    const res = await api.get<User[]>('/users', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  },
 };

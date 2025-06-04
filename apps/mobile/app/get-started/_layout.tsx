@@ -18,14 +18,20 @@ export default function OnboardingLayout() {
   }, [step, setStarted]);
 
   const handlePrevious = () => {
-    if (step === 0 && !completed) return router.back();
     prevStep();
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={handlePrevious} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={step === 0 ? handleGoBack : handlePrevious}
+          style={styles.backButton}
+        >
           <Icon
             name="arrow-back"
             size={FontSizes.h1}

@@ -15,11 +15,14 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function AssessmentPage() {
   const { user } = useAuthStore();
   const { languageId } = useLocalSearchParams<{ languageId: string }>();
+  const [isFetchingAssessment, setIsFetchingAssessment] = useState(false);
   const [userAssessment, setUserAssessment] = useState<UserAssessment>();
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     if (!user || !languageId || hasFetchedRef.current) return;
+
+    setIsFetchingAssessment(true);
 
     hasFetchedRef.current = true;
 
@@ -34,13 +37,15 @@ export default function AssessmentPage() {
       .catch((err) => {
         console.error('[ASSESSMENT]: Failed', err);
         hasFetchedRef.current = false; // optionally allow retry
-      });
+      })
+      .finally(() => setIsFetchingAssessment(false));
 
     console.log('[ASSESSMENT]: Fetched assessment');
   }, [user, languageId]);
 
   return (
     <View>
+      {isFetchingAssessment && <Text>Loading...</Text>}
       <Text>Assessment id : {userAssessment?.id}</Text>
     </View>
   );
