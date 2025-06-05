@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   question: {
-    color: Colors.accent,
-    fontSize: FontSizes.h2,
+    color: Colors.textLight,
+    fontSize: FontSizes.h3,
     marginBottom: Spacing.m,
   },
   optionButton: {

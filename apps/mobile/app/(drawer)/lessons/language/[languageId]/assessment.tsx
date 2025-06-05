@@ -1,3 +1,4 @@
+import ListeningComprehensionQuestion from '@/components/assessment/ListeningComprehensionQuestion';
 import { MultipleChoiceQuestion } from '@/components/assessment/MultipleChoiceQuestion';
 import ReadingComprehensionQuestion from '@/components/assessment/ReadingComprehensionQuestion';
 import SpeakingRepetitionQuestion from '@/components/assessment/SpeakingRepetitionQuestion';
@@ -83,21 +84,6 @@ export default function AssessmentPage() {
     setCurrentQuestionIndex(0);
   }, [userAssessment]);
 
-  // useEffect(() => {
-  //   console.log(
-  //     '[ASSESSMENT]: Current question: ',
-  //     questions[currentQuestionIndex].question
-  //   );
-  //   console.log(
-  //     '[ASSESSMENT]: Current correct answer: ',
-  //     questions[currentQuestionIndex].correct_answer
-  //   );
-  //   console.log(
-  //     '[ASSESSMENT]: Current question options: ',
-  //     questions[currentQuestionIndex].options
-  //   );
-  // }, [currentQuestionIndex, questions]);
-
   const handleNext = () => {
     setCurrentQuestionIndex((prev) => prev + 1);
   };
@@ -132,7 +118,15 @@ export default function AssessmentPage() {
           />
         );
       case 'listening_comprehension':
-        return <Text>Listening</Text>;
+        return (
+          <ListeningComprehensionQuestion
+            question={currentQuestion.question}
+            correct_answer={currentQuestion.correct_answer}
+            options={currentQuestion.options}
+            text_prompt={currentQuestion.text_prompt}
+            onAnswer={() => {}}
+          />
+        );
       case 'speaking_repetition':
         return (
           <SpeakingRepetitionQuestion
@@ -183,7 +177,7 @@ export default function AssessmentPage() {
         <View style={styles.questionContainer}>{renderQuestion()}</View>
       </ScrollView>
       <View style={styles.buttonWrapper}>
-        <Button text="Next" onPress={handleNext} theme="purple" />
+        <Button text="NEXT" onPress={handleNext} theme="purple" />
       </View>
     </View>
   );

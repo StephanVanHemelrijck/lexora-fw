@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.m,
   },
   question: {
-    color: Colors.accent,
-    fontSize: FontSizes.h2,
+    color: Colors.textLight,
+    fontSize: FontSizes.h3,
     marginBottom: Spacing.m,
   },
   optionContainer: {
