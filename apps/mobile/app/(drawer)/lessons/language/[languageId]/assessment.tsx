@@ -16,7 +16,7 @@ import {
 } from '@lexora/styles';
 import { Language, QuestionItem, UserAssessment } from '@lexora/types';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -177,7 +177,7 @@ export default function AssessmentPage() {
       </View>
 
       <ScrollView
-        style={styles.scrollContent}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.questionContainer}>{renderQuestion()}</View>
@@ -191,7 +191,10 @@ export default function AssessmentPage() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
-  scrollContent: { paddingHorizontal: Spacing.screenGutter },
+  scrollContent: {
+    paddingHorizontal: Spacing.screenGutter,
+    flexGrow: 1,
+  },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -202,7 +205,9 @@ const styles = StyleSheet.create({
   },
   backButton: { paddingRight: Spacing.s },
   progressWrapper: { flex: 1 },
-  questionContainer: { flex: 1, justifyContent: 'flex-start' },
+  questionContainer: {
+    flexGrow: 1,
+  },
   nextButton: {
     backgroundColor: Colors.actionButton,
     padding: Spacing.m,
