@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { Icon } from '../ui/Icon';
 import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
-import { ProgressIndicator } from '../ui/ProgessIndicator';
+import { ProgressIndicator } from '../ui/ProgressIndicator';
 
 export default function LessonCard() {
   return (

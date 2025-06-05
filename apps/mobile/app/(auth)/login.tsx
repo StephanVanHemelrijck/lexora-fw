@@ -37,13 +37,7 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const credential = await authService.login(email, password);
-
-      const accessToken = await credential.user.getIdToken();
-
-      const user = await api.user.getMe(accessToken);
-
-      setAuth({ ...user, accessToken });
+      await authService.login(email, password);
     } catch (e) {
       if (isAxiosError(e)) {
         if (e.response) {
@@ -65,6 +59,7 @@ export default function Login() {
       }
     } finally {
       setLoading(false);
+      router.replace('/(drawer)/home');
     }
   };
 
@@ -73,12 +68,6 @@ export default function Login() {
       setCanSignIn(true);
     }
   }, [email, password]);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     router.push('/home');
-  //   }
-  // }, [user, router]);
 
   return (
     <View style={styles.container}>

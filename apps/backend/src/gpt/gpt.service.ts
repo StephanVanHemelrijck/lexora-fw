@@ -7,7 +7,7 @@ export class GptService {
   private readonly OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
   async getGptResponse(
-    messages: { role: string; content: string }[],
+    messages: { role: string; content: string }[]
   ): Promise<string> {
     try {
       const response: AxiosResponse<OpenAIChatResponse> = await axios.post(
@@ -22,7 +22,7 @@ export class GptService {
             Authorization: `Bearer ${this.OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
 
       const reply = response.data.choices[0].message.content;
@@ -37,21 +37,18 @@ export class GptService {
    * Clean GPT response and extract valid JSON content.
    * Strips markdown wrapping like ```json and trims whitespace.
    */
-  cleanGptJsonResponse(response: string): string {
-    let cleaned = response.trim();
+  cleanGptJsonResponse(raw: string): string {
+    // Remove anything before the first {
+    const cleaned = raw.trim().replace(/^.*?({)/s, '$1');
 
-    // Remove ```json and ``` if they exist
-    if (cleaned.startsWith('```json')) {
-      cleaned = cleaned.substring(7);
-    }
-    if (cleaned.startsWith('```')) {
-      cleaned = cleaned.substring(3);
-    }
-    if (cleaned.endsWith('```')) {
-      cleaned = cleaned.substring(0, cleaned.length - 3);
+    // Match all top-level JSON objects
+    const jsonObjects = cleaned.match(/{[^{}]*}(?=\s*{|\s*$)/gs);
+
+    if (!jsonObjects) {
+      throw new Error('No valid JSON objects found');
     }
 
-    // Final trim again
-    return cleaned.trim();
+    // Join them into a JSON array string
+    return `[${jsonObjects.join(',')}]`;
   }
 }

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { ProgressIndicator } from '../ui/ProgessIndicator';
+import { ProgressIndicator } from '../ui/ProgressIndicator';
 import {
   BorderRadius,
   Colors,

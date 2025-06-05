@@ -42,6 +42,7 @@ export class UserAssessmentService {
         {
           where: { userId: uid, assessment: { languageId } },
           include: { assessment: true },
+          orderBy: { createdAt: 'desc' },
         }
       );
 
@@ -194,29 +195,32 @@ ${JSON.stringify(annotatedQuestions)}
     targetLanguage: Language,
     nativeLanguage: string
   ): Promise<UserAssessment> {
-    const prompt = `You are a test generator. Create a language test for learning ${targetLanguage.name}. The user's native language is English.
+    const prompt = `You are a test generator. Create a language placement test for learning ${targetLanguage.name}. The user's native language is English.
 
-Generate exactly 18 questions total.
+The test should estimate the learner's CEFR level (A1–C2). Include a mix of easier (A1–A2), intermediate (B1–B2), and advanced (C1–C2) questions, but do not label the difficulty levels. Mix the order of difficulties and types.
 
-Allowed types:
-- "grammar_multiple_choice": one question + 4 options + correct_answer
-- "vocabulary_multiple_choice": same format
-- "reading_comprehension": short paragraph, 1 question + 4 options + correct_answer
-- "listening_comprehension": a realistic short sentence or dialogue as "text_prompt" that can be read aloud using TTS. Avoid using phrases like "You will hear...". Include "question", "options" (4), and "correct_answer".
-- "speaking_repetition": a single sentence to repeat
+⚠️ All content (questions, paragraphs, text prompts, options, answers, etc.) must be written **entirely in ${targetLanguage.name}**. Do NOT include English translations or explanations.
 
-Return a JSON array of 18 items. Each item must include a "type" field and follow one of the formats below:
+Generate exactly 14 questions using the following structure:
+
+- 4 grammar_multiple_choice
+- 4 vocabulary_multiple_choice
+- 2 reading_comprehension
+- 2 listening_comprehension
+- 2 speaking_repetition
+
+Use these formats exactly:
 
 {
   "type": "grammar_multiple_choice",
-  "question": "Which sentence is correct?",
+  "question": "...",
   "options": ["...", "...", "...", "..."],
   "correct_answer": "..."
 }
 
 {
   "type": "vocabulary_multiple_choice",
-  "question": "What does 'joyful' mean?",
+  "question": "...",
   "options": ["...", "...", "...", "..."],
   "correct_answer": "..."
 }
@@ -231,19 +235,20 @@ Return a JSON array of 18 items. Each item must include a "type" field and follo
 
 {
   "type": "listening_comprehension",
-  "text_prompt": "Anna called her friend to say she'll be 10 minutes late.",
-  "question": "How late will Anna be?",
-  "options": ["5 minutes", "10 minutes", "15 minutes", "20 minutes"],
-  "correct_answer": "10 minutes"
+  "text_prompt": "...",
+  "question": "...",
+  "options": ["...", "...", "...", "..."],
+  "correct_answer": "..."
 }
 
 {
   "type": "speaking_repetition",
-  "prompt": "Repeat: 'I would like a cup of coffee, please.'"
+  "prompt": "..."
 }
 
-Shuffle the order of questions. Randomize correct answer positions. Ensure valid JSON — no extra comments or text.
-`;
+The test should sound natural and represent various everyday topics: daily routines, shopping, travel, food, work, etc.
+
+Shuffle the order of questions. Randomize the correct answer position in options. Output valid JSON only. No explanations, no notes, no formatting.`;
 
     const gptResponse = await this.gptService.getGptResponse([
       {
@@ -256,7 +261,9 @@ Shuffle the order of questions. Randomize correct answer positions. Ensure valid
       },
     ]);
 
-    const parsed: AssessmentJson = JSON.parse(gptResponse);
+    const cleaned = this.gptService.cleanGptJsonResponse(gptResponse);
+    console.log('Cleaned GPT Response:', cleaned);
+    const parsed: AssessmentJson = JSON.parse(cleaned);
     console.log('Parsed GPT Response:', parsed);
 
     const assessment = await this.prisma.assessment.create({
