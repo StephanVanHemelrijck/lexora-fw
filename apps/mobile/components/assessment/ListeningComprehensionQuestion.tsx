@@ -5,7 +5,7 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BorderRadius,
   Colors,
@@ -18,26 +18,28 @@ import { Icon } from '../ui/Icon'; // Optional: assuming you're using an Icon co
 
 interface Props {
   question: string;
-  correct_answer: string;
   options: string[];
   text_prompt: string;
-  onAnswer: (selected: string) => void;
+  onAnswer: (selected: string | null) => void;
   languageCode?: string;
+  selected: string | null;
 }
 
 export default function ListeningComprehensionQuestion({
   question,
-  correct_answer,
   text_prompt,
   options,
   onAnswer,
   languageCode = 'es-ES',
+  selected,
 }: Props) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(question);
+  useEffect(() => {
+    setSelectedOption(selected);
+  }, [selected]);
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);

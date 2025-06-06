@@ -5,14 +5,14 @@ import React, { useEffect, useState } from 'react';
 
 interface Props {
   questionData: ReadingComprehensionQuestionData;
-  onAnswer: (selected: string) => void;
-  selected?: string;
+  onAnswer: (selected: string | null) => void;
+  selected: string | null;
 }
 
 export default function ReadingComprehensionQuestion({
   questionData,
   onAnswer,
-  selected = '',
+  selected,
 }: Props) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 

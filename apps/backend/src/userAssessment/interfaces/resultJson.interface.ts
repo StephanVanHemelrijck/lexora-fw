@@ -10,7 +10,16 @@ export interface GradedEntry {
 }
 
 export interface AssessmentResult {
-  graded: GradedEntry[];
+  graded: {
+    index: number;
+    type: string;
+    correct?: boolean;
+    difficulty?: string;
+  }[];
   level: string;
-  feedback: string;
+  skills?: Record<
+    'grammar' | 'vocabulary' | 'reading' | 'listening' | 'speaking',
+    number
+  >;
+  feedback?: Record<string, string>;
 }

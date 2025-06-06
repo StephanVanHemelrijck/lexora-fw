@@ -11,7 +11,6 @@ export type ReadingAnswer = {
 export type Answer = SimpleAnswer | ReadingAnswer;
 
 export interface SubmitAssessmentDto {
-  uid: string;
   assessmentId: string;
   answers: Answer[];
 }

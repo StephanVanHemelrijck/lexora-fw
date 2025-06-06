@@ -20,12 +20,14 @@ interface Props {
   prompt: string;
   onAnswer: (uri: string) => void;
   languageCode?: string;
+  selected: string | null;
 }
 
 export default function SpeakingRepetitionQuestion({
   prompt,
   onAnswer,
   languageCode = 'es-ES',
+  selected,
 }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -37,6 +39,10 @@ export default function SpeakingRepetitionQuestion({
   const [volume, setVolume] = useState(0);
 
   const volumeIntervalRef = useRef<NodeJS.Timer | null>(null);
+
+  useEffect(() => {
+    if (selected) setRecordedUri(selected);
+  }, [selected]);
 
   useEffect(() => {
     return () => {

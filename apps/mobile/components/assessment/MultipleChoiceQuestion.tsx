@@ -7,12 +7,12 @@ import {
 } from '@lexora/styles';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { MultipleChoiceQuestionData } from '@lexora/types';
+import { Answer, MultipleChoiceQuestionData } from '@lexora/types';
 
 interface Props {
   questionData: MultipleChoiceQuestionData;
-  onAnswer: (selected: string, isCorrect: boolean) => void;
-  selected?: string;
+  onAnswer: (selected: string | null) => void;
+  selected: string | null;
 }
 
 export function MultipleChoiceQuestion({
@@ -30,14 +30,12 @@ export function MultipleChoiceQuestion({
     setSelectedOption(option);
     if (selectedOption === option) {
       setSelectedOption(null);
-      onAnswer('', false);
+      onAnswer(null);
+
       return;
     }
 
-    const isCorrect =
-      option ===
-      questionData.options[questionData.correct_answer.charCodeAt(0) - 65];
-    onAnswer(option, isCorrect);
+    onAnswer(option);
   };
 
   return (

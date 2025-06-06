@@ -10,6 +10,7 @@ import { FirebaseModule } from '../firebase/firebase.module';
 import { LanguageJourneyModule } from '../languageJourney/languageJourney.module';
 import { AppController } from './app.controller';
 import { TtsModule } from '../tts/tts.module';
+import { WhisperModule } from '../whisper/whisper.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TtsModule } from '../tts/tts.module';
     FirebaseModule,
     LanguageJourneyModule,
     TtsModule,
+    WhisperModule,
   ],
   controllers: [AppController],
 })

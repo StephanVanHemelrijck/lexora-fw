@@ -6,6 +6,7 @@ import { UserModule } from '../user/user.module';
 import { AssessmentModule } from '../assessment/assessment.module';
 import { GptModule } from '../gpt/gpt.module';
 import { LanguageJourneyModule } from '../languageJourney/languageJourney.module';
+import { WhisperModule } from '../whisper/whisper.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { LanguageJourneyModule } from '../languageJourney/languageJourney.module
     AssessmentModule,
     GptModule,
     LanguageJourneyModule,
+    WhisperModule,
   ],
   controllers: [UserAssessmentController],
   providers: [UserAssessmentService],
