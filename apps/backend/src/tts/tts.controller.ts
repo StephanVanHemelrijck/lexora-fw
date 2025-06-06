@@ -18,6 +18,8 @@ export class TtsController {
     @Query('lang') lang: string,
     @Res() res: Response
   ) {
+    console.log('[BACKEND]: IN TEXT SERVICE');
+
     if (!text) throw new BadRequestException('Text is required');
 
     const audioUrl = await this.ttsService.synthesizeSpeechToFile(
