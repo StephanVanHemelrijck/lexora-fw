@@ -48,6 +48,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const accessToken = await firebaseUser.getIdToken();
 
+          if (!accessToken) {
+            clearAuth();
+            return;
+          }
+
           const enrichedUser = await api.user.getMe(accessToken);
 
           setAuth({

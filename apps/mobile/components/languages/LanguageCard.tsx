@@ -10,19 +10,29 @@ import {
 import RadarChartComponent from '../charts/RadarChart';
 import { Language } from '@lexora/types';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
+import { getCefrLevelLabel } from '@/utils/levels';
 
 export interface LanguageCardProps {
   onPress?: () => void;
   languageId: string;
+  placementLevel: string | null;
 }
 
 export default function LanguageCard({
   onPress,
   languageId,
+  placementLevel,
 }: LanguageCardProps) {
   const [language, setLanguage] = useState<Language>();
+  const [levelLabel, setLevelLabel] = useState<string>('');
 
   const { getLanguageById } = useLanguagesStore();
+
+  useEffect(() => {
+    if (!placementLevel) return;
+    const l = getCefrLevelLabel(placementLevel);
+    setLevelLabel(l);
+  }, [placementLevel]);
 
   useEffect(() => {
     const resolve = async () => {
@@ -58,7 +68,9 @@ export default function LanguageCard({
             <Text style={styles.cardTitle}>
               {language?.flagEmoji} {language?.name}
             </Text>
-            <Text style={styles.cardText}>A2 - Elementary</Text>
+            <Text style={styles.cardText}>
+              {placementLevel} - {levelLabel}
+            </Text>
             <Text style={styles.cardText}>11% Complete</Text>
           </View>
         </View>

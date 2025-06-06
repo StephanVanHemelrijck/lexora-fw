@@ -1,7 +1,7 @@
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import React, { useEffect } from 'react';
 import { Slot, useRouter } from 'expo-router';
-import { ProgressIndicator } from '@/components/ui/ProgessIndicator';
+import { ProgressIndicator } from '@/components/ui/ProgressIndicator';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { Icon } from '@/components/ui/Icon';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';

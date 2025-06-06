@@ -17,18 +17,21 @@ export const userAssessment = {
       throw err;
     }
   },
-  submit: async (token: string, data: SubmitAssessmentDto) => {
+  submit: async (token: string, formData: any) => {
     try {
       const res = await apiClient.post<UserAssessment>(
         `/user-assessment/submit`,
-        data,
+        formData,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data', // let Axios infer the boundary
+          },
         }
       );
       return res.data;
     } catch (err) {
-      console.error(err);
+      console.error('[API] Submit assessment failed:', err);
       throw err;
     }
   },

@@ -9,6 +9,8 @@ import { LanguageModule } from '../language/language.module';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { LanguageJourneyModule } from '../languageJourney/languageJourney.module';
 import { AppController } from './app.controller';
+import { TtsModule } from '../tts/tts.module';
+import { WhisperModule } from '../whisper/whisper.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AppController } from './app.controller';
     LanguageModule,
     FirebaseModule,
     LanguageJourneyModule,
+    TtsModule,
+    WhisperModule,
   ],
   controllers: [AppController],
 })

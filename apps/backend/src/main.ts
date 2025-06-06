@@ -2,6 +2,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import * as dotenv from 'dotenv';
+import * as express from 'express';
+import { join } from 'path';
 dotenv.config();
 
 async function bootstrap() {
@@ -10,6 +12,8 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   const port = process.env.PORT || 3000;
   app.enableCors();
+
+  app.use('/api/public', express.static(join(__dirname, '..', 'public')));
 
   // enable validation
   app.useGlobalPipes(

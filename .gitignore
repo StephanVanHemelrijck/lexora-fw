@@ -64,3 +64,6 @@ cache/
 
 # Ignore service account keys
 **/secrets/*.json
+
+# Ignore audio files
+apps/backend/public/tts/**

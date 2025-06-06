@@ -9,6 +9,10 @@ export default function Home() {
   const { user } = useAuthStore();
 
   useEffect(() => {
+    console.log('[HOME]');
+  }, []);
+
+  useEffect(() => {
     console.log('[HOME]', user?.accessToken);
   }, [user?.accessToken]);
 

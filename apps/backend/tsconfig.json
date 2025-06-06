@@ -5,7 +5,8 @@
     "paths": {
       "@/*": ["./*"],
       "@lexora/auth": ["../../libs/auth/src/index.ts"]
-    }
+    },
+    "types": ["node", "express", "Multer"]
   },
   "files": [],
   "include": [],

@@ -15,11 +15,15 @@ export default function Page() {
   const router = useRouter();
   const { user } = useAuthStore();
 
-  // useEffect(() => {
-  //   if (user) {
-  //     router.replace('/(drawer)/home');
-  //   }
-  // }, [user, router]);
+  useEffect(() => {
+    console.log('[INDEX]');
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      router.replace('/(drawer)/home');
+    }
+  }, [user, router]);
 
   return (
     <View style={styles.container}>

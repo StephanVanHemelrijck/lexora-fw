@@ -39,7 +39,7 @@ export function ProgressIndicator({
             strokeWidth={strokeWidth}
           />
           <Circle
-            stroke={Colors.accent}
+            stroke={Colors.highlight}
             fill="none"
             cx={size / 2}
             cy={size / 2}
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   barFill: {
     height: '100%',
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.highlight,
     borderRadius: BorderRadius.m,
   },
   circleWrapper: {

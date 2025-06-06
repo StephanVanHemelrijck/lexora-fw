@@ -13,19 +13,6 @@ export interface UserAssessment {
 }
 
 export interface SubmitAssessmentDto {
-  uid: string;
   assessmentId: string;
-  answers: AnswerItem[];
-}
-
-export type AnswerItem = SimpleAnswer | ReadingAnswer;
-
-export interface SimpleAnswer {
-  originalIndex: number;
-  answer: string;
-}
-
-export interface ReadingAnswer {
-  originalIndex: number;
-  answers: Record<number, string>;
+  answers: (string | null)[];
 }
