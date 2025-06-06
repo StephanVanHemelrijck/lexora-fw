@@ -7,6 +7,7 @@ import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import { authService } from '@lexora/auth';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function SaveOnboardingStep() {
   const { getOnboardingSummary, resetAll, password, email, setCompleted } =
@@ -34,9 +35,37 @@ export default function SaveOnboardingStep() {
 
       const latestLanguageJourney = res.user.languageJourneys?.[0];
 
+      console.log('[SAVE] Onboarding completed', latestLanguageJourney);
+      console.log(
+        '[SAVE] Onboarding completed',
+        latestLanguageJourney?.languageId
+      );
+
       if (latestLanguageJourney) {
         setCompleted(true);
         resetAll();
+
+        // Wait until the enriched user is available before routing
+        const waitForReady = async () => {
+          const timeout = 5000; // max wait 5 seconds
+          const pollInterval = 100;
+          const start = Date.now();
+
+          return new Promise<void>((resolve) => {
+            const interval = setInterval(() => {
+              if (
+                useAuthStore.getState().isReady ||
+                Date.now() - start > timeout
+              ) {
+                clearInterval(interval);
+                resolve();
+              }
+            }, pollInterval);
+          });
+        };
+
+        await waitForReady();
+
         router.replace({
           pathname: '/lessons/language/[languageId]/assessment',
           params: {

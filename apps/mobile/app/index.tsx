@@ -16,6 +16,10 @@ export default function Page() {
   const { user } = useAuthStore();
 
   useEffect(() => {
+    console.log('[INDEX]');
+  }, []);
+
+  useEffect(() => {
     if (user) {
       router.replace('/(drawer)/home');
     }
