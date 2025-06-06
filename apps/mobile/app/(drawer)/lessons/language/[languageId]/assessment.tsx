@@ -70,7 +70,7 @@ export default function AssessmentPage() {
       .getActiveOrCreate(user.accessToken, languageId)
       .then(setUserAssessment)
       .catch((err) => {
-        console.error('[ASSESSMENT]: Failed', err);
+        console.error('[ASSESSMENT]: Fetching Failed', err);
       })
       .finally(() => setIsFetchingAssessment(false));
 

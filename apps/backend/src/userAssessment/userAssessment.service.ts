@@ -38,17 +38,17 @@ export class UserAssessmentService {
         throw new BadRequestException('Language not found');
       }
 
-      const existingUserAssessment = await this.prisma.userAssessment.findFirst(
-        {
-          where: { userId: uid, assessment: { languageId } },
-          include: { assessment: true },
-          orderBy: { createdAt: 'desc' },
-        }
-      );
+      // const existingUserAssessment = await this.prisma.userAssessment.findFirst(
+      //   {
+      //     where: { userId: uid, assessment: { languageId } },
+      //     include: { assessment: true },
+      //     orderBy: { createdAt: 'desc' },
+      //   }
+      // );
 
-      if (existingUserAssessment) {
-        return existingUserAssessment;
-      }
+      // if (existingUserAssessment) {
+      //   return existingUserAssessment;
+      // }
 
       const newAssessment = await this.generateNewAssessmentForUser(
         uid,
@@ -195,11 +195,11 @@ ${JSON.stringify(annotatedQuestions)}
     targetLanguage: Language,
     nativeLanguage: string
   ): Promise<UserAssessment> {
-    const prompt = `You are a test generator. Create a language placement test for learning ${targetLanguage.name}. The user's native language is English.
+    const prompt = `You are a test generator. Create a language placement test for learning ${targetLanguage.name}. The user's native language is ${nativeLanguage}.
 
 The test should estimate the learner's CEFR level (A1–C2). Include a mix of easier (A1–A2), intermediate (B1–B2), and advanced (C1–C2) questions, but do not label the difficulty levels. Mix the order of difficulties and types.
 
-⚠️ All content (questions, paragraphs, text prompts, options, answers, etc.) must be written **entirely in ${targetLanguage.name}**. Do NOT include English translations or explanations.
+⚠️ All content (questions, paragraphs, text prompts, options, answers, etc.) must be written entirely in ${targetLanguage.name}, **except** for English translations used as answer choices in vocabulary questions. Do NOT include any explanations or formatting.
 
 Generate exactly 14 questions using the following structure:
 
@@ -220,9 +220,9 @@ Use these formats exactly:
 
 {
   "type": "vocabulary_multiple_choice",
-  "question": "...",
-  "options": ["...", "...", "...", "..."],
-  "correct_answer": "..."
+  "question": "¿Qué significa la palabra '_____’?",
+  "options": ["${nativeLanguage} translation", "...", "...", "..."],
+  "correct_answer": "correct ${nativeLanguage} translation"
 }
 
 {
@@ -235,25 +235,23 @@ Use these formats exactly:
 
 {
   "type": "listening_comprehension",
-  "text_prompt": "...",
-  "question": "...",
+  "text_prompt": "(a single spoken sentence or monologue in ${targetLanguage.name} that clearly implies or states the answer)",
+  "question": "(a question about a specific detail mentioned or implied in the text_prompt)",
   "options": ["...", "...", "...", "..."],
   "correct_answer": "..."
 }
 
 {
   "type": "speaking_repetition",
-  "prompt": "..."
+  "prompt": "(just the sentence to be repeated, no intro like 'Repite la siguiente frase')"
 }
-
-The test should sound natural and represent various everyday topics: daily routines, shopping, travel, food, work, etc.
-
-Shuffle the order of questions. Randomize the correct answer position in options. Output valid JSON only. No explanations, no notes, no formatting.`;
+`;
 
     const gptResponse = await this.gptService.getGptResponse([
       {
         role: 'system',
-        content: 'You create only valid JSON formatted language tests.',
+        content:
+          'You only respond with raw JSON — no prose, no Markdown, no formatting. Only output a JSON array of objects.',
       },
       {
         role: 'user',
@@ -261,10 +259,17 @@ Shuffle the order of questions. Randomize the correct answer position in options
       },
     ]);
 
+    console.log('GPT Response:', gptResponse);
+
     const cleaned = this.gptService.cleanGptJsonResponse(gptResponse);
-    console.log('Cleaned GPT Response:', cleaned);
-    const parsed: AssessmentJson = JSON.parse(cleaned);
-    console.log('Parsed GPT Response:', parsed);
+    let parsed: AssessmentJson;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (err) {
+      console.error('JSON parsing error:', err);
+      console.error('Raw cleaned output:', cleaned);
+      throw err;
+    }
 
     const assessment = await this.prisma.assessment.create({
       data: {

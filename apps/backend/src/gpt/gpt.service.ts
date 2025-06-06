@@ -38,17 +38,15 @@ export class GptService {
    * Strips markdown wrapping like ```json and trims whitespace.
    */
   cleanGptJsonResponse(raw: string): string {
-    // Remove anything before the first {
-    const cleaned = raw.trim().replace(/^.*?({)/s, '$1');
+    const trimmed = raw.trim();
 
-    // Match all top-level JSON objects
-    const jsonObjects = cleaned.match(/{[^{}]*}(?=\s*{|\s*$)/gs);
+    // If wrapped in a Markdown-style ```json block, extract inside
+    const markdownMatch = trimmed.match(/```json\s*([\s\S]*?)\s*```/i);
+    if (markdownMatch) return markdownMatch[1].trim();
 
-    if (!jsonObjects) {
-      throw new Error('No valid JSON objects found');
-    }
+    // If starts with [ or {, assume it's plain JSON
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) return trimmed;
 
-    // Join them into a JSON array string
-    return `[${jsonObjects.join(',')}]`;
+    throw new Error('No valid JSON objects found');
   }
 }
