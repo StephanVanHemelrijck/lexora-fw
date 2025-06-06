@@ -38,7 +38,7 @@ export class TtsService {
     // If the file already exists, return the URL
     try {
       await fs.access(filePath);
-      return `/public/tts/${filename}`;
+      return `${process.env.API_URL}/public/tts/${filename}`;
     } catch {
       // Continue to generate audio
     }
@@ -53,6 +53,6 @@ export class TtsService {
     const [response] = await this.client.synthesizeSpeech(request);
     await fs.writeFile(filePath, response.audioContent as Uint8Array);
 
-    return `/public/tts/${filename}`;
+    return `${process.env.API_URL}/public/tts/${filename}`;
   }
 }

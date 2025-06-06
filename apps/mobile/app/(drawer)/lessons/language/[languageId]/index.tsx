@@ -16,6 +16,7 @@ import { Language, LanguageJourney } from '@lexora/types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
 import { useFocusEffect } from '@react-navigation/native';
+import { getCefrLevelLabel } from '@/utils/levels';
 
 const dummyData = Array.from({ length: 10 }, (_, i) => ({ id: i }));
 
@@ -54,7 +55,7 @@ export default function Page() {
       };
 
       checkAndRedirect();
-    }, [languageId, user])
+    }, [languageId, user, router])
   );
 
   // Fetch language metadata
@@ -99,11 +100,14 @@ export default function Page() {
           <Text style={styles.languageTitle}>
             {language?.flagEmoji} {language?.name}
           </Text>
-          <Text style={styles.languageLevel}>
-            {languageJourney?.placementLevel ?? 'N/A'}
-          </Text>
+          {languageJourney?.startingOption && (
+            <Text style={styles.languageLevel}>
+              {languageJourney?.placementLevel ?? 'N/A'} -{' '}
+              {getCefrLevelLabel(languageJourney?.placementLevel)}
+            </Text>
+          )}
         </View>
-        <RadarChartComponent size={150} />
+        {/* <RadarChartComponent size={150} /> */}
       </View>
 
       <View style={styles.divider} />

@@ -15,6 +15,7 @@ import {
   Spacing,
 } from '@lexora/styles';
 import { Icon } from '../ui/Icon';
+import { api } from '@lexora/api-client';
 
 interface Props {
   prompt: string;
@@ -52,15 +53,15 @@ export default function SpeakingRepetitionQuestion({
 
   const playPrompt = async () => {
     setIsLoading(true);
+    console.log(languageCode);
+
     try {
-      const res = await fetch(
-        `http://192.168.0.129:3000/api/tts?text=${encodeURIComponent(
-          prompt
-        )}&lang=${languageCode}`
+      const audioUrl = await api.tts.synthesizeSpeechToFile(
+        prompt,
+        languageCode
       );
-      const { audioUrl } = await res.json();
       const { sound } = await Audio.Sound.createAsync({
-        uri: `http://192.168.0.129:3000/api${audioUrl}`,
+        uri: audioUrl,
       });
       setIsPlaying(true);
       sound.setOnPlaybackStatusUpdate((status) => {

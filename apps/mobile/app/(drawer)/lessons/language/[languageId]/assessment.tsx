@@ -127,6 +127,7 @@ export default function AssessmentPage() {
             text_prompt={currentQuestion.text_prompt}
             onAnswer={onAnswer}
             selected={answers[currentQuestionIndex]}
+            languageCode={language?.code}
           />
         );
       case 'speaking_repetition':
@@ -135,6 +136,7 @@ export default function AssessmentPage() {
             prompt={currentQuestion.prompt}
             onAnswer={onAnswer}
             selected={answers[currentQuestionIndex]}
+            languageCode={language?.code}
           />
         );
     }

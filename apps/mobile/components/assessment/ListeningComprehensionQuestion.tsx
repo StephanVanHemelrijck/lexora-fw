@@ -15,6 +15,7 @@ import {
 } from '@lexora/styles';
 import { Audio } from 'expo-av';
 import { Icon } from '../ui/Icon'; // Optional: assuming you're using an Icon component
+import { api } from '@lexora/api-client';
 
 interface Props {
   question: string;
@@ -52,15 +53,13 @@ export default function ListeningComprehensionQuestion({
   const playPrompt = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `http://192.168.0.129:3000/api/tts?text=${encodeURIComponent(
-          text_prompt
-        )}&lang=${languageCode}`
+      const audioUrl = await api.tts.synthesizeSpeechToFile(
+        text_prompt,
+        languageCode
       );
-      const { audioUrl } = await res.json();
 
       const { sound } = await Audio.Sound.createAsync({
-        uri: `http://192.168.0.129:3000/api${audioUrl}`,
+        uri: audioUrl,
       });
 
       setIsPlaying(true);

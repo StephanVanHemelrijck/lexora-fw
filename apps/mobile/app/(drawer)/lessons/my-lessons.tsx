@@ -48,6 +48,7 @@ export default function MyLessons() {
             <LanguageCard
               key={languageJourney.languageId}
               languageId={languageJourney.languageId}
+              placementLevel={languageJourney.placementLevel}
               onPress={() => {
                 router.push({
                   pathname: '/lessons/language/[languageId]',
