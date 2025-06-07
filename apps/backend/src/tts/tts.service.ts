@@ -32,9 +32,12 @@ export class TtsService {
     const filename = this.generateFilename(text, languageCode);
     const filePath = join(publicTtsPath, filename);
 
+    console.log('filePAth: ', filePath);
+    console.log('publicTtsPath: ', publicTtsPath);
     // Ensure the directory exists
     await fs.mkdir(publicTtsPath, { recursive: true });
 
+    console.log(`${process.env.API_URL}/public/tts/${filename}`);
     // If the file already exists, return the URL
     try {
       await fs.access(filePath);
