@@ -1,7 +1,7 @@
-export function getCefrLevelLabel(level: string | null): string {
-  switch (level) {
-    case null:
-      return '';
+export function getCefrLevelLabel(level: string): string {
+  const normalizedLevel = level.trim().toUpperCase();
+
+  switch (normalizedLevel) {
     case 'A1':
       return 'Beginner';
     case 'A2':

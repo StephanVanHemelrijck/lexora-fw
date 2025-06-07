@@ -7,7 +7,6 @@ import {
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import RadarChartComponent from '@/components/charts/RadarChart';
 import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
@@ -28,6 +27,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
   const router = useRouter();
+  const [levelLabel, setLevelLabel] = useState<string>('');
 
   useFocusEffect(
     useCallback(() => {
@@ -73,6 +73,14 @@ export default function Page() {
     resolve();
   }, [languageId]);
 
+  useEffect(() => {
+    if (languageJourney?.placementLevel) {
+      const l = getCefrLevelLabel(languageJourney?.placementLevel);
+
+      setLevelLabel(l);
+    }
+  }, [languageJourney]);
+
   // Set drawer title
   useEffect(() => {
     if (!language?.name) return;
@@ -102,8 +110,7 @@ export default function Page() {
           </Text>
           {languageJourney?.startingOption && (
             <Text style={styles.languageLevel}>
-              {languageJourney?.placementLevel ?? 'N/A'} -{' '}
-              {getCefrLevelLabel(languageJourney?.placementLevel)}
+              {languageJourney?.placementLevel ?? 'N/A'} - {levelLabel}
             </Text>
           )}
         </View>
