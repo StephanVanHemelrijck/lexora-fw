@@ -9,6 +9,31 @@ export class LessonService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService
   ) {}
+
+  async getLessonById(id: string): Promise<Lesson> {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id },
+      include: {
+        exercises: true,
+        lessonPlan: {
+          include: {
+            languageJourney: {
+              include: {
+                language: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!lesson) {
+      throw new Error('Lesson not found');
+    }
+
+    return lesson;
+  }
+
   async getUpcomingLessonForUser(uid: string): Promise<Lesson[]> {
     const user = await this.userService.findByUid(uid);
 

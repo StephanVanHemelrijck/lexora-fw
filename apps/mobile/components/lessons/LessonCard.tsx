@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect } from 'react';
 import { Icon } from '../ui/Icon';
 import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
@@ -7,13 +7,10 @@ import { Lesson } from '@lexora/types';
 
 interface Props {
   lesson: Lesson;
+  onPress?: (lesson: Lesson) => void;
 }
 
-export default function LessonCard({ lesson }: Props) {
-  useEffect(() => {
-    console.log(lesson);
-  }, [lesson]);
-
+export default function LessonCard({ lesson, onPress }: Props) {
   return (
     <View style={styles.card}>
       <ProgressIndicator
@@ -23,7 +20,12 @@ export default function LessonCard({ lesson }: Props) {
         type="circle"
         size={48}
       />
-      <View style={styles.cardContent}>
+      <TouchableOpacity
+        style={styles.cardContent}
+        onPress={() => {
+          if (onPress) onPress(lesson);
+        }}
+      >
         <Text numberOfLines={2} style={styles.cardTitle}>
           {lesson.focus}
         </Text>
@@ -36,7 +38,7 @@ export default function LessonCard({ lesson }: Props) {
           />
           <Text style={styles.cardMetaText}>{lesson.estimatedMinutes} min</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }

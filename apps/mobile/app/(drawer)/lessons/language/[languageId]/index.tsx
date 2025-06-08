@@ -30,6 +30,10 @@ export default function Page() {
   const [isFetchingLessonPlan, setIsFetchingLessonPlan] = useState(true);
   const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
 
+  const handleRedirect = (lesson: Lesson) => {
+    router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
+  };
+
   useFocusEffect(
     useCallback(() => {
       const checkAndRedirect = async () => {
@@ -160,7 +164,13 @@ export default function Page() {
             ) : (
               lessonPlan &&
               lessonPlan.lessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  onPress={() => {
+                    handleRedirect(lesson);
+                  }}
+                />
               ))
             )}
           </ScrollView>
