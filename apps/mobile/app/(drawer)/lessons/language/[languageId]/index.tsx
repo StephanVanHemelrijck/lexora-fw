@@ -11,13 +11,11 @@ import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
-import { Language, LanguageJourney } from '@lexora/types';
+import { Language, LanguageJourney, Lesson, LessonPlan } from '@lexora/types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
 import { useFocusEffect } from '@react-navigation/native';
 import { getCefrLevelLabel } from '@/utils/levels';
-
-const dummyData = Array.from({ length: 10 }, (_, i) => ({ id: i }));
 
 export default function Page() {
   const navigation = useNavigation();
@@ -28,6 +26,9 @@ export default function Page() {
   const { user } = useAuthStore();
   const router = useRouter();
   const [levelLabel, setLevelLabel] = useState<string>('');
+  const [lessonPlan, setLessonPlan] = useState<LessonPlan>();
+  const [isFetchingLessonPlan, setIsFetchingLessonPlan] = useState(true);
+  const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -82,16 +83,20 @@ export default function Page() {
       setLevelLabel(l);
     }
 
-    console.log(user.accessToken);
+    setIsFetchingLessonPlan(true);
 
     // fetch lesson plan
     api.lessonPlan
       .generateLessonPlan(user.accessToken, languageJourney.id)
       .then((res) => {
         console.log(res);
+        setLessonPlan(res);
       })
       .catch((err) => {
         console.error(err);
+      })
+      .finally(() => {
+        setIsFetchingLessonPlan(false);
       });
   }, [languageJourney, user]);
 
@@ -148,9 +153,16 @@ export default function Page() {
             nestedScrollEnabled
             contentContainerStyle={styles.scrollView}
           >
-            {dummyData.slice(0, 6).map((item) => (
-              <LessonCard key={item.id} />
-            ))}
+            {isFetchingLessonPlan ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={Colors.accent} />
+              </View>
+            ) : (
+              lessonPlan &&
+              lessonPlan.lessons.map((lesson) => (
+                <LessonCard key={lesson.id} lesson={lesson} />
+              ))
+            )}
           </ScrollView>
         </View>
       </View>
@@ -158,31 +170,34 @@ export default function Page() {
       <Button text="PRACTICE WITH AI" onPress={() => {}} theme="purple" />
 
       {/* Completed Modules */}
-      <View style={styles.completedModules}>
-        <View style={styles.completedModulesText}>
-          <Text style={styles.sectionTitle}>Completed Modules</Text>
-          <Text style={styles.sectionDescription}>
-            Browse completed modules and tap to review your performance.
-          </Text>
+      {completedLessons.length > 0 && (
+        <View style={styles.completedModules}>
+          <View style={styles.completedModulesText}>
+            <Text style={styles.sectionTitle}>Completed Modules</Text>
+            <Text style={styles.sectionDescription}>
+              Browse completed modules and tap to review your performance.
+            </Text>
+          </View>
+          <View style={styles.scrollableCardList}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
+              contentContainerStyle={styles.scrollView}
+            >
+              {completedLessons.map((lesson) => (
+                <LessonCard key={lesson.id} lesson={lesson} />
+              ))}
+            </ScrollView>
+          </View>
         </View>
-        <View style={styles.scrollableCardList}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled
-            contentContainerStyle={styles.scrollView}
-          >
-            {dummyData.slice(0, 8).map((item) => (
-              <LessonCard key={`completed-${item.id}`} />
-            ))}
-          </ScrollView>
-        </View>
-      </View>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: Spacing.screenGutter,
     backgroundColor: Colors.surface,
     gap: Spacing.xl,
@@ -232,10 +247,11 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
   },
   scrollableCardList: {
-    maxHeight: 260,
+    height: 260,
   },
   scrollView: {
     gap: Spacing.m,
+    flexGrow: 1,
   },
   loadingContainer: {
     flex: 1,

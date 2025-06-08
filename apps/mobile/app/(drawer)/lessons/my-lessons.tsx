@@ -18,6 +18,17 @@ export default function MyLessons() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.buttonWrapper}>
+        <Button
+          text="LEARN A NEW LANGUAGE"
+          onPress={() => {
+            router.push({
+              pathname: '/lessons/new-language',
+            });
+          }}
+          theme="purple"
+        />
+      </View>
       <View style={styles.dailyGoalWrapper}>
         <DailyChallenge current={0} goal={user?.dailyMinutes ?? 0} />
       </View>
@@ -25,7 +36,7 @@ export default function MyLessons() {
       {/* Upcoming Lessons */}
       <View style={styles.lessonsWrapper}>
         <Text style={styles.upcomingLessonsTitle}>Upcoming Lessons</Text>
-        <LessonCard />
+        {/* <LessonCard /> */}
       </View>
 
       {/* Languages Learning */}
@@ -58,18 +69,6 @@ export default function MyLessons() {
             />
           ))}
         </ScrollView>
-      </View>
-      <View style={styles.buttonWrapper}>
-        <Button
-          text="LEARN A NEW LANGUAGE"
-          onPress={() => {
-            router.push({
-              pathname: '/lessons/language/[languageId]',
-              params: { languageId: '1' },
-            });
-          }}
-          theme="purple"
-        />
       </View>
     </ScrollView>
   );

@@ -74,13 +74,29 @@ export class LessonPlanService {
       where: { id: languageJourneyId },
     });
 
+    const today = startOfDay(new Date());
+    // get week plan for languageJourneyId and check if its not already expired
+    console.log(`[BACKEND] today: ${today}`);
+
+    const existingWeekPlan = await this.prisma.lessonPlan.findFirst({
+      where: {
+        languageJourneyId,
+        startDate: { lte: today },
+        endDate: { gte: today },
+      },
+      include: { lessons: true },
+    });
+
+    if (existingWeekPlan) {
+      console.log(`[BACKEND] returning existing week plan`);
+      return existingWeekPlan;
+    }
+
     if (!languageJourney)
       throw new NotFoundException('Language Journey not found');
 
     const weekPlan = await this.generateWeeklyLearningPlan(languageJourney);
     // TODO: Save plan and generate lessons based on `weekPlan`
-
-    const today = startOfDay(new Date());
 
     const lessonPlan = await this.prisma.lessonPlan.create({
       data: {
