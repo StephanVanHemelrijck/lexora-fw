@@ -55,6 +55,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
           const enrichedUser = await api.user.getMe(accessToken);
 
+          console.log('[AuthProvider] access token', accessToken);
+
           setAuth({
             ...enrichedUser,
             accessToken,

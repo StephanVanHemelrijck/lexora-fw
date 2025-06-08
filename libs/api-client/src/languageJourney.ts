@@ -4,6 +4,8 @@ import { apiClient } from './api.ts';
 export const languageJourney = {
   findByLanguageId: async (token: string, languageId: string) => {
     try {
+      console.log('[FROM LANGUAGE-JOURNEY-API] INSIDE findByLanguageId');
+
       const res = await apiClient.get<LanguageJourney>(
         `/language-journeys/language/${languageId}`,
         {

@@ -100,15 +100,17 @@ model LessonPlan {
 }
 
 model Lesson {
-  id           String     @id @default(cuid())
-  lessonPlanId String
-  lessonPlan   LessonPlan @relation(fields: [lessonPlanId], references: [id])
-  date         DateTime // What day it is scheduled for
-  isCompleted  Boolean    @default(false)
+  id               String     @id @default(cuid())
+  lessonPlanId     String
+  lessonPlan       LessonPlan @relation(fields: [lessonPlanId], references: [id])
+  date             DateTime // What day it is scheduled for
+  focus            String // e.g. ''Practicing common verbs
+  estimatedMinutes Int
 
-  exercises Exercise[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  isCompleted Boolean    @default(false)
+  exercises   Exercise[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Exercise {

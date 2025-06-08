@@ -1,5 +1,6 @@
 import { languages } from './language.ts';
 import { languageJourney } from './languageJourney.ts';
+import { lessonPlan } from './lessonPlan.ts';
 import { onboarding } from './onboarding.ts';
 import { tts } from './tts.ts';
 import { user } from './user.ts';
@@ -14,4 +15,5 @@ export const api = {
   languageJourney,
   userAssessment,
   tts,
+  lessonPlan,
 };

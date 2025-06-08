@@ -74,12 +74,26 @@ export default function Page() {
   }, [languageId]);
 
   useEffect(() => {
+    if (!languageJourney || !user || !user.accessToken) return;
+    // enrich label
     if (languageJourney?.placementLevel) {
       const l = getCefrLevelLabel(languageJourney?.placementLevel);
 
       setLevelLabel(l);
     }
-  }, [languageJourney]);
+
+    console.log(user.accessToken);
+
+    // fetch lesson plan
+    api.lessonPlan
+      .generateLessonPlan(user.accessToken, languageJourney.id)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [languageJourney, user]);
 
   // Set drawer title
   useEffect(() => {
