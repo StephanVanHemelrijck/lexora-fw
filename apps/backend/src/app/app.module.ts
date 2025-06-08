@@ -12,6 +12,7 @@ import { AppController } from './app.controller';
 import { TtsModule } from '../tts/tts.module';
 import { WhisperModule } from '../whisper/whisper.module';
 import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
+import { LessonModule } from '../lesson/lesson.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
     TtsModule,
     WhisperModule,
     LessonPlanModule,
+    LessonModule,
   ],
   controllers: [AppController],
 })

@@ -1,34 +1,46 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import React, { useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import DailyChallenge from '@/components/daily/DailyChallenge';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
-import LessonCard from '@/components/lessons/LessonCard';
 import LanguageCard from '@/components/languages/LanguageCard';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { api } from '@lexora/api-client';
+import { Lesson } from '@lexora/types';
+import LessonCard from '@/components/lessons/LessonCard';
 
 export default function MyLessons() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const [upcomingLessons, setUpcomingLessons] = useState<Lesson[]>([]);
+  const [isFetchingUpcomingLessons, setIsFetchingUpcomingLessons] =
+    useState(true);
 
   useEffect(() => {
     console.log(user?.languageJourneys);
+
+    if (!user) return;
+    api.lesson
+      .getUpcomingLessonForUser(user.accessToken)
+      .then((res) => {
+        console.log(res);
+        setUpcomingLessons(res);
+        setIsFetchingUpcomingLessons(false);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, [user]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.buttonWrapper}>
-        <Button
-          text="LEARN A NEW LANGUAGE"
-          onPress={() => {
-            router.push({
-              pathname: '/lessons/new-language',
-            });
-          }}
-          theme="purple"
-        />
-      </View>
       <View style={styles.dailyGoalWrapper}>
         <DailyChallenge current={0} goal={user?.dailyMinutes ?? 0} />
       </View>
@@ -36,7 +48,13 @@ export default function MyLessons() {
       {/* Upcoming Lessons */}
       <View style={styles.lessonsWrapper}>
         <Text style={styles.upcomingLessonsTitle}>Upcoming Lessons</Text>
-        {/* <LessonCard /> */}
+        {isFetchingUpcomingLessons ? (
+          <View style={styles.loadingWrapper}>
+            <ActivityIndicator size="large" color={Colors.accent} />
+          </View>
+        ) : (
+          <LessonCard lesson={upcomingLessons[0]} />
+        )}
       </View>
 
       {/* Languages Learning */}
@@ -70,6 +88,17 @@ export default function MyLessons() {
           ))}
         </ScrollView>
       </View>
+      <View style={styles.buttonWrapper}>
+        <Button
+          text="LEARN A NEW LANGUAGE"
+          onPress={() => {
+            router.push({
+              pathname: '/lessons/new-language',
+            });
+          }}
+          theme="purple"
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -85,6 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.screenGutter,
   },
   lessonsWrapper: {
+    minHeight: 130,
     gap: Spacing.m,
     paddingHorizontal: Spacing.screenGutter,
   },
@@ -92,6 +122,11 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.h2,
     fontWeight: 'bold',
     color: Colors.accent,
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   languagesLearningWrapper: {
     gap: Spacing.m,
