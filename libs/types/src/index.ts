@@ -7,3 +7,4 @@ export * from './languageJourney.ts';
 export * from './userAssessment.ts';
 export * from './lessonPlan.ts';
 export * from './lesson.ts';
+export * from './exercise.ts';

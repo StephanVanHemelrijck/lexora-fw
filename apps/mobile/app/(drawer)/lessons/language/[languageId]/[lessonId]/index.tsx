@@ -21,7 +21,7 @@ export default function Page() {
     const fetchLesson = async () => {
       try {
         const res = await api.lesson.getLessonById(user.accessToken, lessonId);
-        console.log('Getting lesson: ', res);
+        console.log('Getting lesson for: ', res);
         setLesson(res);
       } catch (err) {
         console.error(err);
@@ -44,7 +44,7 @@ export default function Page() {
   if (!lesson) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={{ color: Colors.textLight }}>Lesson not found.</Text>
+        <Text style={{ color: Colors.textLight }}>Lesson not found</Text>
       </View>
     );
   }
@@ -52,6 +52,8 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <Text>Focus: {lesson.focus}</Text>
+      <Text>Estimated minutes: {lesson.estimatedMinutes}</Text>
+      <Text>Types: {lesson.exerciseTypes.join(', ')}</Text>
     </View>
   );
 }
