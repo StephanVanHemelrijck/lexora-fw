@@ -39,6 +39,12 @@ export default function MyLessons() {
       });
   }, [user]);
 
+  const handleRedirect = (lesson: Lesson) => {
+    const languageId = lesson.lessonPlan.languageJourney.languageId;
+
+    router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dailyGoalWrapper}>
@@ -52,8 +58,13 @@ export default function MyLessons() {
           <View style={styles.loadingWrapper}>
             <ActivityIndicator size="large" color={Colors.accent} />
           </View>
+        ) : upcomingLessons.length > 0 ? (
+          <LessonCard
+            lesson={upcomingLessons[0]}
+            onPress={() => handleRedirect(upcomingLessons[0])}
+          />
         ) : (
-          <LessonCard lesson={upcomingLessons[0]} />
+          <Text style={styles.noLessonsText}>No upcoming lessons</Text>
         )}
       </View>
 
@@ -122,6 +133,10 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.h2,
     fontWeight: 'bold',
     color: Colors.accent,
+  },
+  noLessonsText: {
+    color: Colors.textLight,
+    fontSize: FontSizes.body,
   },
   loadingWrapper: {
     flex: 1,

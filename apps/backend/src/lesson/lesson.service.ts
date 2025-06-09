@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
-import { Lesson } from '@prisma/client';
+import { Language, LanguageJourney, Lesson } from '@prisma/client';
 
 @Injectable()
 export class LessonService {
@@ -31,6 +31,16 @@ export class LessonService {
       throw new Error('Lesson not found');
     }
 
+    const lj = lesson.lessonPlan.languageJourney;
+    const lang = lj.language;
+
+    if (lesson.exercises.length === 0) {
+      const generatedExercises = await this.generateExercisesForLesson(
+        lesson,
+        lj,
+        lang
+      );
+    }
     return lesson;
   }
 
@@ -69,5 +79,15 @@ export class LessonService {
 
       take: 1,
     });
+  }
+
+  async generateExercisesForLesson(
+    lesson: Lesson,
+    lj: LanguageJourney,
+    lang: Language
+  ) {
+    const { focus, estimatedMinutes } = lesson;
+    const { placementLevel, learningReasons } = lj;
+    const { name: targetLanguage } = lang;
   }
 }

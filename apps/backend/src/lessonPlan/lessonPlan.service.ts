@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { LanguageJourney } from '@prisma/client';
+import { ExerciseType, LanguageJourney } from '@prisma/client';
 import { GptService } from '../gpt/gpt.service';
 import { addDays, startOfDay } from 'date-fns';
 
@@ -54,7 +54,8 @@ Valid exercise types:
 - reading_comprehension
 - listening_comprehension
 - speaking_repetition
-- ai_conversation
+- text_ai_conversation
+- voice_ai_conversation
 
 Make the plan logically progressive. Include **at least one ai_conversation** during the week. Tailor it to the user’s CEFR level and learning motivations.
 `;
@@ -109,6 +110,7 @@ export class LessonPlanService {
             date: addDays(today, day.day - 1),
             focus: day.focus,
             estimatedMinutes: day.estimatedMinutes,
+            exerciseTypes: { set: day.exerciseTypes as ExerciseType[] },
           })),
         },
       },

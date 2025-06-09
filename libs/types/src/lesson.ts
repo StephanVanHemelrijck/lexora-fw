@@ -1,3 +1,5 @@
+import { LessonPlan } from './lessonPlan';
+
 export type Lesson = {
   id: string;
   lessonPlanId: string;
@@ -5,4 +7,5 @@ export type Lesson = {
   isCompleted: boolean;
   estimatedMinutes: number;
   focus: string;
+  lessonPlan: LessonPlan;
 };

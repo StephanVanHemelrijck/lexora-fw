@@ -159,6 +159,9 @@ export default function Page() {
           >
             {isFetchingLessonPlan ? (
               <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>
+                  Generating your week plan...
+                </Text>
                 <ActivityIndicator size="large" color={Colors.accent} />
               </View>
             ) : (
@@ -268,5 +271,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: FontSizes.body,
+    color: Colors.textLight,
+    marginBottom: Spacing.m,
   },
 });
