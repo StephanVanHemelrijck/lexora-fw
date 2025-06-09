@@ -21,6 +21,7 @@ import {
 } from '@lexora/styles';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Icon } from '@/components/ui/Icon';
+import { Tabs } from 'expo-router';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { user } = useAuthStore();
@@ -84,6 +85,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 export default function DrawerLayout() {
   return (
     <Drawer
+      initialRouteName="home"
+      backBehavior="history"
       drawerContent={CustomDrawerContent}
       screenOptions={{
         headerStyle: {
@@ -169,7 +172,7 @@ export default function DrawerLayout() {
         }}
       />
       <Drawer.Screen
-        name="lessons/language/[languageId]/[lessonId]/index"
+        name="lessons/language/[languageId]/[lessonId]"
         options={{
           drawerItemStyle: { display: 'none' },
           title: 'My Lessons - Assessment',

@@ -1,4 +1,4 @@
-import { ExerciseType } from './exercise';
+import { Exercise, ExerciseType } from './exercise';
 import { LessonPlan } from './lessonPlan';
 
 export type Lesson = {
@@ -10,4 +10,5 @@ export type Lesson = {
   focus: string;
   lessonPlan: LessonPlan;
   exerciseTypes: ExerciseType[];
+  exercises: Exercise[];
 };

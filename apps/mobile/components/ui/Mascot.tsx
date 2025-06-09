@@ -13,6 +13,7 @@ type Direction = 'top' | 'bottom' | 'left' | 'right';
 
 interface Props {
   text?: string;
+  parts?: (string | { text: string; accent?: boolean })[];
   size?: number;
   direction?: Direction;
 }
@@ -20,11 +21,24 @@ interface Props {
 export default function Mascot({
   text,
   size = MascotSizes.l,
+  parts,
   direction = 'top',
 }: Props) {
-  const bubble = text && (
+  const bubble = (text || parts) && (
     <View style={styles.bubble}>
-      <Text style={styles.text}>{text}</Text>
+      <Text style={styles.text}>
+        {parts
+          ? parts.map((part, i) =>
+              typeof part === 'string' ? (
+                part
+              ) : (
+                <Text key={i} style={part.accent ? styles.accent : styles.text}>
+                  {part.text}
+                </Text>
+              )
+            )
+          : text}
+      </Text>
     </View>
   );
 
@@ -84,5 +98,9 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.body,
     fontWeight: FontWeights.medium,
     textAlign: 'left',
+  },
+  accent: {
+    color: Colors.accent,
+    fontWeight: FontWeights.bold,
   },
 });

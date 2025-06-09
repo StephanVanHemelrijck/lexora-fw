@@ -8,6 +8,7 @@ import {
   Lesson,
 } from '@prisma/client';
 import { GptService } from '../gpt/gpt.service';
+import { ExerciseJson } from './lesson.interface';
 
 @Injectable()
 export class LessonService {
@@ -47,6 +48,36 @@ export class LessonService {
         lj,
         lang
       );
+
+      await this.prisma.exercise.createMany({
+        data: generatedExercises.map((e) => ({
+          lessonId: lesson.id,
+          type: e.type,
+          data: e,
+        })),
+      });
+
+      const updatedLesson = await this.prisma.lesson.findUnique({
+        where: { id },
+        include: {
+          exercises: true,
+          lessonPlan: {
+            include: {
+              languageJourney: {
+                include: {
+                  language: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!updatedLesson) {
+        throw new Error('Lesson not found');
+      }
+
+      return updatedLesson;
     }
     return lesson;
   }
@@ -179,8 +210,9 @@ Do not include any extra text, comments, Markdown, or explanations.
       { role: 'user', content: prompt },
     ]);
 
-    console.log('[BACKEND] GPT Exercise Response:', generated);
+    const cleaned = this.gptService.cleanGptJsonResponse(generated);
+    const exercises: ExerciseJson[] = JSON.parse(cleaned);
 
-    // You’ll probably also want to validate and save `generated` here.
+    return exercises;
   }
 }
