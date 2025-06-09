@@ -5,7 +5,12 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
@@ -93,7 +98,6 @@ export default function Page() {
     api.lessonPlan
       .generateLessonPlan(user.accessToken, languageJourney.id)
       .then((res) => {
-        console.log(res);
         setLessonPlan(res);
       })
       .catch((err) => {
@@ -105,10 +109,14 @@ export default function Page() {
   }, [languageJourney, user]);
 
   // Set drawer title
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!language?.name) return;
 
-    navigation.setOptions({
+    const parent = navigation.getParent();
+
+    if (!parent) return;
+
+    parent.setOptions({
       title: `My Lessons - ${language.name}`,
     });
   }, [navigation, language]);

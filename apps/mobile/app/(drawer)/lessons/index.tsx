@@ -5,11 +5,16 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import DailyChallenge from '@/components/daily/DailyChallenge';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 import LanguageCard from '@/components/languages/LanguageCard';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
@@ -23,6 +28,14 @@ export default function MyLessons() {
   const [isFetchingUpcomingLessons, setIsFetchingUpcomingLessons] =
     useState(true);
 
+  const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ title: 'My Lessons' });
+    }, [navigation])
+  );
+
   useEffect(() => {
     console.log(user?.languageJourneys);
 
@@ -30,7 +43,6 @@ export default function MyLessons() {
     api.lesson
       .getUpcomingLessonForUser(user.accessToken)
       .then((res) => {
-        console.log(res);
         setUpcomingLessons(res);
         setIsFetchingUpcomingLessons(false);
       })
