@@ -18,13 +18,23 @@ export default function LessonCard({ lesson, onPress }: Props) {
 
   return (
     <View style={styles.card}>
-      <ProgressIndicator
-        current={lessonProgress.completed}
-        total={lessonProgress.total}
-        height="thin"
-        type="circle"
-        size={48}
-      />
+      {lesson.isCompleted ? (
+        <ProgressIndicator
+          current={1} // If completed force to 1 (giving full slider)
+          total={1} // If completed force to 1 (giving full slider)
+          height="thin"
+          type="circle"
+          size={48}
+        />
+      ) : (
+        <ProgressIndicator
+          current={lessonProgress.completed}
+          total={lessonProgress.total}
+          height="thin"
+          type="circle"
+          size={48}
+        />
+      )}
       <TouchableOpacity
         style={styles.cardContent}
         onPress={() => {

@@ -1,12 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import {
-  BorderRadius,
-  Colors,
-  FontSizes,
-  FontWeights,
-  Spacing,
-} from '@lexora/styles';
+import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
 import RadarChartComponent from '../charts/RadarChart';
 import { Language } from '@lexora/types';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
