@@ -153,7 +153,9 @@ export default function Page() {
             theme="outline"
           />
           <Button
-            text="BEGIN"
+            text={
+              lesson.exercises.length === exercises.length ? 'BEGIN' : 'RESUME'
+            }
             onPress={() => {
               handleBegin();
             }}
