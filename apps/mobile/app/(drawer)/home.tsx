@@ -5,16 +5,7 @@ import ScreenContainer from '@/components/layouts/ScreenContainer';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function Home() {
-  // const { user } = useAuth();
   const { user } = useAuthStore();
-
-  useEffect(() => {
-    console.log('[HOME]');
-  }, []);
-
-  useEffect(() => {
-    console.log('[HOME]', user?.accessToken);
-  }, [user?.accessToken]);
 
   return (
     <ScreenContainer>
