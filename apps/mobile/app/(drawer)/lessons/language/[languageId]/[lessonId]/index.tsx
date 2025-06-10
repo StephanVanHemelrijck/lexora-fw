@@ -5,11 +5,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { Lesson, LessonResult } from '@lexora/types';
+import { Exercise, Lesson, LessonResult } from '@lexora/types';
 import { Colors, FontSizes, MascotSizes, Spacing } from '@lexora/styles';
 import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
@@ -29,6 +29,7 @@ export default function Page() {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [lessonResult, setLessonResult] = useState<LessonResult | null>(null);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
 
   useEffect(() => {
     if (!user || !lessonId) return;
@@ -38,8 +39,20 @@ export default function Page() {
         const res = await api.lesson.getLessonById(user.accessToken, lessonId);
         setLesson(res);
 
-        // const CEI = res.exercises.findIndex((e) => e.status !== 'completed');
-        console.log(res.exercises);
+        const incompletedExercises = res.exercises.filter(
+          (e) => e.status !== 'completed'
+        );
+
+        if (incompletedExercises.length === 0 && res.exercises.length > 0) {
+          await api.lessonResult.markAsComplete(user.accessToken, lessonId);
+
+          router.replace({
+            pathname: '/lessons/language/[languageId]/[lessonId]/results',
+            params: { languageId, lessonId },
+          });
+        }
+
+        setExercises(incompletedExercises);
 
         setCurrentExerciseIndex(0);
       } catch (err) {
@@ -50,12 +63,24 @@ export default function Page() {
     };
 
     fetchLesson();
-  }, [languageId, lessonId, user]);
+  }, [languageId, lessonId, user, router]);
 
   useEffect(() => {});
 
-  const handleOnNext = () => {
-    setCurrentExerciseIndex(currentExerciseIndex + 1);
+  const handleOnNext = async () => {
+    if (lesson && user) {
+      const isLast = currentExerciseIndex === exercises.length - 1;
+
+      if (isLast) {
+        // mark lesson as completed
+        await api.lessonResult.markAsComplete(user.accessToken, lessonId);
+
+        router.replace({
+          pathname: '/lessons/language/[languageId]/[lessonId]/results',
+          params: { languageId, lessonId },
+        });
+      } else setCurrentExerciseIndex(currentExerciseIndex + 1);
+    }
   };
 
   const handleBegin = async () => {
@@ -92,17 +117,33 @@ export default function Page() {
     return (
       <View style={styles.hasStartedContainer}>
         <View style={styles.mascotWrapper}>
-          <Mascot
-            parts={[
-              "In this lesson we'll be learning ",
-              { text: lesson.focus, accent: true },
-              '. We have prepared ',
-              { text: `${lesson.exercises.length}`, accent: true },
-              ' exercises for you. Good luck!',
-            ]}
-            direction="bottom"
-            size={MascotSizes.m}
-          />
+          {lesson.exercises.length === exercises.length ? (
+            <Mascot
+              parts={[
+                "In this lesson we'll be learning ",
+                { text: lesson.focus, accent: true },
+                '. We have prepared ',
+                { text: `${lesson.exercises.length}`, accent: true },
+                ' exercises for you. Good luck!',
+              ]}
+              direction="bottom"
+              size={MascotSizes.m}
+            />
+          ) : (
+            <Mascot
+              parts={[
+                "You're resuming the lesson ",
+                { text: lesson.focus, accent: true },
+                '. You have ',
+                { text: `${exercises.length}`, accent: true },
+                ` ${
+                  exercises.length === 1 ? 'exercise' : 'exercises'
+                } left to complete. Good luck!`,
+              ]}
+              direction="bottom"
+              size={MascotSizes.m}
+            />
+          )}
         </View>
 
         <View style={styles.buttonWrapper}>
@@ -147,15 +188,18 @@ export default function Page() {
         <View style={styles.progressWrapper}>
           <ProgressIndicator
             current={currentExerciseIndex + 1}
-            total={lesson.exercises.length}
+            total={exercises.length}
           />
         </View>
       </View>
-      <ExerciseRenderer
-        exercise={lesson.exercises[currentExerciseIndex]}
-        onNext={handleOnNext}
-        lessonResultId={lessonResult?.id}
-      />
+
+      {exercises[currentExerciseIndex] && (
+        <ExerciseRenderer
+          exercise={exercises[currentExerciseIndex]}
+          onNext={handleOnNext}
+          lessonResultId={lessonResult?.id}
+        />
+      )}
     </View>
   );
 }

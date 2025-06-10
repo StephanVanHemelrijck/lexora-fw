@@ -93,6 +93,7 @@ export class LessonService {
 
     return this.prisma.lesson.findMany({
       where: {
+        isCompleted: false,
         lessonPlan: {
           languageJourney: {
             uid,

@@ -38,6 +38,8 @@ export default function Page() {
   const updateFromLessons = useLessonProgressStore(
     (state) => state.updateFromLessons
   );
+  const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
+  const [incompletedLessons, setIncompletedLessons] = useState<Lesson[]>([]);
 
   const handleRedirect = (lesson: Lesson) => {
     router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
@@ -101,6 +103,12 @@ export default function Page() {
       .then((res) => {
         setLessonPlan(res);
         updateFromLessons(res.lessons);
+
+        const completed = res.lessons.filter((l) => l.isCompleted);
+        const incompleted = res.lessons.filter((l) => !l.isCompleted);
+
+        setCompletedLessons(completed);
+        setIncompletedLessons(incompleted);
       })
       .catch(console.error)
       .finally(() => setIsFetchingLessonPlan(false));
@@ -142,8 +150,8 @@ export default function Page() {
         <View style={styles.currentFocusText}>
           <Text style={styles.sectionTitle}>Current Focus</Text>
           <Text style={styles.sectionDescription}>
-            Based on your results, your weakness lies in grammar. We’ve selected
-            exercises to help you progress.
+            A custom plan based on your level — complete these lessons to keep
+            improving.
           </Text>
         </View>
         <View style={styles.scrollableCardList}>
@@ -160,7 +168,7 @@ export default function Page() {
                 <ActivityIndicator size="large" color={Colors.accent} />
               </View>
             ) : (
-              lessonPlan?.lessons.map((lesson) => (
+              incompletedLessons.map((lesson) => (
                 <LessonCard
                   key={lesson.id}
                   lesson={lesson}
@@ -173,6 +181,33 @@ export default function Page() {
       </View>
 
       <Button text="PRACTICE WITH AI" onPress={() => {}} theme="purple" />
+
+      {completedLessons.length > 0 && (
+        <View style={styles.completedLessons}>
+          <View style={styles.completedLessonsText}>
+            <Text style={styles.sectionTitle}>Completed Lessons</Text>
+            <Text style={styles.sectionDescription}>
+              Scroll through the lessons you&#39;ve completed and tap on them to
+              review how you handled them.
+            </Text>
+          </View>
+          <View style={styles.scrollableCardList}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
+              contentContainerStyle={styles.scrollView}
+            >
+              {completedLessons.map((lesson) => (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  onPress={() => handleRedirect(lesson)}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -211,6 +246,12 @@ const styles = StyleSheet.create({
     gap: Spacing.l,
   },
   currentFocusText: {
+    gap: Spacing.s,
+  },
+  completedLessons: {
+    gap: Spacing.l,
+  },
+  completedLessonsText: {
     gap: Spacing.s,
   },
   scrollableCardList: {

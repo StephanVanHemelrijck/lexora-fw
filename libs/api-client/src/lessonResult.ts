@@ -22,4 +22,37 @@ export const lessonResult = {
       throw err;
     }
   },
+
+  markAsComplete: async (token: string, lessonId: string) => {
+    try {
+      const res = await apiClient.post(
+        '/lesson-result/mark-as-complete',
+        {
+          lessonId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
+  getByLessonId: async (token: string, lessonId: string) => {
+    try {
+      const res = await apiClient.get<LessonResult>(
+        `/lesson-result/get-by-lesson-id/${lessonId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
 };

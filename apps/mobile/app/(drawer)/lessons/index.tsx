@@ -5,12 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useState } from 'react';
 import DailyChallenge from '@/components/daily/DailyChallenge';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 import LanguageCard from '@/components/languages/LanguageCard';
@@ -39,21 +34,24 @@ export default function MyLessons() {
     }, [navigation])
   );
 
-  useEffect(() => {
-    console.log(user?.languageJourneys);
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ title: 'My Lessons' });
 
-    if (!user) return;
-    api.lesson
-      .getUpcomingLessonForUser(user.accessToken)
-      .then((res) => {
-        setUpcomingLessons(res);
-        setIsFetchingUpcomingLessons(false);
-        updateFromLessons(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, [user, updateFromLessons]);
+      if (!user) return;
+
+      setIsFetchingUpcomingLessons(true); // Reset loader on focus
+
+      api.lesson
+        .getUpcomingLessonForUser(user.accessToken)
+        .then((res) => {
+          setUpcomingLessons(res);
+          updateFromLessons(res);
+        })
+        .catch(console.error)
+        .finally(() => setIsFetchingUpcomingLessons(false));
+    }, [user, navigation, updateFromLessons])
+  );
 
   const handleRedirect = (lesson: Lesson) => {
     const languageId = lesson.lessonPlan.languageJourney.languageId;
