@@ -30,4 +30,14 @@ export class WhisperService {
       throw err;
     }
   }
+
+  compareTranscription(actual: string, expected: string): boolean {
+    const normalize = (text: string) =>
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/[.,!?]/g, '');
+
+    return normalize(actual) === normalize(expected);
+  }
 }

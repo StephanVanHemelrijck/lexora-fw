@@ -1,12 +1,14 @@
 import { StyleSheet, Text } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Exercise,
   ExerciseJson,
   GrammarMultipleChoice,
+  SpeakingRepetition,
   VocabularyMultipleChoice,
 } from '@lexora/types';
 import MultipleChoiceExercise from './MultipleChoiceExercise';
+import SpeakingRepetitionExercise from './SpeakingRepetitionExercise';
 
 interface Props {
   exercise: Exercise;
@@ -23,6 +25,16 @@ export default function ExerciseRenderer({ exercise, onNext }: Props) {
     );
   };
 
+  const isSpeakingRepetition = (
+    data: ExerciseJson
+  ): data is SpeakingRepetition => {
+    return data.type === 'speaking_repetition';
+  };
+
+  useEffect(() => {
+    console.log('ExerciseRenderer', exercise);
+  }, [exercise]);
+
   const handleOnNext = () => {
     onNext();
   };
@@ -31,6 +43,17 @@ export default function ExerciseRenderer({ exercise, onNext }: Props) {
     return (
       <MultipleChoiceExercise
         data={exercise.data}
+        exerciseId={exercise.id}
+        onNext={handleOnNext}
+      />
+    );
+  }
+
+  if (isSpeakingRepetition(exercise.data)) {
+    return (
+      <SpeakingRepetitionExercise
+        prompt={exercise.data.prompt}
+        languageCode={'es'}
         exerciseId={exercise.id}
         onNext={handleOnNext}
       />
