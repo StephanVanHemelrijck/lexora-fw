@@ -27,6 +27,7 @@ interface Props {
   exerciseId: string;
   languageCode?: string;
   onNext(): void;
+  lessonResultId?: string;
 }
 
 export default function SpeakingRepetitionExerciseWithCheck({
@@ -34,6 +35,7 @@ export default function SpeakingRepetitionExerciseWithCheck({
   exerciseId,
   languageCode = 'es-ES',
   onNext,
+  lessonResultId,
 }: Props) {
   const { user } = useAuthStore();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
@@ -165,6 +167,7 @@ export default function SpeakingRepetitionExerciseWithCheck({
         selectedAnswer: recordedUri,
         isCorrect,
         status: 'completed' as ExerciseStatus,
+        lessonResultId,
       });
     } catch (err) {
       console.error('Check failed', err);
@@ -174,14 +177,24 @@ export default function SpeakingRepetitionExerciseWithCheck({
   };
 
   const handleNext = () => {
-    if (!storedResult) {
-      addResult({
-        exerciseId,
-        selectedAnswer: null,
-        isCorrect: false,
-        status: 'skipped' as ExerciseStatus,
-      });
-    }
+    if (!user) return;
+
+    const isCorrect = checkResult === 'correct';
+    const hasAnswered = !!recordedUri;
+
+    const result = {
+      exerciseId,
+      selectedAnswer: hasAnswered ? recordedUri : null,
+      isCorrect: hasAnswered ? isCorrect : false,
+      status: hasAnswered
+        ? ('completed' as ExerciseStatus)
+        : ('skipped' as ExerciseStatus),
+      lessonResultId,
+    };
+
+    addResult(result);
+    api.exerciseResult.save(user.accessToken, result);
+
     onNext();
   };
 

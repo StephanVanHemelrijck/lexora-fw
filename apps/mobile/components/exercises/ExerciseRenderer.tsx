@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 import React, { useEffect } from 'react';
 import {
   Exercise,
@@ -62,11 +62,10 @@ export default function ExerciseRenderer({
         languageCode={'es'}
         exerciseId={exercise.id}
         onNext={handleOnNext}
+        lessonResultId={lessonResultId}
       />
     );
   }
 
   return <Text>ExerciseRenderer</Text>;
 }
-
-const styles = StyleSheet.create({});
