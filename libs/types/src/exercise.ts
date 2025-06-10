@@ -78,3 +78,15 @@ export type Exercise = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type ExerciseResult = {
+  exerciseId: string;
+  selectedAnswer: string | null;
+  isCorrect: boolean;
+  status: ExerciseStatus;
+};
+
+export enum ExerciseStatus {
+  completed = 'completed',
+  skipped = 'skipped',
+}

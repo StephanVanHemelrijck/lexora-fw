@@ -1,12 +1,21 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Lesson } from '@lexora/types';
-import { Colors, MascotSizes, Spacing } from '@lexora/styles';
+import { Colors, FontSizes, MascotSizes, Spacing } from '@lexora/styles';
 import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
+import ExerciseRenderer from '@/components/exercises/ExerciseRenderer';
+import { Icon } from '@/components/ui/Icon';
+import { ProgressIndicator } from '@/components/ui/ProgressIndicator';
 
 export default function Page() {
   const navigation = useNavigation();
@@ -19,19 +28,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const [hasStarted, setHasStarted] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!lesson) return;
-    const language = lesson.lessonPlan.languageJourney.language;
-
-    const parent = navigation.getParent();
-
-    if (!parent) return;
-
-    parent.setOptions({
-      title: `My Lessons - ${language.name}`,
-    });
-  }, [navigation, lesson]);
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 
   useEffect(() => {
     if (!user || !lessonId) return;
@@ -40,6 +37,10 @@ export default function Page() {
       try {
         const res = await api.lesson.getLessonById(user.accessToken, lessonId);
         setLesson(res);
+
+        const CEI = res.exercises.findIndex((e) => e.status !== 'completed');
+
+        setCurrentExerciseIndex(CEI >= 0 ? CEI : 0);
       } catch (err) {
         console.error(err);
       } finally {
@@ -49,6 +50,12 @@ export default function Page() {
 
     fetchLesson();
   }, [languageId, lessonId, user]);
+
+  useEffect(() => {});
+
+  const handleOnNext = () => {
+    setCurrentExerciseIndex(currentExerciseIndex + 1);
+  };
 
   if (isLoading) {
     return (
@@ -68,7 +75,7 @@ export default function Page() {
 
   if (!hasStarted) {
     return (
-      <View style={styles.container}>
+      <View style={styles.hasStartedContainer}>
         <View style={styles.mascotWrapper}>
           <Mascot
             parts={[
@@ -102,8 +109,35 @@ export default function Page() {
   }
 
   return (
-    <View>
-      <Text>Lol</Text>
+    <View style={styles.container}>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => {
+            if (currentExerciseIndex > 0)
+              setCurrentExerciseIndex(currentExerciseIndex - 1);
+            else setHasStarted(false);
+          }}
+          style={styles.backButton}
+        >
+          <Icon
+            name={currentExerciseIndex > 0 ? 'arrow-back' : 'close'}
+            size={FontSizes.h1}
+            color={Colors.textLight}
+            library="Ionicons"
+          />
+        </TouchableOpacity>
+
+        <View style={styles.progressWrapper}>
+          <ProgressIndicator
+            current={currentExerciseIndex + 1}
+            total={lesson.exercises.length}
+          />
+        </View>
+      </View>
+      <ExerciseRenderer
+        exercise={lesson.exercises[currentExerciseIndex]}
+        onNext={handleOnNext}
+      />
     </View>
   );
 }
@@ -115,17 +149,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.surface,
   },
+  hasStartedContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surface,
+    padding: Spacing.screenGutter,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.surface,
-    padding: Spacing.screenGutter,
-    justifyContent: 'space-between',
   },
   mascotWrapper: {
     flex: 1,
     justifyContent: 'center',
   },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: Spacing.screenGutter,
+    paddingHorizontal: Spacing.screenGutter,
+  },
   buttonWrapper: {
     gap: Spacing.m,
   },
+  backButton: { paddingRight: Spacing.s },
+  progressWrapper: { flex: 1 },
 });
