@@ -85,7 +85,7 @@ export class LessonPlanService {
         startDate: { lte: today },
         endDate: { gte: today },
       },
-      include: { lessons: true },
+      include: { lessons: { include: { exercises: true } } },
     });
 
     if (existingWeekPlan) {
@@ -114,7 +114,13 @@ export class LessonPlanService {
           })),
         },
       },
-      include: { lessons: true },
+      include: {
+        lessons: {
+          include: {
+            exercises: true,
+          },
+        },
+      },
     });
 
     console.log('[BACKEND] Generated plan: ', lessonPlan);
@@ -168,5 +174,39 @@ export class LessonPlanService {
     }
 
     return parsed;
+  }
+
+  async getLessonProgressForPlan(lessonPlanId: string, userId: string) {
+    const lessons = await this.prisma.lesson.findMany({
+      where: { lessonPlanId },
+      include: {
+        exercises: {
+          select: { id: true },
+        },
+        LessonResult: {
+          where: { userId },
+          include: {
+            exercises: true,
+          },
+        },
+      },
+    });
+
+    return lessons.map((lesson) => {
+      const completedCount =
+        lesson.LessonResult[0]?.exercises.filter(
+          (ex) => ex.status === 'completed'
+        ).length || 0;
+
+      return {
+        id: lesson.id,
+        focus: lesson.focus,
+        estimatedMinutes: lesson.estimatedMinutes,
+        exercises: {
+          total: lesson.exercises.length,
+          completed: completedCount,
+        },
+      };
+    });
   }
 }

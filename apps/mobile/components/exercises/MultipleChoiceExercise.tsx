@@ -21,7 +21,7 @@ interface Props {
   data: GrammarMultipleChoice | VocabularyMultipleChoice;
   exerciseId: string;
   onNext(): void;
-  lessonResultId?: string;
+  lessonResultId?: string; // used as lessonId in this example
 }
 
 export default function MultipleChoiceExercise({
@@ -35,6 +35,8 @@ export default function MultipleChoiceExercise({
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const addResult = useLessonProgressStore((state) => state.addResult);
+  const setProgress = useLessonProgressStore((state) => state.setProgress);
+  const progressMap = useLessonProgressStore((state) => state.progress);
   const storedResult = useLessonProgressStore((state) =>
     state.getResultById(exerciseId)
   );
@@ -49,17 +51,15 @@ export default function MultipleChoiceExercise({
 
   const handleOptionSelect = (option: string) => {
     if (hasSubmitted) return;
-    setSelectedOption(option);
     if (selectedOption === option) {
       setSelectedOption(null);
-      return;
+    } else {
+      setSelectedOption(option);
     }
   };
 
   const handleCheckAnswer = () => {
-    const isCorrect = selectedOption
-      ? selectedOption === data.correct_answer
-      : false;
+    const isCorrect = selectedOption === data.correct_answer;
 
     addResult({
       exerciseId,
@@ -77,14 +77,7 @@ export default function MultipleChoiceExercise({
   const handleNextAnswer = () => {
     if (!user) return;
 
-    if (hasSubmitted) {
-      onNext();
-      return;
-    }
-
-    const isCorrect = selectedOption
-      ? selectedOption === data.correct_answer
-      : false;
+    const isCorrect = selectedOption === data.correct_answer;
 
     const result = {
       exerciseId,
@@ -97,8 +90,23 @@ export default function MultipleChoiceExercise({
     };
 
     addResult(result);
-
     api.exerciseResult.save(user.accessToken, result);
+
+    // Update progress if lessonId is available
+    if (lessonResultId) {
+      const lessonId = lessonResultId;
+      const current = progressMap[lessonId] ?? { completed: 0, total: 1 };
+
+      const updatedCompleted =
+        result.status === 'completed'
+          ? current.completed + 1
+          : current.completed;
+
+      setProgress(lessonId, {
+        completed: updatedCompleted,
+        total: current.total,
+      });
+    }
 
     setHasSubmitted(true);
     onNext();

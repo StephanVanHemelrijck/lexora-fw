@@ -19,4 +19,16 @@ export class LessonPlanController {
       user.uid
     );
   }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('/:lessonPlanId/get-progress')
+  async getLessonProgressForPlan(
+    @User() user: FirebaseUser,
+    @Param('lessonPlanId') lessonPlanId: string
+  ) {
+    return this.lessonPlanService.getLessonProgressForPlan(
+      lessonPlanId,
+      user.uid
+    );
+  }
 }

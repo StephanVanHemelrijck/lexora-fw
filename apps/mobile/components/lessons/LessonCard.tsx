@@ -1,21 +1,26 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Icon } from '../ui/Icon';
 import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
 import { ProgressIndicator } from '../ui/ProgressIndicator';
 import { Lesson } from '@lexora/types';
+import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 
 interface Props {
   lesson: Lesson;
+
   onPress?: (lesson: Lesson) => void;
 }
 
 export default function LessonCard({ lesson, onPress }: Props) {
+  const { progress } = useLessonProgressStore();
+  const lessonProgress = progress[lesson.id] ?? { completed: 0, total: 1 };
+
   return (
     <View style={styles.card}>
       <ProgressIndicator
-        current={25}
-        total={60}
+        current={lessonProgress.completed}
+        total={lessonProgress.total}
         height="thin"
         type="circle"
         size={48}

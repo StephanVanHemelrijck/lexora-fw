@@ -1,3 +1,4 @@
+// pages/lessons/language/[languageId]/index.tsx
 import {
   StyleSheet,
   Text,
@@ -21,6 +22,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
 import { useFocusEffect } from '@react-navigation/native';
 import { getCefrLevelLabel } from '@/utils/levels';
+import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 
 export default function Page() {
   const navigation = useNavigation();
@@ -33,7 +35,9 @@ export default function Page() {
   const [levelLabel, setLevelLabel] = useState<string>('');
   const [lessonPlan, setLessonPlan] = useState<LessonPlan>();
   const [isFetchingLessonPlan, setIsFetchingLessonPlan] = useState(true);
-  const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
+  const updateFromLessons = useLessonProgressStore(
+    (state) => state.updateFromLessons
+  );
 
   const handleRedirect = (lesson: Lesson) => {
     router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
@@ -84,44 +88,32 @@ export default function Page() {
   }, [languageId]);
 
   useEffect(() => {
-    if (!languageJourney || !user || !user.accessToken) return;
-    // enrich label
-    if (languageJourney?.placementLevel) {
-      const l = getCefrLevelLabel(languageJourney?.placementLevel);
+    if (!languageJourney || !user?.accessToken) return;
 
-      setLevelLabel(l);
+    if (languageJourney.placementLevel) {
+      setLevelLabel(getCefrLevelLabel(languageJourney.placementLevel));
     }
 
     setIsFetchingLessonPlan(true);
 
-    // fetch lesson plan
     api.lessonPlan
       .generateLessonPlan(user.accessToken, languageJourney.id)
       .then((res) => {
         setLessonPlan(res);
+        updateFromLessons(res.lessons);
       })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        setIsFetchingLessonPlan(false);
-      });
-  }, [languageJourney, user]);
+      .catch(console.error)
+      .finally(() => setIsFetchingLessonPlan(false));
+  }, [languageJourney, user, updateFromLessons]);
 
   // Set drawer title
   useLayoutEffect(() => {
     if (!language?.name) return;
-
-    const parent = navigation.getParent();
-
-    if (!parent) return;
-
-    parent.setOptions({
+    navigation.getParent()?.setOptions({
       title: `My Lessons - ${language.name}`,
     });
   }, [navigation, language]);
 
-  // Loading screen during redirect
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -132,25 +124,20 @@ export default function Page() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.nativeLanguageName}>{language?.nativeName}</Text>
           <Text style={styles.languageTitle}>
             {language?.flagEmoji} {language?.name}
           </Text>
-          {languageJourney?.startingOption && (
-            <Text style={styles.languageLevel}>
-              {languageJourney?.placementLevel ?? 'N/A'} - {levelLabel}
-            </Text>
-          )}
+          <Text style={styles.languageLevel}>
+            {languageJourney?.placementLevel ?? 'N/A'} - {levelLabel}
+          </Text>
         </View>
-        {/* <RadarChartComponent size={150} /> */}
       </View>
 
       <View style={styles.divider} />
 
-      {/* Current Focus */}
       <View style={styles.currentFocus}>
         <View style={styles.currentFocusText}>
           <Text style={styles.sectionTitle}>Current Focus</Text>
@@ -173,14 +160,11 @@ export default function Page() {
                 <ActivityIndicator size="large" color={Colors.accent} />
               </View>
             ) : (
-              lessonPlan &&
-              lessonPlan.lessons.map((lesson) => (
+              lessonPlan?.lessons.map((lesson) => (
                 <LessonCard
                   key={lesson.id}
                   lesson={lesson}
-                  onPress={() => {
-                    handleRedirect(lesson);
-                  }}
+                  onPress={() => handleRedirect(lesson)}
                 />
               ))
             )}
@@ -189,29 +173,6 @@ export default function Page() {
       </View>
 
       <Button text="PRACTICE WITH AI" onPress={() => {}} theme="purple" />
-
-      {/* Completed Modules */}
-      {completedLessons.length > 0 && (
-        <View style={styles.completedModules}>
-          <View style={styles.completedModulesText}>
-            <Text style={styles.sectionTitle}>Completed Modules</Text>
-            <Text style={styles.sectionDescription}>
-              Browse completed modules and tap to review your performance.
-            </Text>
-          </View>
-          <View style={styles.scrollableCardList}>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              nestedScrollEnabled
-              contentContainerStyle={styles.scrollView}
-            >
-              {completedLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      )}
     </ScrollView>
   );
 }
@@ -252,11 +213,12 @@ const styles = StyleSheet.create({
   currentFocusText: {
     gap: Spacing.s,
   },
-  completedModules: {
-    gap: Spacing.l,
+  scrollableCardList: {
+    height: 260,
   },
-  completedModulesText: {
-    gap: Spacing.s,
+  scrollView: {
+    gap: Spacing.m,
+    flexGrow: 1,
   },
   sectionTitle: {
     fontSize: FontSizes.h2,
@@ -267,16 +229,8 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.body,
     color: Colors.textLight,
   },
-  scrollableCardList: {
-    height: 260,
-  },
-  scrollView: {
-    gap: Spacing.m,
-    flexGrow: 1,
-  },
   loadingContainer: {
     flex: 1,
-    backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },

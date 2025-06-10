@@ -20,6 +20,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
 import { Lesson } from '@lexora/types';
 import LessonCard from '@/components/lessons/LessonCard';
+import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 
 export default function MyLessons() {
   const router = useRouter();
@@ -27,8 +28,10 @@ export default function MyLessons() {
   const [upcomingLessons, setUpcomingLessons] = useState<Lesson[]>([]);
   const [isFetchingUpcomingLessons, setIsFetchingUpcomingLessons] =
     useState(true);
-
   const navigation = useNavigation();
+  const updateFromLessons = useLessonProgressStore(
+    (state) => state.updateFromLessons
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -45,11 +48,12 @@ export default function MyLessons() {
       .then((res) => {
         setUpcomingLessons(res);
         setIsFetchingUpcomingLessons(false);
+        updateFromLessons(res);
       })
       .catch((err) => {
         console.error(err);
       });
-  }, [user]);
+  }, [user, updateFromLessons]);
 
   const handleRedirect = (lesson: Lesson) => {
     const languageId = lesson.lessonPlan.languageJourney.languageId;
@@ -65,7 +69,7 @@ export default function MyLessons() {
 
       {/* Upcoming Lessons */}
       <View style={styles.lessonsWrapper}>
-        <Text style={styles.upcomingLessonsTitle}>Upcoming Lessons</Text>
+        <Text style={styles.upcomingLessonsTitle}>Upcoming Lesson</Text>
         {isFetchingUpcomingLessons ? (
           <View style={styles.loadingWrapper}>
             <ActivityIndicator size="large" color={Colors.accent} />
@@ -76,7 +80,7 @@ export default function MyLessons() {
             onPress={() => handleRedirect(upcomingLessons[0])}
           />
         ) : (
-          <Text style={styles.noLessonsText}>No upcoming lessons</Text>
+          <Text style={styles.noLessonsText}>No upcoming lesson</Text>
         )}
       </View>
 

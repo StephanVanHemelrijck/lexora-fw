@@ -38,9 +38,10 @@ export default function Page() {
         const res = await api.lesson.getLessonById(user.accessToken, lessonId);
         setLesson(res);
 
-        const CEI = res.exercises.findIndex((e) => e.status !== 'completed');
+        // const CEI = res.exercises.findIndex((e) => e.status !== 'completed');
+        console.log(res.exercises);
 
-        setCurrentExerciseIndex(CEI >= 0 ? CEI : 0);
+        setCurrentExerciseIndex(0);
       } catch (err) {
         console.error(err);
       } finally {
