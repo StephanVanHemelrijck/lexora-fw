@@ -4,11 +4,13 @@ import {
   Exercise,
   ExerciseJson,
   GrammarMultipleChoice,
+  ListeningComprehension,
   SpeakingRepetition,
   VocabularyMultipleChoice,
 } from '@lexora/types';
 import MultipleChoiceExercise from './MultipleChoiceExercise';
 import SpeakingRepetitionExercise from './SpeakingRepetitionExercise';
+import ListeningComprehesionExercise from './ListeningComprehesionExercise';
 
 interface Props {
   exercise: Exercise;
@@ -34,6 +36,12 @@ export default function ExerciseRenderer({
     data: ExerciseJson
   ): data is SpeakingRepetition => {
     return data.type === 'speaking_repetition';
+  };
+
+  const isListeningComprehension = (
+    data: ExerciseJson
+  ): data is ListeningComprehension => {
+    return data.type === 'listening_comprehension';
   };
 
   useEffect(() => {
@@ -63,6 +71,18 @@ export default function ExerciseRenderer({
         exerciseId={exercise.id}
         onNext={handleOnNext}
         lessonResultId={lessonResultId}
+      />
+    );
+  }
+
+  if (isListeningComprehension(exercise.data)) {
+    return (
+      <ListeningComprehesionExercise
+        onNext={handleOnNext}
+        data={exercise.data}
+        exerciseId={exercise.id}
+        lessonResultId={lessonResultId}
+        languageCode={'es'}
       />
     );
   }

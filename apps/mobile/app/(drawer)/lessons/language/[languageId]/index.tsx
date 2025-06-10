@@ -152,7 +152,9 @@ export default function Page() {
 
       <View style={styles.currentFocus}>
         <View style={styles.currentFocusText}>
-          <Text style={styles.sectionTitle}>Current Focus</Text>
+          <Text style={styles.sectionTitle}>
+            Current Focus ({incompletedLessons.length})
+          </Text>
           <Text style={styles.sectionDescription}>
             A custom plan based on your level — complete these lessons to keep
             improving.
@@ -189,7 +191,9 @@ export default function Page() {
       {completedLessons.length > 0 && (
         <View style={styles.completedLessons}>
           <View style={styles.completedLessonsText}>
-            <Text style={styles.sectionTitle}>Completed Lessons</Text>
+            <Text style={styles.sectionTitle}>
+              Completed Lessons ({completedLessons.length})
+            </Text>
             <Text style={styles.sectionDescription}>
               Scroll through the lessons you&#39;ve completed and tap on them to
               review how you handled them.
