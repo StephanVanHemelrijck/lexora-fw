@@ -3,17 +3,17 @@ export function getCefrLevelLabel(level: string): string {
 
   switch (normalizedLevel) {
     case 'A1':
-      return 'Beginner';
+      return 'A1 - Beginner';
     case 'A2':
-      return 'Elementary';
+      return 'A2 - Elementary';
     case 'B1':
-      return 'Intermediate';
+      return 'B1 - Intermediate';
     case 'B2':
-      return 'Upper-Intermediate';
+      return 'B2 - Upper-Intermediate';
     case 'C1':
-      return 'Advanced';
+      return 'C1 - Advanced';
     case 'C2':
-      return 'Proficient';
+      return 'C2 - Proficient';
     default:
       return '';
   }

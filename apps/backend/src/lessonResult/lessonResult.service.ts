@@ -41,7 +41,23 @@ export class LessonResultService {
   async getLessonResultByLessonId(uid: string, lessonId: string) {
     return this.prisma.lessonResult.findFirst({
       where: { userId: uid, lessonId },
-      include: { exercises: true },
+      include: {
+        exercises: true,
+        lesson: {
+          include: {
+            exercises: true,
+            lessonPlan: {
+              include: {
+                languageJourney: {
+                  include: {
+                    language: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 }

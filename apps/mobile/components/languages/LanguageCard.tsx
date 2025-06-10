@@ -68,9 +68,7 @@ export default function LanguageCard({
             <Text style={styles.cardTitle}>
               {language?.flagEmoji} {language?.name}
             </Text>
-            <Text style={styles.cardText}>
-              {placementLevel} - {levelLabel}
-            </Text>
+            <Text style={styles.cardText}>{levelLabel}</Text>
             <Text style={styles.cardText}>11% Complete</Text>
           </View>
         </View>

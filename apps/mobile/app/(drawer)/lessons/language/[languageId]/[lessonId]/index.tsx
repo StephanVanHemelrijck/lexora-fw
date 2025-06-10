@@ -65,8 +65,6 @@ export default function Page() {
     fetchLesson();
   }, [languageId, lessonId, user, router]);
 
-  useEffect(() => {});
-
   const handleOnNext = async () => {
     if (lesson && user) {
       const isLast = currentExerciseIndex === exercises.length - 1;

@@ -42,7 +42,13 @@ export default function Page() {
   const [incompletedLessons, setIncompletedLessons] = useState<Lesson[]>([]);
 
   const handleRedirect = (lesson: Lesson) => {
-    router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
+    const isCompleted = lesson.isCompleted;
+
+    if (isCompleted)
+      router.push(
+        `/(drawer)/lessons/language/${languageId}/${lesson.id}/results`
+      );
+    else router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
   };
 
   useFocusEffect(
@@ -138,9 +144,7 @@ export default function Page() {
           <Text style={styles.languageTitle}>
             {language?.flagEmoji} {language?.name}
           </Text>
-          <Text style={styles.languageLevel}>
-            {languageJourney?.placementLevel ?? 'N/A'} - {levelLabel}
-          </Text>
+          <Text style={styles.languageLevel}>{levelLabel}</Text>
         </View>
       </View>
 
