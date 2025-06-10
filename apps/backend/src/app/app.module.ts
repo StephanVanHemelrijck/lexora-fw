@@ -13,6 +13,7 @@ import { TtsModule } from '../tts/tts.module';
 import { WhisperModule } from '../whisper/whisper.module';
 import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
 import { LessonModule } from '../lesson/lesson.module';
+import { ExerciseResultModule } from '../exerciseResult/exerciseResult.module';
 
 @Module({
   imports: [
@@ -29,7 +30,9 @@ import { LessonModule } from '../lesson/lesson.module';
     WhisperModule,
     LessonPlanModule,
     LessonModule,
+    ExerciseResultModule,
   ],
+
   controllers: [AppController],
 })
 export class AppModule {}

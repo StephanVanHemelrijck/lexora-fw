@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { Button } from '../ui/Button';
 import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 import { ExerciseStatus } from '@lexora/types';
 import { api } from '@lexora/api-client';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Props {
   prompt: string;
@@ -34,6 +35,7 @@ export default function SpeakingRepetitionExerciseWithCheck({
   languageCode = 'es-ES',
   onNext,
 }: Props) {
+  const { user } = useAuthStore();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -50,6 +52,13 @@ export default function SpeakingRepetitionExerciseWithCheck({
 
   const soundRef = useRef<Audio.Sound | null>(null);
 
+  useEffect(() => {
+    if (storedResult?.selectedAnswer) {
+      setRecordedUri(storedResult.selectedAnswer);
+      setCheckResult(storedResult.isCorrect ? 'correct' : 'incorrect');
+    }
+  }, [storedResult]);
+
   const startRecording = async () => {
     const { granted } = await Audio.requestPermissionsAsync();
     if (!granted) return;
@@ -64,6 +73,7 @@ export default function SpeakingRepetitionExerciseWithCheck({
     await rec.startAsync();
     setRecording(rec);
     setIsRecording(true);
+    setCheckResult(null); // reset feedback on new recording
   };
 
   const stopRecording = async () => {
@@ -127,7 +137,7 @@ export default function SpeakingRepetitionExerciseWithCheck({
   };
 
   const handleCheck = async () => {
-    if (!recordedUri) return;
+    if (!recordedUri || !user) return;
 
     try {
       setIsChecking(true);
@@ -145,15 +155,8 @@ export default function SpeakingRepetitionExerciseWithCheck({
         type: 'audio/m4a',
       } as any);
 
-      const res = await fetch(
-        'http://192.168.0.129:3000/api/whisper/transcribe',
-        {
-          method: 'POST',
-          body: form,
-        }
-      );
+      const result = await api.whisper.transcribe(form, user.accessToken);
 
-      const result = await res.json();
       const isCorrect = result.isCorrect ?? false;
       setCheckResult(isCorrect ? 'correct' : 'incorrect');
 

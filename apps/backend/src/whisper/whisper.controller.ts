@@ -4,15 +4,18 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { WhisperService } from './whisper.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
 
 @Controller('whisper')
 export class WhisperController {
   constructor(private readonly whisperService: WhisperService) {}
 
+  @UseGuards(FirebaseAuthGuard)
   @Post('transcribe')
   @UseInterceptors(FileInterceptor('file'))
   async transcribeAudio(

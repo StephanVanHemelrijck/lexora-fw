@@ -14,6 +14,8 @@ model User {
   assessmentsTaken UserAssessment[]
 
   languageJourneys LanguageJourney[]
+  ExerciseResult   ExerciseResult[]
+  LessonResult     LessonResult[]
 }
 
 model LanguageJourney {
@@ -112,6 +114,7 @@ model Lesson {
   exercises     Exercise[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  LessonResult  LessonResult[]
 }
 
 model Exercise {
@@ -124,8 +127,46 @@ model Exercise {
   status    ExerciseStatus @default(pending)
   cefrLevel String? // Optional override (e.g., "B1")
 
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ExerciseResult ExerciseResult[]
+}
+
+model ExerciseResult {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [uid])
+
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+
+  lessonResultId String? // Optional
+  lessonResult   LessonResult? @relation(fields: [lessonResultId], references: [id])
+
+  selectedAnswer String?
+  isCorrect      Boolean
+  status         ExerciseStatus
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, exerciseId]) // Prevent duplicates
+}
+
+model LessonResult {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [uid])
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  exercises ExerciseResult[] // Optional reverse relation
+
+  @@unique([userId, lessonId]) // One result per user per lesson
 }
 
 enum ExerciseType {

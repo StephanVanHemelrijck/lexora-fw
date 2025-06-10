@@ -1,3 +1,4 @@
+import { exerciseResult } from './exerciseResult.ts';
 import { languages } from './language.ts';
 import { languageJourney } from './languageJourney.ts';
 import { lesson } from './lesson.ts';
@@ -6,6 +7,7 @@ import { onboarding } from './onboarding.ts';
 import { tts } from './tts.ts';
 import { user } from './user.ts';
 import { userAssessment } from './userAssessment.ts';
+import { whisper } from './whisper.ts';
 
 export * from './api.ts';
 
@@ -18,4 +20,6 @@ export const api = {
   tts,
   lessonPlan,
   lesson,
+  whisper,
+  exerciseResult,
 };

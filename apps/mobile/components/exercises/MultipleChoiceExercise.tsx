@@ -14,6 +14,8 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button } from '../ui/Button';
 import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
+import { api } from '@lexora/api-client';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Props {
   data: GrammarMultipleChoice | VocabularyMultipleChoice;
@@ -26,6 +28,7 @@ export default function MultipleChoiceExercise({
   exerciseId,
   onNext,
 }: Props) {
+  const { user } = useAuthStore();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -38,7 +41,7 @@ export default function MultipleChoiceExercise({
   useEffect(() => {
     if (storedResult) {
       setSelectedOption(storedResult.selectedAnswer ?? null);
-      setHasSubmitted(storedResult.status !== 'completed');
+      setHasSubmitted(storedResult.status === 'completed');
     }
   }, [storedResult]);
 
@@ -69,6 +72,8 @@ export default function MultipleChoiceExercise({
   };
 
   const handleNextAnswer = () => {
+    if (!user) return;
+
     if (hasSubmitted) {
       onNext();
       return;
@@ -78,14 +83,18 @@ export default function MultipleChoiceExercise({
       ? selectedOption === data.correct_answer
       : false;
 
-    addResult({
+    const result = {
       exerciseId,
       selectedAnswer: selectedOption,
       isCorrect,
       status: !selectedOption
         ? ('skipped' as ExerciseStatus)
         : ('completed' as ExerciseStatus),
-    });
+    };
+
+    addResult(result);
+
+    api.exerciseResult.save(user.accessToken, result);
 
     setHasSubmitted(true);
     onNext();
