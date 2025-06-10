@@ -21,12 +21,14 @@ interface Props {
   data: GrammarMultipleChoice | VocabularyMultipleChoice;
   exerciseId: string;
   onNext(): void;
+  lessonResultId?: string;
 }
 
 export default function MultipleChoiceExercise({
   data,
   exerciseId,
   onNext,
+  lessonResultId,
 }: Props) {
   const { user } = useAuthStore();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -66,6 +68,7 @@ export default function MultipleChoiceExercise({
       status: !selectedOption
         ? ('skipped' as ExerciseStatus)
         : ('completed' as ExerciseStatus),
+      lessonResultId,
     });
 
     setHasSubmitted(true);
@@ -90,6 +93,7 @@ export default function MultipleChoiceExercise({
       status: !selectedOption
         ? ('skipped' as ExerciseStatus)
         : ('completed' as ExerciseStatus),
+      lessonResultId,
     };
 
     addResult(result);

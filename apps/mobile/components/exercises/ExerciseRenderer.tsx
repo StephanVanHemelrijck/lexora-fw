@@ -13,9 +13,14 @@ import SpeakingRepetitionExercise from './SpeakingRepetitionExercise';
 interface Props {
   exercise: Exercise;
   onNext: () => void;
+  lessonResultId?: string;
 }
 
-export default function ExerciseRenderer({ exercise, onNext }: Props) {
+export default function ExerciseRenderer({
+  exercise,
+  onNext,
+  lessonResultId,
+}: Props) {
   const isMultipleChoice = (
     data: ExerciseJson
   ): data is GrammarMultipleChoice | VocabularyMultipleChoice => {
@@ -45,6 +50,7 @@ export default function ExerciseRenderer({ exercise, onNext }: Props) {
         data={exercise.data}
         exerciseId={exercise.id}
         onNext={handleOnNext}
+        lessonResultId={lessonResultId}
       />
     );
   }

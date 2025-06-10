@@ -3,6 +3,7 @@ import { languages } from './language.ts';
 import { languageJourney } from './languageJourney.ts';
 import { lesson } from './lesson.ts';
 import { lessonPlan } from './lessonPlan.ts';
+import { lessonResult } from './lessonResult.ts';
 import { onboarding } from './onboarding.ts';
 import { tts } from './tts.ts';
 import { user } from './user.ts';
@@ -22,4 +23,5 @@ export const api = {
   lesson,
   whisper,
   exerciseResult,
+  lessonResult,
 };

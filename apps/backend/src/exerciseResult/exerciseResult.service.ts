@@ -10,6 +10,17 @@ export class ExerciseResultService {
     const { exerciseId, selectedAnswer, isCorrect, status, lessonResultId } =
       dto;
 
+    console.log(lessonResultId);
+
+    await this.prisma.exercise.update({
+      where: {
+        id: exerciseId,
+      },
+      data: {
+        status,
+      },
+    });
+
     return this.prisma.exerciseResult.upsert({
       where: {
         userId_exerciseId: {

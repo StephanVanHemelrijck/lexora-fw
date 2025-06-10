@@ -84,6 +84,7 @@ export type ExerciseResult = {
   selectedAnswer: string | null;
   isCorrect: boolean;
   status: ExerciseStatus;
+  lessonResultId: string;
 };
 
 export enum ExerciseStatus {

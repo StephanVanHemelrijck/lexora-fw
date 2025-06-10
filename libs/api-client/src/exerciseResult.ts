@@ -3,7 +3,7 @@ import { apiClient } from './api.ts';
 import { ExerciseResult } from '@lexora/types';
 
 export const exerciseResult = {
-  save: async (token: string, payload: ExerciseResult): Promise<any> => {
+  save: async (token: string, payload: ExerciseResult) => {
     try {
       const res = await apiClient.post('/exercise-result/save', payload, {
         headers: { Authorization: `Bearer ${token}` },

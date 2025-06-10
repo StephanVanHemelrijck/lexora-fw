@@ -9,7 +9,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { Lesson } from '@lexora/types';
+import { Lesson, LessonResult } from '@lexora/types';
 import { Colors, FontSizes, MascotSizes, Spacing } from '@lexora/styles';
 import Mascot from '@/components/ui/Mascot';
 import { Button } from '@/components/ui/Button';
@@ -18,7 +18,6 @@ import { Icon } from '@/components/ui/Icon';
 import { ProgressIndicator } from '@/components/ui/ProgressIndicator';
 
 export default function Page() {
-  const navigation = useNavigation();
   const { languageId, lessonId } = useLocalSearchParams<{
     languageId: string;
     lessonId: string;
@@ -29,6 +28,7 @@ export default function Page() {
   const router = useRouter();
   const [hasStarted, setHasStarted] = useState(false);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [lessonResult, setLessonResult] = useState<LessonResult | null>(null);
 
   useEffect(() => {
     if (!user || !lessonId) return;
@@ -55,6 +55,20 @@ export default function Page() {
 
   const handleOnNext = () => {
     setCurrentExerciseIndex(currentExerciseIndex + 1);
+  };
+
+  const handleBegin = async () => {
+    if (!user) return;
+
+    api.lessonResult
+      .ensureCreated(user.accessToken, lessonId)
+      .then((res) => {
+        setLessonResult(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => setHasStarted(true));
   };
 
   if (isLoading) {
@@ -100,7 +114,9 @@ export default function Page() {
           />
           <Button
             text="BEGIN"
-            onPress={() => setHasStarted(true)}
+            onPress={() => {
+              handleBegin();
+            }}
             theme="purple"
           />
         </View>
@@ -137,6 +153,7 @@ export default function Page() {
       <ExerciseRenderer
         exercise={lesson.exercises[currentExerciseIndex]}
         onNext={handleOnNext}
+        lessonResultId={lessonResult?.id}
       />
     </View>
   );

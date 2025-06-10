@@ -14,6 +14,7 @@ import { WhisperModule } from '../whisper/whisper.module';
 import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
 import { LessonModule } from '../lesson/lesson.module';
 import { ExerciseResultModule } from '../exerciseResult/exerciseResult.module';
+import { LessonResultModule } from '../lessonResult/lessonResult.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ExerciseResultModule } from '../exerciseResult/exerciseResult.module';
     LessonPlanModule,
     LessonModule,
     ExerciseResultModule,
+    LessonResultModule,
   ],
 
   controllers: [AppController],
