@@ -13,10 +13,7 @@ interface LessonProgressState {
   progress: LessonProgress;
   addResult: (result: ExerciseResult) => void;
   updateFromLessons: (lessons: Lesson[]) => void;
-  setProgress: (
-    lessonId: string,
-    progress: { completed: number; total: number }
-  ) => void;
+  updateProgressForExercise: (exerciseId: string) => void;
   getResultById: (exerciseId: string) => ExerciseResult | null;
   reset: () => void;
 }
@@ -47,17 +44,31 @@ export const useLessonProgressStore = create<LessonProgressState>(
         return { progress: updatedProgress };
       }),
 
-    setProgress: (lessonId, progress) =>
-      set((state) => ({
-        progress: {
-          ...state.progress,
-          [lessonId]: progress,
-        },
-      })),
+    updateProgressForExercise: (exerciseId: string) =>
+      set((state) => {
+        const result = state.results.find((r) => r.exerciseId === exerciseId);
+        if (!result?.lessonResultId) return {};
+
+        const lessonId = result.lessonResultId;
+        const lessonResults = state.results.filter(
+          (r) => r.lessonResultId === lessonId
+        );
+
+        const total = lessonResults.length;
+        const completed = lessonResults.filter(
+          (r) => r.status === 'completed'
+        ).length;
+
+        return {
+          progress: {
+            ...state.progress,
+            [lessonId]: { completed, total },
+          },
+        };
+      }),
 
     getResultById: (exerciseId: string) =>
-      get().results.find((r: ExerciseResult) => r.exerciseId === exerciseId) ||
-      null,
+      get().results.find((r) => r.exerciseId === exerciseId) || null,
 
     reset: () => set({ results: [], progress: {} }),
   })

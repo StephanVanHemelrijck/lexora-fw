@@ -51,6 +51,9 @@ export default function SpeakingRepetitionExerciseWithCheck({
   const storedResult = useLessonProgressStore((state) =>
     state.getResultById(exerciseId)
   );
+  const updateProgressForExercise = useLessonProgressStore(
+    (state) => state.updateProgressForExercise
+  );
 
   const soundRef = useRef<Audio.Sound | null>(null);
 
@@ -193,6 +196,7 @@ export default function SpeakingRepetitionExerciseWithCheck({
     };
 
     addResult(result);
+    updateProgressForExercise(exerciseId);
     api.exerciseResult.save(user.accessToken, result);
 
     onNext();

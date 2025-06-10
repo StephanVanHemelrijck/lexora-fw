@@ -21,7 +21,7 @@ interface Props {
   data: GrammarMultipleChoice | VocabularyMultipleChoice;
   exerciseId: string;
   onNext(): void;
-  lessonResultId?: string; // used as lessonId in this example
+  lessonResultId?: string;
 }
 
 export default function MultipleChoiceExercise({
@@ -35,13 +35,13 @@ export default function MultipleChoiceExercise({
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const addResult = useLessonProgressStore((state) => state.addResult);
-  const setProgress = useLessonProgressStore((state) => state.setProgress);
-  const progressMap = useLessonProgressStore((state) => state.progress);
+  const updateProgress = useLessonProgressStore(
+    (state) => state.updateProgressForExercise
+  );
   const storedResult = useLessonProgressStore((state) =>
     state.getResultById(exerciseId)
   );
 
-  // Hydrate component with previously stored result (if any)
   useEffect(() => {
     if (storedResult) {
       setSelectedOption(storedResult.selectedAnswer ?? null);
@@ -51,11 +51,7 @@ export default function MultipleChoiceExercise({
 
   const handleOptionSelect = (option: string) => {
     if (hasSubmitted) return;
-    if (selectedOption === option) {
-      setSelectedOption(null);
-    } else {
-      setSelectedOption(option);
-    }
+    setSelectedOption((prev) => (prev === option ? null : option));
   };
 
   const handleCheckAnswer = () => {
@@ -65,9 +61,9 @@ export default function MultipleChoiceExercise({
       exerciseId,
       selectedAnswer: selectedOption,
       isCorrect,
-      status: !selectedOption
-        ? ('skipped' as ExerciseStatus)
-        : ('completed' as ExerciseStatus),
+      status: selectedOption
+        ? ('completed' as ExerciseStatus)
+        : ('skipped' as ExerciseStatus),
       lessonResultId,
     });
 
@@ -83,30 +79,15 @@ export default function MultipleChoiceExercise({
       exerciseId,
       selectedAnswer: selectedOption,
       isCorrect,
-      status: !selectedOption
-        ? ('skipped' as ExerciseStatus)
-        : ('completed' as ExerciseStatus),
+      status: selectedOption
+        ? ('completed' as ExerciseStatus)
+        : ('skipped' as ExerciseStatus),
       lessonResultId,
     };
 
     addResult(result);
+    updateProgress(exerciseId);
     api.exerciseResult.save(user.accessToken, result);
-
-    // Update progress if lessonId is available
-    if (lessonResultId) {
-      const lessonId = lessonResultId;
-      const current = progressMap[lessonId] ?? { completed: 0, total: 1 };
-
-      const updatedCompleted =
-        result.status === 'completed'
-          ? current.completed + 1
-          : current.completed;
-
-      setProgress(lessonId, {
-        completed: updatedCompleted,
-        total: current.total,
-      });
-    }
 
     setHasSubmitted(true);
     onNext();
