@@ -61,7 +61,7 @@ export default function LanguageSelectionStep() {
         />
       </View>
 
-      <Text>VIA: {url}</Text>
+      <Text style={{ display: 'none' }}>VIA: {url}</Text>
       <Text style={styles.title}>Language Selection</Text>
 
       <ScrollView
