@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 
-export default function NewLanguage() {
+export default function Page() {
   return (
     <View>
-      <Text>NewLanguage</Text>
+      <Text>Page</Text>
     </View>
   );
 }

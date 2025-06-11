@@ -1,18 +1,54 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateLanguageJourneyDto } from './dto/CreateLanguageJourney.dto';
+import { LanguageJourney } from '@prisma/client';
 
 @Injectable()
 export class LanguageJourneyService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(uid: string) {
-    return this.prisma.languageJourney.findMany({ where: { uid } });
+    return this.prisma.languageJourney.findMany({
+      where: { uid },
+      include: { language: true },
+    });
   }
 
   async findForUserByLanguageId(uid: string, id: string) {
     return await this.prisma.languageJourney.findFirst({
       where: { uid, languageId: id },
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createLanguageJourney(
+    dto: CreateLanguageJourneyDto
+  ): Promise<LanguageJourney> {
+    const { uid, languageId } = dto;
+
+    const exists = await this.prisma.languageJourney.findFirst({
+      where: { uid, languageId },
+    });
+
+    if (exists) {
+      throw new BadRequestException(
+        'Language journey already exists for this language'
+      );
+    }
+
+    return this.prisma.languageJourney.create({
+      data: {
+        uid,
+        languageId,
+        learningReasons: dto.learningReasons,
+        startingOption: dto.startingOption,
+        lastActivity: new Date(),
+        placementLevel: dto.startingOption === 'scratch' ? 'A1' : null,
+      },
     });
   }
 

@@ -9,15 +9,12 @@ import {
   Spacing,
 } from '@lexora/styles';
 
-interface DailyChallengeProps {
+interface DailyGoalProps {
   current: number;
   goal: number;
 }
 
-export default function DailyChallenge({
-  current = 0,
-  goal,
-}: DailyChallengeProps) {
+export default function DailyGoalCard({ current = 0, goal }: DailyGoalProps) {
   return (
     <View style={styles.container}>
       <ProgressIndicator current={current} total={goal} height="thin" />

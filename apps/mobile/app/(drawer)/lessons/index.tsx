@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import React, { useCallback, useState } from 'react';
-import DailyChallenge from '@/components/daily/DailyChallenge';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 import LanguageCard from '@/components/languages/LanguageCard';
 import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
@@ -16,6 +15,7 @@ import { api } from '@lexora/api-client';
 import { Lesson } from '@lexora/types';
 import LessonCard from '@/components/lessons/LessonCard';
 import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
+import DailyGoalCard from '@/components/daily/DailyGoal';
 
 export default function MyLessons() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function MyLessons() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dailyGoalWrapper}>
-        <DailyChallenge current={0} goal={user?.dailyMinutes ?? 0} />
+        <DailyGoalCard current={0} goal={user?.dailyMinutes ?? 0} />
       </View>
 
       {/* Upcoming Lessons */}
@@ -117,9 +117,7 @@ export default function MyLessons() {
         <Button
           text="LEARN A NEW LANGUAGE"
           onPress={() => {
-            router.push({
-              pathname: '/lessons/new-language',
-            });
+            router.push('/(drawer)/new-language');
           }}
           theme="purple"
         />
@@ -131,7 +129,7 @@ export default function MyLessons() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: Spacing.xl,
+    paddingVertical: Spacing.screenGutter,
     backgroundColor: Colors.surface,
     gap: Spacing.xl,
   },
