@@ -196,6 +196,8 @@ export default function Page() {
           exercise={exercises[currentExerciseIndex]}
           onNext={handleOnNext}
           lessonResultId={lessonResult?.id}
+          key={exercises[currentExerciseIndex].id}
+          languageId={languageId}
         />
       )}
     </View>

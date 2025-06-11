@@ -1,9 +1,10 @@
 import { Text } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Exercise,
   ExerciseJson,
   GrammarMultipleChoice,
+  Language,
   ListeningComprehension,
   ReadingComprehension,
   SpeakingRepetition,
@@ -13,18 +14,34 @@ import MultipleChoiceExercise from './MultipleChoiceExercise';
 import SpeakingRepetitionExercise from './SpeakingRepetitionExercise';
 import ListeningComprehesionExercise from './ListeningComprehesionExercise';
 import ReadingComprehensionExercise from './ReadingComprehensionExercise';
+import { api } from '@lexora/api-client';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Props {
   exercise: Exercise;
   onNext: () => void;
   lessonResultId?: string;
+  languageId: string;
 }
 
 export default function ExerciseRenderer({
   exercise,
   onNext,
   lessonResultId,
+  languageId,
 }: Props) {
+  const { user } = useAuthStore();
+  const [language, setLanguage] = useState<Language>();
+
+  useEffect(() => {
+    if (!languageId || !user) return;
+
+    api.languages
+      .getById(user.accessToken, languageId)
+      .then(setLanguage)
+      .catch(console.error);
+  }, [languageId, user]);
+
   const isMultipleChoice = (
     data: ExerciseJson
   ): data is GrammarMultipleChoice | VocabularyMultipleChoice => {
@@ -75,7 +92,7 @@ export default function ExerciseRenderer({
     return (
       <SpeakingRepetitionExercise
         prompt={exercise.data.prompt}
-        languageCode={'es'}
+        languageCode={language?.code ?? 'en'}
         exerciseId={exercise.id}
         onNext={handleOnNext}
         lessonResultId={lessonResultId}
