@@ -27,16 +27,25 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const currentUser = auth.currentUser;
       if (currentUser) {
         try {
-          await currentUser.getIdToken(true);
+          const refreshedToken = await currentUser.getIdToken(true);
+          console.log('[AuthProvider] Refreshed token', refreshedToken);
+
+          const currentStoreUser = useAuthStore.getState().user;
+          if (currentStoreUser) {
+            useAuthStore.getState().setAuth({
+              ...currentStoreUser,
+              accessToken: refreshedToken,
+            });
+          }
         } catch (err) {
-          console.error('[AuthProvider] Failed to refresh token:', err);
+          console.error('[AuthProvider] Token refresh failed:', err);
           clearAuth();
         }
       }
     }, 55 * 60 * 1000); // 55 minutes
 
     return () => clearInterval(interval);
-  }, [setAuth, clearAuth]);
+  }, [clearAuth]);
 
   // Initial auth state listener
   useEffect(() => {

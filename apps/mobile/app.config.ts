@@ -3,8 +3,8 @@ import 'dotenv/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'mobile',
-  slug: 'mobile',
+  name: 'Lexora',
+  slug: 'lexora-mobile',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',

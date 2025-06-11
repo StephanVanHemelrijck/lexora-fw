@@ -84,6 +84,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 export default function DrawerLayout() {
   return (
     <Drawer
+      initialRouteName="home"
+      backBehavior="history"
       drawerContent={CustomDrawerContent}
       screenOptions={{
         headerStyle: {
@@ -119,8 +121,9 @@ export default function DrawerLayout() {
         }}
       />
       <Drawer.Screen
-        name="lessons/my-lessons"
+        name="lessons"
         options={{
+          drawerLabel: 'My Lessons',
           title: 'My Lessons',
           drawerActiveTintColor: Colors.accent,
           drawerInactiveTintColor: Colors.textLight,
@@ -131,40 +134,6 @@ export default function DrawerLayout() {
           },
           drawerItemStyle: {
             borderRadius: BorderRadius.l,
-          },
-        }}
-      />
-      <Drawer.Screen
-        name="lessons/new-language"
-        options={{
-          drawerItemStyle: { display: 'none' },
-        }}
-      />
-      <Drawer.Screen
-        name="lessons/language/[languageId]/index"
-        options={{
-          drawerItemStyle: { display: 'none' },
-          title: 'My Lessons',
-          drawerActiveTintColor: Colors.accent,
-          drawerInactiveTintColor: Colors.textLight,
-          drawerInactiveBackgroundColor: Colors.main,
-          drawerLabelStyle: {
-            fontSize: FontSizes.body,
-            fontWeight: FontWeights.bold,
-          },
-        }}
-      />
-      <Drawer.Screen
-        name="lessons/language/[languageId]/assessment"
-        options={{
-          drawerItemStyle: { display: 'none' },
-          title: 'My Lessons - Assessment',
-          drawerActiveTintColor: Colors.accent,
-          drawerInactiveTintColor: Colors.textLight,
-          drawerInactiveBackgroundColor: Colors.main,
-          drawerLabelStyle: {
-            fontSize: FontSizes.body,
-            fontWeight: FontWeights.bold,
           },
         }}
       />

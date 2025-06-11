@@ -11,6 +11,10 @@ import { LanguageJourneyModule } from '../languageJourney/languageJourney.module
 import { AppController } from './app.controller';
 import { TtsModule } from '../tts/tts.module';
 import { WhisperModule } from '../whisper/whisper.module';
+import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
+import { LessonModule } from '../lesson/lesson.module';
+import { ExerciseResultModule } from '../exerciseResult/exerciseResult.module';
+import { LessonResultModule } from '../lessonResult/lessonResult.module';
 
 @Module({
   imports: [
@@ -25,7 +29,12 @@ import { WhisperModule } from '../whisper/whisper.module';
     LanguageJourneyModule,
     TtsModule,
     WhisperModule,
+    LessonPlanModule,
+    LessonModule,
+    ExerciseResultModule,
+    LessonResultModule,
   ],
+
   controllers: [AppController],
 })
 export class AppModule {}

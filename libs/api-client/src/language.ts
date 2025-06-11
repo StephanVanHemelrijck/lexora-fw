@@ -13,4 +13,15 @@ export const languages = {
       throw err;
     }
   },
+  getById: async (token: string, id: string) => {
+    try {
+      const res = await apiClient.get<Language>(`/languages/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch (err) {
+      console.error('Error fetching languages: ', err);
+      throw err;
+    }
+  },
 };

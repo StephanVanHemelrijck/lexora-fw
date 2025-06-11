@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import { authService } from '@lexora/auth';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { languageJourney } from '../../../../../libs/api-client/src/languageJourney';
 
 export default function SaveOnboardingStep() {
   const { getOnboardingSummary, resetAll, password, email, setCompleted } =
@@ -66,12 +67,24 @@ export default function SaveOnboardingStep() {
 
         await waitForReady();
 
-        router.replace({
-          pathname: '/lessons/language/[languageId]/assessment',
-          params: {
-            languageId: latestLanguageJourney.languageId,
-          },
-        });
+        if (
+          latestLanguageJourney.startingOption === 'placement' &&
+          !latestLanguageJourney.placementLevel
+        ) {
+          router.replace({
+            pathname: '/lessons/language/[languageId]/assessment',
+            params: {
+              languageId: latestLanguageJourney.languageId,
+            },
+          });
+        } else {
+          router.replace({
+            pathname: '/lessons/language/[languageId]',
+            params: {
+              languageId: latestLanguageJourney.languageId,
+            },
+          });
+        }
       }
     } catch (e: any) {
       console.error('[SAVE] Error during onboarding', e);

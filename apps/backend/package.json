@@ -46,6 +46,7 @@
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.1.0",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "firebase-admin": "^13.4.0",
     "form-data": "^4.0.3",
     "multer": "^2.0.1",
@@ -53,6 +54,9 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.2",
-    "@types/multer": "^1.4.12"
+    "@types/express-serve-static-core": "^5.0.6",
+    "@types/multer": "^1.4.12",
+    "concat-stream": "^2.0.0",
+    "readable-stream": "^3.6.2"
   }
 }

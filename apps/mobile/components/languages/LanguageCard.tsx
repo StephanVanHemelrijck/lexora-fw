@@ -1,12 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import {
-  BorderRadius,
-  Colors,
-  FontSizes,
-  FontWeights,
-  Spacing,
-} from '@lexora/styles';
+import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
 import RadarChartComponent from '../charts/RadarChart';
 import { Language } from '@lexora/types';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
@@ -68,9 +62,7 @@ export default function LanguageCard({
             <Text style={styles.cardTitle}>
               {language?.flagEmoji} {language?.name}
             </Text>
-            <Text style={styles.cardText}>
-              {placementLevel} - {levelLabel}
-            </Text>
+            <Text style={styles.cardText}>{levelLabel}</Text>
             <Text style={styles.cardText}>11% Complete</Text>
           </View>
         </View>
