@@ -82,18 +82,13 @@ export default function Page() {
 
   // Fetch language metadata
   useEffect(() => {
-    if (!languageId) return;
+    if (!languageId || !user) return;
 
-    const resolve = async () => {
-      const lang = await useLanguagesStore
-        .getState()
-        .getLanguageById(languageId);
-
-      setLanguage(lang);
-    };
-
-    resolve();
-  }, [languageId]);
+    api.languages
+      .getById(user.accessToken, languageId)
+      .then(setLanguage)
+      .catch(console.error);
+  }, [languageId, user]);
 
   useEffect(() => {
     if (!languageJourney || !user?.accessToken) return;

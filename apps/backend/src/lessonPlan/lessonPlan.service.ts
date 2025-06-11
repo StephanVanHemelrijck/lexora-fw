@@ -33,7 +33,7 @@ Create a structured 7-day learning plan for a student learning ${targetLanguage}
 Each day should include:
 - A short title/description of the focus
 - A list of 1–3 exercise types to target the day's objective
-- An estimated number of minutes for that day (this can vary slightly, e.g., 20–30 min)
+- An estimated number of minutes for that day (this can vary slightly, e.g., around ${dailyMinutes} minutes)
 
 🧠 Educational goals:
 - The plan should build progressively from foundational to more applied language skills.
@@ -89,16 +89,15 @@ export class LessonPlanService {
       include: { lessons: { include: { exercises: true } } },
     });
 
-    // if (existingWeekPlan) {
-    //   console.log(`[BACKEND] returning existing week plan`);
-    //   return existingWeekPlan;
-    // }
+    if (existingWeekPlan) {
+      console.log(`[BACKEND] returning existing week plan`);
+      return existingWeekPlan;
+    }
 
     if (!languageJourney)
       throw new NotFoundException('Language Journey not found');
 
     const weekPlan = await this.generateWeeklyLearningPlan(languageJourney);
-    // TODO: Save plan and generate lessons based on `weekPlan`
 
     console.log('[BACKEND WEEKPLAN]', weekPlan);
 
