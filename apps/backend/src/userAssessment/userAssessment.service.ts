@@ -4,11 +4,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Language, UserAssessment } from '@prisma/client';
-import { Answer, SubmitAssessmentDto } from './dto/submit-assessment.dto';
 import { QuestionItem } from '@lexora/types';
 import { AssessmentResult } from './interfaces/resultJson.interface';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserService } from '../user/user.service';
 import { AssessmentService } from '../assessment/assessment.service';
 import { GptService } from '../gpt/gpt.service';
 import { AssessmentJson } from '../assessment/interfaces/assessmentJson.interface';
@@ -19,7 +17,6 @@ import { WhisperService } from '../whisper/whisper.service';
 export class UserAssessmentService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService,
     private readonly assessmentService: AssessmentService,
     private readonly gptService: GptService,
     private readonly languageJourneyService: LanguageJourneyService,

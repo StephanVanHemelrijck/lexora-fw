@@ -1,9 +1,11 @@
+import { Language } from './language';
 import { StartingOptions } from './onboarding';
 
 export interface LanguageJourney {
   id: string;
   uid: string;
   languageId: string;
+  language: Language;
   learningReasons: string[];
   startingOption: StartingOptions;
   placementLevel: string | null;

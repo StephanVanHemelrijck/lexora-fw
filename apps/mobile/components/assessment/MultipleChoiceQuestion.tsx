@@ -7,7 +7,7 @@ import {
 } from '@lexora/styles';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Answer, MultipleChoiceQuestionData } from '@lexora/types';
+import { MultipleChoiceQuestionData } from '@lexora/types';
 
 interface Props {
   questionData: MultipleChoiceQuestionData;

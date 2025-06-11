@@ -1,3 +1,4 @@
+// pages/lessons/language/[languageId]/index.tsx
 import {
   StyleSheet,
   Text,
@@ -5,20 +6,23 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import RadarChartComponent from '@/components/charts/RadarChart';
 import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
 import { useLanguagesStore } from '@/stores/useLanguagesStore';
-import { Language, LanguageJourney } from '@lexora/types';
+import { Language, LanguageJourney, Lesson, LessonPlan } from '@lexora/types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
 import { useFocusEffect } from '@react-navigation/native';
 import { getCefrLevelLabel } from '@/utils/levels';
-
-const dummyData = Array.from({ length: 10 }, (_, i) => ({ id: i }));
+import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 
 export default function Page() {
   const navigation = useNavigation();
@@ -28,6 +32,24 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
   const router = useRouter();
+  const [levelLabel, setLevelLabel] = useState<string>('');
+  const [lessonPlan, setLessonPlan] = useState<LessonPlan>();
+  const [isFetchingLessonPlan, setIsFetchingLessonPlan] = useState(true);
+  const updateFromLessons = useLessonProgressStore(
+    (state) => state.updateFromLessons
+  );
+  const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
+  const [incompletedLessons, setIncompletedLessons] = useState<Lesson[]>([]);
+
+  const handleRedirect = (lesson: Lesson) => {
+    const isCompleted = lesson.isCompleted;
+
+    if (isCompleted)
+      router.push(
+        `/(drawer)/lessons/language/${languageId}/${lesson.id}/results`
+      );
+    else router.push(`/(drawer)/lessons/language/${languageId}/${lesson.id}`);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -60,29 +82,54 @@ export default function Page() {
 
   // Fetch language metadata
   useEffect(() => {
-    if (!languageId) return;
+    if (!languageId || !user) return;
 
-    const resolve = async () => {
-      const lang = await useLanguagesStore
-        .getState()
-        .getLanguageById(languageId);
+    api.languages
+      .getById(user.accessToken, languageId)
+      .then(setLanguage)
+      .catch(console.error);
+  }, [languageId, user]);
 
-      setLanguage(lang);
-    };
+  useEffect(() => {
+    if (!languageJourney || !user?.accessToken) return;
 
-    resolve();
-  }, [languageId]);
+    if (languageJourney.placementLevel) {
+      setLevelLabel(getCefrLevelLabel(languageJourney.placementLevel));
+    }
+
+    setIsFetchingLessonPlan(true);
+
+    api.lessonPlan
+      .generateLessonPlan(user.accessToken, languageJourney.id)
+      .then((res) => {
+        setLessonPlan(res);
+        updateFromLessons(res.lessons);
+
+        const completed = res.lessons
+          .filter((l) => l.isCompleted && l.lessonResult?.completedAt)
+          .sort((l1, l2) => {
+            const d1 = new Date(l1.lessonResult!.completedAt!).getTime();
+            const d2 = new Date(l2.lessonResult!.completedAt!).getTime();
+            return d2 - d1; // descending = most recent first
+          });
+
+        const incompleted = res.lessons.filter((l) => !l.isCompleted);
+
+        setCompletedLessons(completed);
+        setIncompletedLessons(incompleted);
+      })
+      .catch(console.error)
+      .finally(() => setIsFetchingLessonPlan(false));
+  }, [languageJourney, user, updateFromLessons]);
 
   // Set drawer title
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!language?.name) return;
-
-    navigation.setOptions({
+    navigation.getParent()?.setOptions({
       title: `My Lessons - ${language.name}`,
     });
   }, [navigation, language]);
 
-  // Loading screen during redirect
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -93,32 +140,26 @@ export default function Page() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.nativeLanguageName}>{language?.nativeName}</Text>
           <Text style={styles.languageTitle}>
             {language?.flagEmoji} {language?.name}
           </Text>
-          {languageJourney?.startingOption && (
-            <Text style={styles.languageLevel}>
-              {languageJourney?.placementLevel ?? 'N/A'} -{' '}
-              {getCefrLevelLabel(languageJourney?.placementLevel)}
-            </Text>
-          )}
+          <Text style={styles.languageLevel}>{levelLabel}</Text>
         </View>
-        {/* <RadarChartComponent size={150} /> */}
       </View>
 
       <View style={styles.divider} />
 
-      {/* Current Focus */}
       <View style={styles.currentFocus}>
         <View style={styles.currentFocusText}>
-          <Text style={styles.sectionTitle}>Current Focus</Text>
+          <Text style={styles.sectionTitle}>
+            Current Focus ({incompletedLessons.length})
+          </Text>
           <Text style={styles.sectionDescription}>
-            Based on your results, your weakness lies in grammar. We’ve selected
-            exercises to help you progress.
+            A custom plan based on your level — complete these lessons to keep
+            improving.
           </Text>
         </View>
         <View style={styles.scrollableCardList}>
@@ -127,41 +168,63 @@ export default function Page() {
             nestedScrollEnabled
             contentContainerStyle={styles.scrollView}
           >
-            {dummyData.slice(0, 6).map((item) => (
-              <LessonCard key={item.id} />
-            ))}
+            {isFetchingLessonPlan ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>
+                  Generating your week plan...
+                </Text>
+                <ActivityIndicator size="large" color={Colors.accent} />
+              </View>
+            ) : (
+              incompletedLessons.map((lesson) => (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  onPress={() => handleRedirect(lesson)}
+                />
+              ))
+            )}
           </ScrollView>
         </View>
       </View>
 
       <Button text="PRACTICE WITH AI" onPress={() => {}} theme="purple" />
 
-      {/* Completed Modules */}
-      <View style={styles.completedModules}>
-        <View style={styles.completedModulesText}>
-          <Text style={styles.sectionTitle}>Completed Modules</Text>
-          <Text style={styles.sectionDescription}>
-            Browse completed modules and tap to review your performance.
-          </Text>
+      {completedLessons.length > 0 && (
+        <View style={styles.completedLessons}>
+          <View style={styles.completedLessonsText}>
+            <Text style={styles.sectionTitle}>
+              Completed Lessons ({completedLessons.length})
+            </Text>
+            <Text style={styles.sectionDescription}>
+              Scroll through the lessons you&#39;ve completed and tap on them to
+              review how you handled them.
+            </Text>
+          </View>
+          <View style={styles.scrollableCardList}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
+              contentContainerStyle={styles.scrollView}
+            >
+              {completedLessons.map((lesson) => (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  onPress={() => handleRedirect(lesson)}
+                />
+              ))}
+            </ScrollView>
+          </View>
         </View>
-        <View style={styles.scrollableCardList}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled
-            contentContainerStyle={styles.scrollView}
-          >
-            {dummyData.slice(0, 8).map((item) => (
-              <LessonCard key={`completed-${item.id}`} />
-            ))}
-          </ScrollView>
-        </View>
-      </View>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: Spacing.screenGutter,
     backgroundColor: Colors.surface,
     gap: Spacing.xl,
@@ -195,11 +258,18 @@ const styles = StyleSheet.create({
   currentFocusText: {
     gap: Spacing.s,
   },
-  completedModules: {
+  completedLessons: {
     gap: Spacing.l,
   },
-  completedModulesText: {
+  completedLessonsText: {
     gap: Spacing.s,
+  },
+  scrollableCardList: {
+    height: 280,
+  },
+  scrollView: {
+    gap: Spacing.m,
+    flexGrow: 1,
   },
   sectionTitle: {
     fontSize: FontSizes.h2,
@@ -210,16 +280,14 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.body,
     color: Colors.textLight,
   },
-  scrollableCardList: {
-    maxHeight: 260,
-  },
-  scrollView: {
-    gap: Spacing.m,
-  },
   loadingContainer: {
     flex: 1,
-    backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: FontSizes.body,
+    color: Colors.textLight,
+    marginBottom: Spacing.m,
   },
 });

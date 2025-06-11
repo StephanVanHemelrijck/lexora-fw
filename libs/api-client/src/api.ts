@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// const baseURL = 'http://192.168.0.129:3000/api'; // local
+const baseURL = 'http://192.168.0.129:3000/api'; // local
 const baseURLProd = 'https://stephanvh.com/api';
 
 export const apiClient = axios.create({
