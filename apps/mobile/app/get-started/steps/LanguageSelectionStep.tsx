@@ -26,6 +26,8 @@ export default function LanguageSelectionStep() {
   const [error, setError] = useState<string | null>(null);
   const hasFetched = useRef(false);
 
+  const [url, setUrl] = useState('');
+
   const handleNextStep = () => {
     if (!selectedLanguage) return;
     nextStep();
@@ -37,6 +39,8 @@ export default function LanguageSelectionStep() {
 
     const apiUrl = apiClient.defaults.baseURL;
     if (!apiUrl) return;
+
+    setUrl(apiUrl);
 
     api.languages
       .getSupportedLanguages()
@@ -57,6 +61,7 @@ export default function LanguageSelectionStep() {
         />
       </View>
 
+      <Text style={{ display: 'none' }}>VIA: {url}</Text>
       <Text style={styles.title}>Language Selection</Text>
 
       <ScrollView
