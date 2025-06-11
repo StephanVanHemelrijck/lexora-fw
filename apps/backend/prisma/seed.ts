@@ -3,6 +3,17 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.exerciseResult.deleteMany();
+  await prisma.lessonResult.deleteMany();
+  await prisma.exercise.deleteMany();
+  await prisma.lesson.deleteMany();
+  await prisma.lessonPlan.deleteMany();
+  await prisma.languageJourney.deleteMany();
+  await prisma.userAssessment.deleteMany();
+  await prisma.assessment.deleteMany();
+  await prisma.language.deleteMany();
+  await prisma.user.deleteMany();
+
   const languages = [
     {
       code: 'en',

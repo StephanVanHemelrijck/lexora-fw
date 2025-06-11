@@ -8,7 +8,6 @@ import { ExerciseType, LanguageJourney } from '@prisma/client';
 import { GptService } from '../gpt/gpt.service';
 import { addDays, startOfDay } from 'date-fns';
 
-// ✅ Helper Prompt Builder
 function buildWeekPlanPrompt({
   targetLanguage,
   nativeLanguage,
@@ -36,7 +35,20 @@ Each day should include:
 - A list of 1–3 exercise types to target the day's objective
 - An estimated number of minutes for that day (this can vary slightly, e.g., 20–30 min)
 
-⚠️ Return JSON only in this format:
+🧠 Educational goals:
+- The plan should build progressively from foundational to more applied language skills.
+- Match difficulty and focus to the user's CEFR level and learning motivations.
+- Ensure variety and well-rounded skill development.
+
+✅ Important requirements:
+- Use **every** one of the following exercise types **at least once** during the 7-day plan:
+  - grammar_multiple_choice
+  - vocabulary_multiple_choice
+  - reading_comprehension
+  - listening_comprehension
+  - speaking_repetition
+
+⚠️ Return only JSON in the format below:
 
 [
   {
@@ -47,17 +59,6 @@ Each day should include:
   },
   ...
 ]
-
-Valid exercise types:
-- grammar_multiple_choice
-- vocabulary_multiple_choice
-- reading_comprehension
-- listening_comprehension
-- speaking_repetition
-- text_ai_conversation
-- voice_ai_conversation
-
-Make the plan logically progressive. Include **at least one ai_conversation** during the week. Tailor it to the user’s CEFR level and learning motivations.
 `;
 }
 
@@ -88,16 +89,18 @@ export class LessonPlanService {
       include: { lessons: { include: { exercises: true } } },
     });
 
-    if (existingWeekPlan) {
-      console.log(`[BACKEND] returning existing week plan`);
-      return existingWeekPlan;
-    }
+    // if (existingWeekPlan) {
+    //   console.log(`[BACKEND] returning existing week plan`);
+    //   return existingWeekPlan;
+    // }
 
     if (!languageJourney)
       throw new NotFoundException('Language Journey not found');
 
     const weekPlan = await this.generateWeeklyLearningPlan(languageJourney);
     // TODO: Save plan and generate lessons based on `weekPlan`
+
+    console.log('[BACKEND WEEKPLAN]', weekPlan);
 
     const lessonPlan = await this.prisma.lessonPlan.create({
       data: {
