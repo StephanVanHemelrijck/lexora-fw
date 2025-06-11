@@ -12,7 +12,10 @@ export class LanguageJourneyService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(uid: string) {
-    return this.prisma.languageJourney.findMany({ where: { uid } });
+    return this.prisma.languageJourney.findMany({
+      where: { uid },
+      include: { language: true },
+    });
   }
 
   async findForUserByLanguageId(uid: string, id: string) {

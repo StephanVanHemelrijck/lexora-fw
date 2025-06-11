@@ -104,6 +104,24 @@ export default function DrawerLayout() {
       }}
     >
       <Drawer.Screen
+        initialParams={{ screen: 'index' }}
+        name="daily-challenge"
+        options={{
+          drawerLabel: 'Daily Challenge',
+          title: 'Daily Challenge',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+          drawerItemStyle: {
+            borderRadius: BorderRadius.l,
+          },
+        }}
+      />
+      <Drawer.Screen
         name="home"
         options={{
           drawerLabel: 'Home',
@@ -122,6 +140,7 @@ export default function DrawerLayout() {
       />
       <Drawer.Screen
         name="lessons"
+        initialParams={{ screen: 'index' }}
         options={{
           drawerLabel: 'My Lessons',
           title: 'My Lessons',
@@ -139,6 +158,7 @@ export default function DrawerLayout() {
       />
       <Drawer.Screen
         name="new-language"
+        initialParams={{ screen: 'index' }}
         options={{
           drawerLabel: 'Learn New Language',
           title: 'Learn New Language',

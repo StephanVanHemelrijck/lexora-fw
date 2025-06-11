@@ -2,6 +2,19 @@ import { CreateLanguageJourneyDto, LanguageJourney } from '@lexora/types';
 import { apiClient } from './api.ts';
 
 export const languageJourney = {
+  findAll: async (token: string) => {
+    try {
+      const res = await apiClient.get<LanguageJourney[]>('/language-journeys', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return res.data;
+    } catch (err) {
+      console.error('Error fetching language journeys: ', err);
+      throw err;
+    }
+  },
+
   findByLanguageId: async (token: string, languageId: string) => {
     try {
       console.log('[FROM LANGUAGE-JOURNEY-API] INSIDE findByLanguageId');

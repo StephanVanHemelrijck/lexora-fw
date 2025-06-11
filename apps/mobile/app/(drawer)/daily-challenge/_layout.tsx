@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-export default function NewLanguageLayout() {
+export default function LessonLayout() {
   return (
     <Stack
       screenOptions={{

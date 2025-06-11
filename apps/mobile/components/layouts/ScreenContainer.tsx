@@ -13,7 +13,8 @@ export default function ScreenContainer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.main,
-    padding: Spacing.screenGutter,
+    backgroundColor: Colors.surface,
+    paddingVertical: Spacing.screenGutter,
+    gap: Spacing.xl,
   },
 });

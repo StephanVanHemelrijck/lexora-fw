@@ -93,7 +93,7 @@ export default function LessonCard({ lesson, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.main,
+    backgroundColor: Colors.surface,
     padding: Spacing.m,
     borderRadius: BorderRadius.m,
     flexDirection: 'row',

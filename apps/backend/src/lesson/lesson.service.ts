@@ -120,6 +120,34 @@ export class LessonService {
     });
   }
 
+  async getUpcomingLessonForJourney(
+    languageJourneyId: string
+  ): Promise<Lesson | null> {
+    return this.prisma.lesson.findFirst({
+      where: {
+        isCompleted: false,
+        lessonPlan: {
+          languageJourneyId,
+        },
+      },
+      include: {
+        exercises: true,
+        lessonPlan: {
+          include: {
+            languageJourney: {
+              include: {
+                language: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+  }
+
   async generateExercisesForLesson(
     lesson: Lesson,
     lj: LanguageJourney,

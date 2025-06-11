@@ -26,4 +26,22 @@ export const lesson = {
       throw err;
     }
   },
+  getUpcomingLessonForJourney: async (
+    token: string,
+    languageJourneyId: string
+  ) => {
+    try {
+      const res = await apiClient.get<Lesson>(
+        `/lesson/upcoming/journey/${languageJourneyId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
 };
