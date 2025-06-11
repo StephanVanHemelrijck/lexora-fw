@@ -25,7 +25,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 interface Props {
   prompt: string;
   exerciseId: string;
-  languageCode?: string;
+  languageCode: string;
   onNext(): void;
   lessonResultId?: string;
 }
@@ -33,7 +33,7 @@ interface Props {
 export default function SpeakingRepetitionExerciseWithCheck({
   prompt,
   exerciseId,
-  languageCode = 'es-ES',
+  languageCode,
   onNext,
   lessonResultId,
 }: Props) {
