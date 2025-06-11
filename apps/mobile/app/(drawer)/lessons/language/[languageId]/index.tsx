@@ -105,7 +105,14 @@ export default function Page() {
         setLessonPlan(res);
         updateFromLessons(res.lessons);
 
-        const completed = res.lessons.filter((l) => l.isCompleted);
+        const completed = res.lessons
+          .filter((l) => l.isCompleted && l.lessonResult?.completedAt)
+          .sort((l1, l2) => {
+            const d1 = new Date(l1.lessonResult!.completedAt!).getTime();
+            const d2 = new Date(l2.lessonResult!.completedAt!).getTime();
+            return d2 - d1; // descending = most recent first
+          });
+
         const incompleted = res.lessons.filter((l) => !l.isCompleted);
 
         setCompletedLessons(completed);
@@ -258,7 +265,7 @@ const styles = StyleSheet.create({
     gap: Spacing.s,
   },
   scrollableCardList: {
-    height: 260,
+    height: 280,
   },
   scrollView: {
     gap: Spacing.m,

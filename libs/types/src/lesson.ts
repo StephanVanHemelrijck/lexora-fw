@@ -1,5 +1,6 @@
 import { Exercise, ExerciseType } from './exercise';
 import { LessonPlan } from './lessonPlan';
+import { LessonResult } from './lessonResult';
 
 export type Lesson = {
   id: string;
@@ -11,4 +12,5 @@ export type Lesson = {
   lessonPlan: LessonPlan;
   exerciseTypes: ExerciseType[];
   exercises: Exercise[];
+  lessonResult: LessonResult;
 };

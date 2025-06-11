@@ -33,7 +33,8 @@ export const useLessonProgressStore = create<LessonProgressState>(
         const updatedProgress: LessonProgress = { ...state.progress };
 
         lessons.forEach((lesson) => {
-          const total = lesson.exercises?.length ?? 0;
+          const total =
+            lesson.exercises?.length > 0 ? lesson.exercises.length : 1;
           const completed =
             lesson.exercises?.filter((e) => e.status === 'completed').length ??
             0;

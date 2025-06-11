@@ -5,29 +5,31 @@ import {
   FontWeights,
   Spacing,
 } from '@lexora/styles';
-import {
-  ExerciseStatus,
-  GrammarMultipleChoice,
-  VocabularyMultipleChoice,
-} from '@lexora/types';
+import { ExerciseStatus, ReadingComprehension } from '@lexora/types';
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Button } from '../ui/Button';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { Button } from '../ui/Button';
 
 interface Props {
-  data: GrammarMultipleChoice | VocabularyMultipleChoice;
+  onNext: () => void;
+  data: ReadingComprehension;
   exerciseId: string;
-  onNext(): void;
   lessonResultId?: string;
 }
 
-export default function MultipleChoiceExercise({
+export default function ReadingComprehensionExercise({
+  onNext,
   data,
   exerciseId,
-  onNext,
   lessonResultId,
 }: Props) {
   const { user } = useAuthStore();
@@ -44,7 +46,7 @@ export default function MultipleChoiceExercise({
 
   const prevExerciseIdRef = useRef<string | null>(null);
 
-  // Eager state reset when exerciseId changes
+  // Eager state reset to avoid flickering previous answer
   if (exerciseId !== prevExerciseIdRef.current) {
     prevExerciseIdRef.current = exerciseId;
 
@@ -82,7 +84,7 @@ export default function MultipleChoiceExercise({
     setHasSubmitted(true);
   };
 
-  const handleNextAnswer = () => {
+  const handleNext = () => {
     if (!user) return;
 
     const isCorrect = selectedOption === data.correct_answer;
@@ -108,7 +110,10 @@ export default function MultipleChoiceExercise({
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.title}>Select the correct answer</Text>
+        <Text style={styles.title}>
+          Read the paragraph and choose the answer
+        </Text>
+        <Text style={styles.paragraph}>{data.paragraph}</Text>
         <Text style={styles.question}>{data.question}</Text>
 
         <View style={styles.optionContainer}>
@@ -155,7 +160,7 @@ export default function MultipleChoiceExercise({
           theme="outline"
           disabled={hasSubmitted}
         />
-        <Button text="NEXT" onPress={handleNextAnswer} theme="purple" />
+        <Button text="NEXT" onPress={handleNext} theme="purple" />
       </View>
     </View>
   );
@@ -171,6 +176,11 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     fontSize: FontSizes.h2,
     fontWeight: FontWeights.bold,
+    marginBottom: Spacing.m,
+  },
+  paragraph: {
+    color: Colors.textLight,
+    fontSize: FontSizes.body,
     marginBottom: Spacing.m,
   },
   question: {

@@ -73,10 +73,7 @@ export default function Page() {
         // mark lesson as completed
         await api.lessonResult.markAsComplete(user.accessToken, lessonId);
 
-        router.replace({
-          pathname: '/lessons/language/[languageId]/[lessonId]/results',
-          params: { languageId, lessonId },
-        });
+        router.back();
       } else setCurrentExerciseIndex(currentExerciseIndex + 1);
     }
   };
@@ -98,6 +95,7 @@ export default function Page() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Generating exercises for you...</Text>
         <ActivityIndicator size="large" color={Colors.accent} />
       </View>
     );
@@ -210,6 +208,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.surface,
+  },
+  loadingText: {
+    color: Colors.textLight,
+    marginBottom: Spacing.l,
   },
   hasStartedContainer: {
     flex: 1,

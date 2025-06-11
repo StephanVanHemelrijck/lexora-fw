@@ -114,7 +114,7 @@ model Lesson {
   exercises     Exercise[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  LessonResult  LessonResult[]
+  lessonResult  LessonResult?
 }
 
 model Exercise {
@@ -158,7 +158,7 @@ model LessonResult {
   userId String
   user   User   @relation(fields: [userId], references: [uid])
 
-  lessonId String
+  lessonId String @unique
   lesson   Lesson @relation(fields: [lessonId], references: [id])
 
   startedAt   DateTime  @default(now())

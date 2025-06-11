@@ -1,10 +1,17 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Icon } from '../ui/Icon';
-import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  FontStyles,
+  Spacing,
+} from '@lexora/styles';
 import { ProgressIndicator } from '../ui/ProgressIndicator';
 import { Lesson } from '@lexora/types';
 import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
+import { format } from 'date-fns';
 
 interface Props {
   lesson: Lesson;
@@ -15,10 +22,27 @@ interface Props {
 export default function LessonCard({ lesson, onPress }: Props) {
   const { progress } = useLessonProgressStore();
   const lessonProgress = progress[lesson.id] ?? { completed: 0, total: 1 };
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [finishedDate, setFinishedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (lesson.isCompleted) {
+      setIsCompleted(true);
+
+      console.log(lesson.lessonResult);
+      if (lesson.lessonResult.completedAt) {
+        {
+          const date = new Date(lesson.lessonResult.completedAt);
+          console.log(date);
+          setFinishedDate(date);
+        }
+      }
+    }
+  }, [lesson]);
 
   return (
     <View style={styles.card}>
-      {lesson.isCompleted ? (
+      {isCompleted ? (
         <ProgressIndicator
           current={1} // If completed force to 1 (giving full slider)
           total={1} // If completed force to 1 (giving full slider)
@@ -51,7 +75,16 @@ export default function LessonCard({ lesson, onPress }: Props) {
             color={Colors.textLight}
             library="Feather"
           />
-          <Text style={styles.cardMetaText}>{lesson.estimatedMinutes} min</Text>
+          <View style={styles.textWrapper}>
+            <Text style={styles.cardMetaText}>
+              {lesson.estimatedMinutes} min
+            </Text>
+            {isCompleted && finishedDate && (
+              <Text style={styles.cardDateText}>
+                {format(finishedDate, 'dd/MM/yyyy')}
+              </Text>
+            )}
+          </View>
         </View>
       </TouchableOpacity>
     </View>
@@ -87,5 +120,17 @@ const styles = StyleSheet.create({
   cardMetaText: {
     color: Colors.textLight,
     fontSize: FontSizes.body,
+  },
+  textWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  cardDateText: {
+    color: Colors.disabled,
+    fontSize: FontSizes.caption,
+    textAlign: 'right',
+    fontStyle: FontStyles.italic,
   },
 });

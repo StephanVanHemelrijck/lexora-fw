@@ -86,7 +86,9 @@ export class LessonPlanService {
         startDate: { lte: today },
         endDate: { gte: today },
       },
-      include: { lessons: { include: { exercises: true } } },
+      include: {
+        lessons: { include: { exercises: true, lessonResult: true } },
+      },
     });
 
     if (existingWeekPlan) {
@@ -120,6 +122,7 @@ export class LessonPlanService {
         lessons: {
           include: {
             exercises: true,
+            lessonResult: true,
           },
         },
       },
@@ -185,7 +188,7 @@ export class LessonPlanService {
         exercises: {
           select: { id: true },
         },
-        LessonResult: {
+        lessonResult: {
           where: { userId },
           include: {
             exercises: true,
@@ -196,9 +199,8 @@ export class LessonPlanService {
 
     return lessons.map((lesson) => {
       const completedCount =
-        lesson.LessonResult[0]?.exercises.filter(
-          (ex) => ex.status === 'completed'
-        ).length || 0;
+        lesson.lessonResult?.exercises.filter((ex) => ex.status === 'completed')
+          .length || 0;
 
       return {
         id: lesson.id,
