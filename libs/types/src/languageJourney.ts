@@ -13,3 +13,9 @@ export interface LanguageJourney {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface CreateLanguageJourneyDto {
+  languageId: string;
+  learningReasons: string[];
+  startingOption: StartingOptions;
+}

@@ -11,7 +11,7 @@ import { Icon } from '@/components/ui/Icon';
 import { StartingOptions } from '@lexora/types';
 
 interface Props {
-  selected?: StartingOptions;
+  selected?: StartingOptions | null;
   onSelect: (option: StartingOptions) => void;
 }
 
@@ -19,7 +19,7 @@ export default function LanguagePlacementSelection({
   selected,
   onSelect,
 }: Props) {
-  const isSelected = (option: StartingOptions) => selected === option;
+  const isSelected = (option: StartingOptions | null) => selected === option;
 
   return (
     <View style={styles.container}>

@@ -1,4 +1,4 @@
-import { LanguageJourney } from '@lexora/types';
+import { CreateLanguageJourneyDto, LanguageJourney } from '@lexora/types';
 import { apiClient } from './api.ts';
 
 export const languageJourney = {
@@ -15,6 +15,21 @@ export const languageJourney = {
       return res.data;
     } catch (err) {
       console.error('Error fetching language journeys: ', err);
+      throw err;
+    }
+  },
+
+  create: async (
+    token: string,
+    payload: CreateLanguageJourneyDto
+  ): Promise<LanguageJourney> => {
+    try {
+      const res = await apiClient.post('/language-journeys/create', payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch (err) {
+      console.error('Error creating language journey: ', err);
       throw err;
     }
   },

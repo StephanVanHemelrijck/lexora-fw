@@ -4,11 +4,11 @@ import { Language, StartingOptions } from '@lexora/types';
 interface NewLanguageState {
   selectedLanguage?: Language;
   selectedReasons: string[];
-  startingOption?: StartingOptions;
+  startingOption?: StartingOptions | null;
 
   setLanguage: (language: Language) => void;
   toggleReason: (reason: string) => void;
-  setStartingOption: (option: StartingOptions) => void;
+  setStartingOption: (option: StartingOptions | null) => void;
   reset: () => void;
 }
 
