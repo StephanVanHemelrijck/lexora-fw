@@ -118,7 +118,7 @@ export default function MyLessons() {
           text="LEARN A NEW LANGUAGE"
           onPress={() => {
             router.push({
-              pathname: '/lessons/new-language',
+              pathname: '/(drawer)/lessons/new-language',
             });
           }}
           theme="purple"
@@ -131,7 +131,7 @@ export default function MyLessons() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: Spacing.xl,
+    paddingVertical: Spacing.screenGutter,
     backgroundColor: Colors.surface,
     gap: Spacing.xl,
   },

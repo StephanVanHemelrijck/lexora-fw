@@ -16,7 +16,6 @@ import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import LessonCard from '@/components/lessons/LessonCard';
 import { Button } from '@/components/ui/Button';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
-import { useLanguagesStore } from '@/stores/useLanguagesStore';
 import { Language, LanguageJourney, Lesson, LessonPlan } from '@lexora/types';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
