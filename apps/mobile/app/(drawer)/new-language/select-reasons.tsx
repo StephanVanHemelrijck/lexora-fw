@@ -35,7 +35,7 @@ export default function SelectReasonPage() {
   };
 
   const handleNext = () => {
-    router.push('/lessons/new-language/select-placement');
+    router.push('/(drawer)/new-language/select-placement');
   };
 
   return (

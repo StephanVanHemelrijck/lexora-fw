@@ -137,6 +137,23 @@ export default function DrawerLayout() {
           },
         }}
       />
+      <Drawer.Screen
+        name="new-language"
+        options={{
+          drawerLabel: 'Learn New Language',
+          title: 'Learn New Language',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+          drawerItemStyle: {
+            borderRadius: BorderRadius.l,
+          },
+        }}
+      />
     </Drawer>
   );
 }

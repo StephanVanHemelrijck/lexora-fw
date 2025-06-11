@@ -44,7 +44,7 @@ export class LanguageJourneyService {
         learningReasons: dto.learningReasons,
         startingOption: dto.startingOption,
         lastActivity: new Date(),
-        placementLevel: dto.startingOption === 'scratch' ? 'A1' : undefined,
+        placementLevel: dto.startingOption === 'scratch' ? 'A1' : null,
       },
     });
   }

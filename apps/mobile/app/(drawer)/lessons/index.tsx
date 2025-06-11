@@ -117,9 +117,7 @@ export default function MyLessons() {
         <Button
           text="LEARN A NEW LANGUAGE"
           onPress={() => {
-            router.push({
-              pathname: '/(drawer)/lessons/new-language',
-            });
+            router.push('/(drawer)/new-language');
           }}
           theme="purple"
         />

@@ -29,7 +29,7 @@ export default function SelectLanguagePage() {
 
   const handleNext = () => {
     if (selectedLanguage) {
-      router.push('/lessons/new-language/select-reasons');
+      router.push('/(drawer)/new-language/select-reasons');
     }
   };
 

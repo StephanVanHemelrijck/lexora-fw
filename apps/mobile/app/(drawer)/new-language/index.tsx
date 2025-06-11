@@ -29,7 +29,7 @@ export default function Page() {
         <Button text="NOT NOW" onPress={() => router.back()} theme="outline" />
         <Button
           text="START"
-          onPress={() => router.push('/lessons/new-language/select-language')}
+          onPress={() => router.push('/(drawer)/new-language/select-language')}
           theme="purple"
         />
       </View>
