@@ -187,7 +187,11 @@ export default function Page() {
         </View>
       </View>
 
-      <Button text="PRACTICE WITH AI" onPress={() => {}} theme="purple" />
+      <Button
+        text="PRACTICE WITH AI"
+        onPress={() => router.push('/(drawer)/conversation')}
+        theme="purple"
+      />
 
       {completedLessons.length > 0 && (
         <View style={styles.completedLessons}>

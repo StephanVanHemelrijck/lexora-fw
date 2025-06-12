@@ -6,6 +6,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AiScenarioService {
   constructor(private prisma: PrismaService) {}
 
+  async getById(id: string) {
+    return this.prisma.aiScenario.findUnique({ where: { id } });
+  }
+
   async getAllScenarios() {
     return this.prisma.aiScenario.findMany({
       orderBy: {

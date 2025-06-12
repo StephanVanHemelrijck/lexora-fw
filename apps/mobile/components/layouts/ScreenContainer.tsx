@@ -15,6 +15,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surface,
     paddingVertical: Spacing.screenGutter,
-    gap: Spacing.xl,
   },
 });
