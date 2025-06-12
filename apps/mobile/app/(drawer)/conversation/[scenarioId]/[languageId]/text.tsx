@@ -7,7 +7,7 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import { api } from '@lexora/api-client';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
-import { Scenario } from '@lexora/types';
+import { LanguageJourney, Scenario } from '@lexora/types';
 import TextConversation from '@/components/conversations/TextConversation';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
@@ -15,9 +15,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from '@/components/ui/Icon';
 
 export default function TextScenarioPage() {
-  const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
+  const { scenarioId, languageId } = useLocalSearchParams<{
+    scenarioId: string;
+    languageId: string;
+  }>();
   const { user } = useAuthStore();
-  const [scenario, setScenario] = useState<Scenario | null>(null);
+  const [scenario, setScenario] = useState<Scenario>();
+  const [languageJourney, setLanguageJourney] = useState<LanguageJourney>();
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -34,7 +38,11 @@ export default function TextScenarioPage() {
       .getById(user.accessToken, scenarioId)
       .then(setScenario)
       .catch(console.error);
-  }, [scenarioId, user]);
+
+    api.languageJourney
+      .findByLanguageId(user.accessToken, languageId)
+      .then(setLanguageJourney);
+  }, [scenarioId, user, languageId]);
 
   if (!scenario) return null;
 
@@ -61,7 +69,12 @@ export default function TextScenarioPage() {
         </View>
         <View style={styles.divider} />
 
-        <TextConversation scenario={scenario} />
+        {languageJourney && (
+          <TextConversation
+            scenario={scenario}
+            language={languageJourney.language}
+          />
+        )}
       </View>
     </ScreenContainer>
   );

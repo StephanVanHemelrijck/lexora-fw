@@ -22,7 +22,10 @@ import { Button } from '@/components/ui/Button';
 
 export default function Page() {
   const { user } = useAuthStore();
-  const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
+  const { scenarioId, languageId } = useLocalSearchParams<{
+    scenarioId: string;
+    languageId: string;
+  }>();
   const [scenario, setScenario] = useState<Scenario>();
   const [isFetchingScenario, setIsFetchingScenario] = useState(true);
   const router = useRouter();
@@ -83,7 +86,9 @@ export default function Page() {
             <Button
               text="PRACTICE TEXT"
               onPress={() => {
-                router.push(`/(drawer)/conversation/${scenario.id}/text`);
+                router.push(
+                  `/(drawer)/conversation/${scenario.id}/${languageId}/text`
+                );
               }}
               theme="purple"
             />
@@ -91,7 +96,9 @@ export default function Page() {
             <Button
               text="PRACTICE VOICE"
               onPress={() => {
-                router.push(`/(drawer)/conversation/${scenario.id}/voice`);
+                router.push(
+                  `/(drawer)/conversation/${scenario.id}/${languageId}/voice`
+                );
               }}
               theme="purple"
             />

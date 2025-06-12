@@ -4,6 +4,7 @@ import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
 import { AiScenarioService } from './ai-scenario.service';
 import { User } from '../decorators/user.decorator';
 import type { FirebaseUser } from '../types/firebase-user';
+import { Language } from '@lexora/types';
 
 @Controller('ai-scenario')
 export class AiScenarioController {
@@ -50,12 +51,21 @@ export class AiScenarioController {
     body: {
       scenarioId: string;
       messages: { role: 'user' | 'assistant'; content: string }[];
+      language: Language;
     }
   ) {
-    return this.scenarioService.handlePracticeMessage(
-      user.uid,
-      body.scenarioId,
-      body.messages
-    );
+    console.log(body.language);
+
+    try {
+      return this.scenarioService.handlePracticeMessage(
+        user.uid,
+        body.scenarioId,
+        body.messages,
+        body.language
+      );
+    } catch (err) {
+      console.error('[BACKEND] AI Conversation Error:', err);
+      throw err;
+    }
   }
 }

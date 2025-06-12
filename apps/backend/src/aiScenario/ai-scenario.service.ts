@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GptService } from '../gpt/gpt.service';
+import { Language } from '@lexora/types';
 
 @Injectable()
 export class AiScenarioService {
@@ -13,7 +14,8 @@ export class AiScenarioService {
   async handlePracticeMessage(
     userId: string,
     scenarioId: string,
-    messages: { role: 'user' | 'assistant'; content: string }[]
+    messages: { role: 'user' | 'assistant'; content: string }[],
+    language: Language
   ) {
     const scenario = await this.prisma.aiScenario.findUnique({
       where: { id: scenarioId },
@@ -26,7 +28,7 @@ export class AiScenarioService {
     const gptMessages = [
       {
         role: 'system',
-        content: `You are roleplaying a native speaker for a language learner. The scenario is: "${scenario.prompt}". Speak naturally, be helpful, ask follow-up questions, and gently correct grammar if needed.`,
+        content: `You are roleplaying a native speaker for a language learner. The scenario is: "${scenario.prompt}". Speak naturally, be helpful, ask follow-up questions, and gently correct grammar if needed. You must respond in ${language.name}.`,
       },
       ...messages,
     ];

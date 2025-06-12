@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
@@ -43,13 +44,20 @@ export default function Page() {
   const [recommendedScenarios, setRecommendedScenarios] =
     useState<Scenario[]>();
   const [allScenarios, setAllScenarios] = useState<Scenario[]>();
+  const [isFetchingScenarios, setIsFetchingScenarios] = useState(false);
 
   const handleRedirect = (scenarioId: string) => {
-    router.push(`/(drawer)/conversation/${scenarioId}`);
+    if (!scenarioId || !selectedLj) return;
+
+    router.push(
+      `/(drawer)/conversation/${scenarioId}/${selectedLj.languageId}`
+    );
   };
 
   useEffect(() => {
     if (!allScenarios || !selectedLj) return;
+
+    setIsFetchingScenarios(true);
 
     const reasons = selectedLj.learningReasons.map((r) => r.trim());
 
@@ -63,6 +71,7 @@ export default function Page() {
       result.push(...matching.slice(3, 5).reverse());
     }
 
+    setIsFetchingScenarios(false);
     setRecommendedScenarios(result);
   }, [allScenarios, selectedLj]);
 
@@ -83,6 +92,16 @@ export default function Page() {
     if (!user || !selectedLj) return;
     api.scenario.getAll(user.accessToken).then(setAllScenarios);
   }, [user, selectedLj]);
+
+  if (isFetchingLjs && isFetchingScenarios)
+    return (
+      <ScreenContainer>
+        <View style={styles.loading}>
+          <Text style={styles.loadingText}>Getting Scenarios...</Text>
+          <ActivityIndicator size="large" color={Colors.accent} />
+        </View>
+      </ScreenContainer>
+    );
 
   return (
     <ScreenContainer>
@@ -185,6 +204,16 @@ export default function Page() {
 }
 
 const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: Colors.textLight,
+    marginBottom: Spacing.l,
+  },
+
   dropdownContainer: {
     paddingHorizontal: Spacing.screenGutter,
     marginBottom: Spacing.l,

@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
-import { GptRoles, Scenario } from '@lexora/types';
+import { GptRoles, Language, Scenario } from '@lexora/types';
 import {
   Colors,
   FontSizes,
@@ -21,6 +21,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Props {
   scenario: Scenario;
+  language: Language;
 }
 
 interface Message {
@@ -28,7 +29,7 @@ interface Message {
   content: string;
 }
 
-export default function TextConversation({ scenario }: Props) {
+export default function TextConversation({ scenario, language }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +56,8 @@ export default function TextConversation({ scenario }: Props) {
       const aiResponse = await api.gpt.sendAiPracticeMessage(
         user.accessToken,
         scenario.id,
-        updatedMessages
+        updatedMessages,
+        language
       );
 
       console.log('[BACKEND] AI response: ', aiResponse);
