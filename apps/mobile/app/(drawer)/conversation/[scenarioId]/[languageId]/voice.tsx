@@ -11,15 +11,19 @@ import { Icon } from '@/components/ui/Icon';
 import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@lexora/api-client';
-import { Scenario } from '@lexora/types';
+import { LanguageJourney, Scenario } from '@lexora/types';
 import VoiceConversation from '@/components/conversations/VoiceConversation';
 
 export default function Page() {
-  const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
+  const { scenarioId, languageId } = useLocalSearchParams<{
+    scenarioId: string;
+    languageId: string;
+  }>();
   const { user } = useAuthStore();
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const router = useRouter();
   const navigation = useNavigation();
+  const [languageJourney, setLanguageJourney] = useState<LanguageJourney>();
 
   useFocusEffect(
     useCallback(() => {
@@ -34,7 +38,12 @@ export default function Page() {
       .getById(user.accessToken, scenarioId)
       .then(setScenario)
       .catch(console.error);
-  }, [scenarioId, user]);
+
+    api.languageJourney
+      .findByLanguageId(user.accessToken, languageId)
+      .then(setLanguageJourney)
+      .catch(console.error);
+  }, [scenarioId, user, languageId]);
 
   if (!scenario) return null;
 
@@ -61,7 +70,12 @@ export default function Page() {
         </View>
         <View style={styles.divider} />
 
-        <VoiceConversation scenario={scenario} />
+        {languageJourney && (
+          <VoiceConversation
+            scenario={scenario}
+            language={languageJourney.language}
+          />
+        )}
       </View>
     </ScreenContainer>
   );

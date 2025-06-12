@@ -67,7 +67,6 @@ export class TtsService {
         input: { text },
         voice: {
           languageCode: voiceConfig.languageCode,
-          name: voiceConfig.name,
           ssmlGender: 'FEMALE',
         },
         audioConfig: { audioEncoding: 'MP3' },

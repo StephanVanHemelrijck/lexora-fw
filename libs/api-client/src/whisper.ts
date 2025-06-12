@@ -1,3 +1,4 @@
+import { Language } from '@lexora/types';
 import { apiClient } from './api.ts';
 
 export const whisper = {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -8,7 +8,7 @@ import {
   Text,
 } from 'react-native';
 import { Audio } from 'expo-av';
-import { Scenario, GptRoles } from '@lexora/types';
+import { Scenario, GptRoles, Language } from '@lexora/types';
 import { api } from '@lexora/api-client';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Colors, FontSizes, Spacing, BorderRadius } from '@lexora/styles';
@@ -16,6 +16,7 @@ import { Icon } from '../ui/Icon';
 
 interface Props {
   scenario: Scenario;
+  language: Language;
 }
 
 interface Message {
@@ -25,7 +26,7 @@ interface Message {
   transcript: string;
 }
 
-export default function VoiceConversation({ scenario }: Props) {
+export default function VoiceConversation({ scenario, language }: Props) {
   const { user } = useAuthStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -115,12 +116,13 @@ export default function VoiceConversation({ scenario }: Props) {
         updatedMessages.map(({ role, transcript }) => ({
           role,
           content: transcript,
-        }))
+        })),
+        language
       );
 
       const ttsUri = await api.tts.synthesizeSpeechToFile(
         aiResponse.content,
-        'en'
+        language.code
       );
       const { sound } = await Audio.Sound.createAsync({ uri: ttsUri });
       const info = await sound.getStatusAsync();
