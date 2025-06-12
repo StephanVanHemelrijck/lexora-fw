@@ -10,3 +10,14 @@ export type Scenario = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type ConversationReply = {
+  role: GptRoles;
+  content: string;
+};
+
+export enum GptRoles {
+  user = 'user',
+  assistant = 'assistant',
+  system = 'system',
+}

@@ -1,7 +1,9 @@
 // ai-scenario.controller.ts
 import { Controller, Get, Post, Body, UseGuards, Param } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
-import { AiScenarioService } from './ai-scenario-service';
+import { AiScenarioService } from './ai-scenario.service';
+import { User } from '../decorators/user.decorator';
+import type { FirebaseUser } from '../types/firebase-user';
 
 @Controller('ai-scenario')
 export class AiScenarioController {
@@ -38,5 +40,22 @@ export class AiScenarioController {
       console.error(err);
       throw err;
     }
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('practice')
+  async handlePracticeMessage(
+    @User() user: FirebaseUser,
+    @Body()
+    body: {
+      scenarioId: string;
+      messages: { role: 'user' | 'assistant'; content: string }[];
+    }
+  ) {
+    return this.scenarioService.handlePracticeMessage(
+      user.uid,
+      body.scenarioId,
+      body.messages
+    );
   }
 }

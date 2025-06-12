@@ -1,4 +1,5 @@
 import { exerciseResult } from './exerciseResult.ts';
+import { gpt } from './gpt.ts';
 import { languages } from './language.ts';
 import { languageJourney } from './languageJourney.ts';
 import { lesson } from './lesson.ts';
@@ -26,4 +27,5 @@ export const api = {
   exerciseResult,
   lessonResult,
   scenario,
+  gpt,
 };

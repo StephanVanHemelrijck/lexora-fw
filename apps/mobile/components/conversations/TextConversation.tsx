@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
-import { Scenario } from '@lexora/types';
+import { GptRoles, Scenario } from '@lexora/types';
 import {
   Colors,
   FontSizes,
@@ -17,13 +17,14 @@ import {
 } from '@lexora/styles';
 import { api } from '@lexora/api-client';
 import { Icon } from '../ui/Icon';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Props {
   scenario: Scenario;
 }
 
 interface Message {
-  role: 'user' | 'ai';
+  role: GptRoles;
   content: string;
 }
 
@@ -31,35 +32,53 @@ export default function TextConversation({ scenario }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuthStore();
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !user) return;
 
-    const userMessage: Message = { role: 'user', content: input };
+    const userMessage: Message = { role: 'user' as GptRoles, content: input };
     const updatedMessages = [...messages, userMessage];
 
     setMessages(updatedMessages);
     setInput('');
     setIsLoading(true);
 
-    // try {
-    //   const aiResponse = await api.gpt.sendAiPracticeMessage({
-    //     scenarioId: scenario.id,
-    //     messages: updatedMessages,
-    //   });
+    try {
+      const aiResponse = await api.gpt.sendAiPracticeMessage(
+        user.accessToken,
+        scenario.id,
+        updatedMessages
+      );
 
-    //   const aiMessage: Message = { role: 'ai', content: aiResponse.reply };
-    //   setMessages([...updatedMessages, aiMessage]);
-    // } catch (err) {
-    //   console.error('AI Error:', err);
-    // } finally {
-    //   setIsLoading(false);
-    // }
+      console.log('[BACKEND] AI response: ', aiResponse);
+
+      const aiMessage: Message = {
+        role: aiResponse.role as GptRoles,
+        content: aiResponse.content,
+      };
+      setMessages([...updatedMessages, aiMessage]);
+    } catch (err) {
+      console.error('AI Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.messages}>
+      <ScrollView
+        contentContainerStyle={styles.messages}
+        showsVerticalScrollIndicator={false}
+        ref={scrollViewRef}
+      >
         {messages.map((msg, index) => (
           <View
             key={index}
@@ -68,7 +87,16 @@ export default function TextConversation({ scenario }: Props) {
               msg.role === 'user' ? styles.userMessage : styles.aiMessage,
             ]}
           >
-            <Text style={styles.messageText}>{msg.content}</Text>
+            <Text
+              style={[
+                styles.messageText,
+                msg.role === 'user'
+                  ? styles.userMessageText
+                  : styles.aiMessageText,
+              ]}
+            >
+              {msg.content}
+            </Text>
           </View>
         ))}
       </ScrollView>
@@ -89,7 +117,7 @@ export default function TextConversation({ scenario }: Props) {
           <Icon
             name="arrow-up"
             size={FontSizes.h1}
-            color={Colors.textLight}
+            color={Colors.textDark}
             library="Ionicons"
           />
         </TouchableOpacity>
@@ -126,6 +154,12 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     fontSize: FontSizes.body,
   },
+  userMessageText: {
+    color: Colors.textDark,
+  },
+  aiMessageText: {
+    color: Colors.textLight,
+  },
   inputContainer: {
     flexDirection: 'row',
     gap: Spacing.s,
@@ -137,12 +171,17 @@ const styles = StyleSheet.create({
     padding: Spacing.s,
     borderRadius: BorderRadius.m,
     color: Colors.textLight,
+    height: 48,
   },
   sendButton: {
+    height: 48,
+    width: 48,
     paddingVertical: Spacing.s,
-    paddingHorizontal: Spacing.m,
+    paddingHorizontal: Spacing.s,
     backgroundColor: Colors.accent,
-    borderRadius: BorderRadius.m,
+    borderRadius: BorderRadius.l,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sendButtonText: {
     color: Colors.textDark,
