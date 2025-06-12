@@ -1,4 +1,12 @@
-import { Dimensions, StyleSheet, Text, View, ScrollView } from 'react-native';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -10,6 +18,7 @@ import LanguageJourneyCard from '@/components/languages/LanguageJourneyCard';
 import HeroCard from '@/components/conversations/HeroCard';
 import Quote from '@/components/ui/Quote';
 import { Button } from '@/components/ui/Button';
+import { useRouter } from 'expo-router';
 
 export default function Home() {
   const { user } = useAuthStore();
@@ -20,6 +29,8 @@ export default function Home() {
   const screenWidth = Dimensions.get('window').width;
   const gutter = Spacing.screenGutter;
   const cardWidth = screenWidth - gutter * 2;
+
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;
@@ -47,6 +58,11 @@ export default function Home() {
           </View>
         </View>
 
+        {isFetchingLanguageJourneys && (
+          <View style={styles.section}>
+            <ActivityIndicator size={'small'} color={Colors.accent} />
+          </View>
+        )}
         {/* Language Journeys */}
         {languageJourneys && languageJourneys?.length > 0 && (
           <View style={styles.section}>
@@ -57,7 +73,10 @@ export default function Home() {
             >
               {languageJourneys &&
                 languageJourneys.map((lj, idx) => (
-                  <View
+                  <TouchableOpacity
+                    onPress={() => {
+                      router.push(`/lessons/language/${lj.languageId}`);
+                    }}
                     key={lj.id}
                     style={{
                       marginRight:
@@ -65,7 +84,7 @@ export default function Home() {
                     }}
                   >
                     <LanguageJourneyCard lj={lj} width={cardWidth} />
-                  </View>
+                  </TouchableOpacity>
                 ))}
             </ScrollView>
           </View>
@@ -92,8 +111,18 @@ export default function Home() {
         </View>
 
         <View style={[styles.section, styles.buttonWrapper]}>
-          <Button text="Lessons" theme="purple" style={styles.button} />
-          <Button text="AI Practice" theme="purple" style={styles.button} />
+          <Button
+            text="Lessons"
+            theme="purple"
+            style={styles.button}
+            onPress={() => router.push('/(drawer)/lessons')}
+          />
+          <Button
+            text="AI Practice"
+            theme="purple"
+            style={styles.button}
+            onPress={() => router.push('/(drawer)/conversation')}
+          />
         </View>
       </ScrollView>
     </ScreenContainer>

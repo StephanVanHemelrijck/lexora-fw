@@ -5,6 +5,7 @@ import { lesson } from './lesson.ts';
 import { lessonPlan } from './lessonPlan.ts';
 import { lessonResult } from './lessonResult.ts';
 import { onboarding } from './onboarding.ts';
+import { scenario } from './scenario.ts';
 import { tts } from './tts.ts';
 import { user } from './user.ts';
 import { userAssessment } from './userAssessment.ts';
@@ -24,4 +25,5 @@ export const api = {
   whisper,
   exerciseResult,
   lessonResult,
+  scenario,
 };

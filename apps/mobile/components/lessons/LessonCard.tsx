@@ -17,9 +17,10 @@ interface Props {
   lesson: Lesson;
 
   onPress?: (lesson: Lesson) => void;
+  theme?: 'light' | 'dark';
 }
 
-export default function LessonCard({ lesson, onPress }: Props) {
+export default function LessonCard({ lesson, onPress, theme = 'dark' }: Props) {
   const { progress } = useLessonProgressStore();
   const lessonProgress = progress[lesson.id] ?? { completed: 0, total: 1 };
   const [isCompleted, setIsCompleted] = useState(false);
@@ -41,7 +42,12 @@ export default function LessonCard({ lesson, onPress }: Props) {
   }, [lesson]);
 
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        theme === 'dark' ? styles.cardDark : styles.cardLight,
+      ]}
+    >
       {isCompleted ? (
         <ProgressIndicator
           current={1} // If completed force to 1 (giving full slider)
@@ -93,13 +99,19 @@ export default function LessonCard({ lesson, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
     padding: Spacing.m,
     borderRadius: BorderRadius.m,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.m,
   },
+  cardDark: {
+    backgroundColor: Colors.main,
+  },
+  cardLight: {
+    backgroundColor: Colors.surface,
+  },
+
   cardContent: {
     flex: 1,
     justifyContent: 'center',

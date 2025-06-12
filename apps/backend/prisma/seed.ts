@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { seedAiScenarios } from './seed/ai-scenarios';
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,7 @@ async function main() {
   await prisma.assessment.deleteMany();
   await prisma.language.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.aiScenario.deleteMany();
 
   const languages = [
     {
@@ -106,6 +108,8 @@ async function main() {
   }
 
   console.log('🌍 Seeded languages.');
+
+  await seedAiScenarios(prisma);
 }
 
 main()

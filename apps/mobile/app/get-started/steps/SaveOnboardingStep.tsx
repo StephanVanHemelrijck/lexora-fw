@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import { authService } from '@lexora/auth';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { languageJourney } from '../../../../../libs/api-client/src/languageJourney';
 
 export default function SaveOnboardingStep() {
   const { getOnboardingSummary, resetAll, password, email, setCompleted } =

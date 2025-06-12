@@ -9,3 +9,4 @@ export * from './lessonPlan.ts';
 export * from './lesson.ts';
 export * from './exercise.ts';
 export * from './lessonResult.ts';
+export * from './scenario.ts';
