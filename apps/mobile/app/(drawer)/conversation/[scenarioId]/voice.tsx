@@ -1,20 +1,20 @@
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import ScreenContainer from '@/components/layouts/ScreenContainer';
 import {
   useFocusEffect,
   useLocalSearchParams,
   useNavigation,
   useRouter,
 } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { api } from '@lexora/api-client';
-import ScreenContainer from '@/components/layouts/ScreenContainer';
-import { Scenario } from '@lexora/types';
-import TextConversation from '@/components/conversations/TextConversation';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from '@/components/ui/Icon';
+import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { api } from '@lexora/api-client';
+import { Scenario } from '@lexora/types';
+import VoiceConversation from '@/components/conversations/VoiceConversation';
 
-export default function TextScenarioPage() {
+export default function Page() {
   const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
   const { user } = useAuthStore();
   const [scenario, setScenario] = useState<Scenario | null>(null);
@@ -23,7 +23,7 @@ export default function TextScenarioPage() {
 
   useFocusEffect(
     useCallback(() => {
-      navigation.getParent()?.setOptions({ title: 'AI Practice - Text' });
+      navigation.getParent()?.setOptions({ title: 'AI Practice - Voice' });
     }, [navigation])
   );
 
@@ -61,7 +61,7 @@ export default function TextScenarioPage() {
         </View>
         <View style={styles.divider} />
 
-        <TextConversation scenario={scenario} />
+        <VoiceConversation scenario={scenario} />
       </View>
     </ScreenContainer>
   );
@@ -70,7 +70,18 @@ export default function TextScenarioPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.surface,
     gap: Spacing.xl,
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+  },
+  loadingText: {
+    color: Colors.textLight,
+    marginBottom: Spacing.l,
   },
   topBar: {
     flexDirection: 'row',
@@ -98,5 +109,16 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Colors.textLight,
     marginHorizontal: Spacing.screenGutter,
+  },
+  actionWrapper: {
+    gap: Spacing.l,
+    paddingHorizontal: Spacing.screenGutter,
+    justifyContent: 'center',
+    flex: 1,
+  },
+  orText: {
+    textAlign: 'center',
+    fontSize: FontSizes.body,
+    color: Colors.textLight,
   },
 });

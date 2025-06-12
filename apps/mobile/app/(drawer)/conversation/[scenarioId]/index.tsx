@@ -5,8 +5,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from 'expo-router';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
 import { Scenario } from '@lexora/types';
 import { api } from '@lexora/api-client';
@@ -21,6 +26,13 @@ export default function Page() {
   const [scenario, setScenario] = useState<Scenario>();
   const [isFetchingScenario, setIsFetchingScenario] = useState(true);
   const router = useRouter();
+  const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ title: 'AI Practice' });
+    }, [navigation])
+  );
 
   useEffect(() => {
     if (!scenarioId || !user) return;
@@ -76,7 +88,13 @@ export default function Page() {
               theme="purple"
             />
             <Text style={styles.orText}>or ...</Text>
-            <Button text="PRACTICE VOICE" onPress={() => {}} theme="purple" />
+            <Button
+              text="PRACTICE VOICE"
+              onPress={() => {
+                router.push(`/(drawer)/conversation/${scenario.id}/voice`);
+              }}
+              theme="purple"
+            />
           </View>
         </View>
       ) : (
