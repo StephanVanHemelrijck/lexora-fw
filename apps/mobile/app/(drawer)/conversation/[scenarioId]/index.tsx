@@ -2,12 +2,11 @@ import {
   ActivityIndicator,
   StyleSheet,
   Text,
-  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import ScreenContainer from '@/components/layouts/ScreenContainer';
 import { Scenario } from '@lexora/types';
 import { api } from '@lexora/api-client';
@@ -21,6 +20,7 @@ export default function Page() {
   const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
   const [scenario, setScenario] = useState<Scenario>();
   const [isFetchingScenario, setIsFetchingScenario] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (!scenarioId || !user) return;
@@ -48,7 +48,7 @@ export default function Page() {
         <View style={styles.container}>
           <View>
             <View style={styles.topBar}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.back()}>
                 <Icon
                   library="Ionicons"
                   name="arrow-back"
@@ -68,7 +68,13 @@ export default function Page() {
           <View style={styles.divider} />
 
           <View style={styles.actionWrapper}>
-            <Button text="PRACTICE TEXT" onPress={() => {}} theme="purple" />
+            <Button
+              text="PRACTICE TEXT"
+              onPress={() => {
+                router.push(`/(drawer)/conversation/${scenario.id}/text`);
+              }}
+              theme="purple"
+            />
             <Text style={styles.orText}>or ...</Text>
             <Button text="PRACTICE VOICE" onPress={() => {}} theme="purple" />
           </View>
