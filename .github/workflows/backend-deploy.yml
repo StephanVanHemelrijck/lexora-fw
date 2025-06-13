@@ -1,0 +1,66 @@
+name: Deploy backend & apk to Droplet
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Run backend deployment script on Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 104.248.88.182
+          username: root
+          key: ${{ secrets.DMP_WEB_DROPLET_PRIVATE_KEY }}
+          port: 22
+          script: |
+            pwd
+            ./deploy-backend.sh
+
+      - name: Send Discord Notification on Success
+        if: success()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[Backend] Deployment completed :white_check_mark:'
+
+      - name: Send Discord Notification on Failure
+        if: failure()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[Backend] Deployment failed :x:'
+
+      - name: Run apk deployment script on Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 104.248.88.182
+          username: root
+          key: ${{ secrets.DMP_WEB_DROPLET_PRIVATE_KEY }}
+          port: 22
+          script: |
+            pwd
+            ./deploy-apk.sh
+
+      - name: Send Discord Notification on Success
+        if: success()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[APK] Deployment completed :white_check_mark:'
+
+      - name: Send Discord Notification on Failure
+        if: failure()
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: '[APK] Deployment failed :x:'

@@ -1,14 +1,16 @@
-export interface AnswerItem {
+export type SimpleAnswer = {
   originalIndex: number;
-  answer: Answer;
-}
+  answer: string;
+};
 
-export interface Answer {
-  answer: string | Record<number, string>;
-}
+export type ReadingAnswer = {
+  originalIndex: number;
+  answers: Record<number, string>;
+};
 
-export class SubmitAssessmentDto {
+export type Answer = SimpleAnswer | ReadingAnswer;
+
+export interface SubmitAssessmentDto {
   assessmentId: string;
-  uid: string;
-  answers: AnswerItem[];
+  answers: Answer[];
 }

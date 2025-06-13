@@ -6,6 +6,16 @@ import { GptModule } from '../gpt/gpt.module';
 import { AssessmentModule } from '../assessment/assessment.module';
 import { UserAssessmentModule } from '../userAssessment/userAssessment.module';
 import { LanguageModule } from '../language/language.module';
+import { FirebaseModule } from '../firebase/firebase.module';
+import { LanguageJourneyModule } from '../languageJourney/languageJourney.module';
+import { AppController } from './app.controller';
+import { TtsModule } from '../tts/tts.module';
+import { WhisperModule } from '../whisper/whisper.module';
+import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
+import { LessonModule } from '../lesson/lesson.module';
+import { ExerciseResultModule } from '../exerciseResult/exerciseResult.module';
+import { LessonResultModule } from '../lessonResult/lessonResult.module';
+import { AiScenarioModule } from '../aiScenario/ai-scenario.module';
 
 @Module({
   imports: [
@@ -16,6 +26,17 @@ import { LanguageModule } from '../language/language.module';
     AssessmentModule,
     UserAssessmentModule,
     LanguageModule,
+    FirebaseModule,
+    LanguageJourneyModule,
+    TtsModule,
+    WhisperModule,
+    LessonPlanModule,
+    LessonModule,
+    ExerciseResultModule,
+    LessonResultModule,
+    AiScenarioModule,
   ],
+
+  controllers: [AppController],
 })
 export class AppModule {}

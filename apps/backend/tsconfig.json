@@ -1,6 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
-
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@lexora/auth": ["../../libs/auth/src/index.ts"]
+    },
+    "types": ["node", "express", "Multer"]
+  },
   "files": [],
   "include": [],
   "references": [

@@ -1,6 +1,7 @@
 export const Colors = {
   main: '#242933',
   textDark: '#262626',
+  textDarker: '#191919',
   textLight: '#F6F0E9',
   accent: '#C5A4E7',
   actionButton: '#66BB6A',

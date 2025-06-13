@@ -1,13 +1,13 @@
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import React, { useEffect } from 'react';
 import { Slot, useRouter } from 'expo-router';
-import { ProgressIndicator } from '@/components/ui/ProgessIndicator';
+import { ProgressIndicator } from '@/components/ui/ProgressIndicator';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { Icon } from '@/components/ui/Icon';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 
 export default function OnboardingLayout() {
-  const { step, totalSteps, started, prevStep, setStarted } =
+  const { step, totalSteps, started, prevStep, setStarted, completed } =
     useOnboardingStore();
 
   const router = useRouter();
@@ -18,14 +18,20 @@ export default function OnboardingLayout() {
   }, [step, setStarted]);
 
   const handlePrevious = () => {
-    if (step === 0) return router.back();
     prevStep();
+  };
+
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={handlePrevious} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={step === 0 ? handleGoBack : handlePrevious}
+          style={styles.backButton}
+        >
           <Icon
             name="arrow-back"
             size={FontSizes.h1}

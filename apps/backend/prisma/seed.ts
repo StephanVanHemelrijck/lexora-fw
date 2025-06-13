@@ -1,8 +1,21 @@
 import { PrismaClient } from '@prisma/client';
+import { seedAiScenarios } from './seed/ai-scenarios';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.exerciseResult.deleteMany();
+  await prisma.lessonResult.deleteMany();
+  await prisma.exercise.deleteMany();
+  await prisma.lesson.deleteMany();
+  await prisma.lessonPlan.deleteMany();
+  await prisma.languageJourney.deleteMany();
+  await prisma.userAssessment.deleteMany();
+  await prisma.assessment.deleteMany();
+  await prisma.language.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.aiScenario.deleteMany();
+
   const languages = [
     {
       code: 'en',
@@ -95,6 +108,8 @@ async function main() {
   }
 
   console.log('🌍 Seeded languages.');
+
+  await seedAiScenarios(prisma);
 }
 
 main()

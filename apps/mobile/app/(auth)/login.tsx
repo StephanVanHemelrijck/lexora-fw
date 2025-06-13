@@ -1,4 +1,4 @@
-import { authService, useAuth } from '@lexora/auth';
+import { authService } from '@lexora/auth';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -17,11 +17,11 @@ import {
   BorderRadius,
 } from '@lexora/styles';
 import { Button } from '@/components/ui/Button';
+import { isAxiosError } from 'axios';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,10 +33,27 @@ export default function Login() {
     try {
       await authService.login(email, password);
     } catch (e) {
-      console.error(e);
-      setError('Login failed. Please try again.');
+      if (isAxiosError(e)) {
+        if (e.response) {
+          // Server responded with status code out of 2xx range
+          setError(
+            e.response.data?.message || 'Server Error. Please try again.'
+          );
+        } else if (e.request) {
+          // Request made but no response received
+          setError(
+            'No response from server. Please check your internet connection.'
+          );
+        } else {
+          // Something else happened
+          setError(`Error: ${e.message}`);
+        }
+      } else {
+        setError(`Error: ${e}`);
+      }
     } finally {
       setLoading(false);
+      // router.replace('/(drawer)/home');
     }
   };
 
@@ -46,12 +63,6 @@ export default function Login() {
     }
   }, [email, password]);
 
-  useEffect(() => {
-    if (user) {
-      router.replace('/');
-    }
-  }, [user, router]);
-
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -59,7 +70,7 @@ export default function Login() {
           <Icon
             name="close"
             size={FontSizes.h1}
-            color={Colors.disabled}
+            color={Colors.textLight}
             library="Ionicons"
           />
         </TouchableOpacity>
@@ -105,9 +116,21 @@ export default function Login() {
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      <Button onPress={handleLogin} text="LOG IN" disabled={!canSignIn} />
-
-      <Text style={styles.forgotPasswordText}>FORGOT PASSWORD?</Text>
+      {loading ? (
+        <Button
+          onPress={() => {}}
+          text="LOGGING IN..."
+          disabled={true}
+          theme="purple"
+        />
+      ) : (
+        <Button
+          onPress={handleLogin}
+          text="LOG IN"
+          disabled={!canSignIn}
+          theme="purple"
+        />
+      )}
     </View>
   );
 }
@@ -128,12 +151,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSizes.h2,
     fontWeight: FontWeights.bold,
-    color: Colors.disabled,
+    color: Colors.textLight,
     textAlign: 'center',
   },
   inputContainer: {
     flexDirection: 'column',
     gap: Spacing.m,
+    marginBottom: Spacing.l,
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -167,7 +191,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: FontSizes.body,
     textAlign: 'center',
-    marginTop: Spacing.m,
+    marginBottom: Spacing.l,
   },
   forgotPasswordText: {
     marginTop: Spacing.xl,

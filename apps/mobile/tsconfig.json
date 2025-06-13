@@ -4,6 +4,9 @@
     "strict": true,
     "paths": {
       "@/*": ["./*"],
+      "@providers/*": ["./providers/*"],
+      "@guards/*": ["./guards/*"],
+      "@stores/*": ["./stores/*"],
       "@lexora/auth": ["../../libs/auth/src/index.ts"],
       "@lexora/styles": ["../../libs/styles/src/index.ts"],
       "@lexora/api-client": ["../../libs/api-client/src/index.ts"],
@@ -13,9 +16,6 @@
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "references": [
-    {
-      "path": "../../libs/utils"
-    },
     {
       "path": "../../libs/types"
     },

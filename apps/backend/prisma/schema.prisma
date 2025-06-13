@@ -10,12 +10,39 @@ datasource db {
 model User {
   uid              String           @id @unique
   nativeLanguage   String           @default("English")
+  dailyMinutes     Int
   assessmentsTaken UserAssessment[]
+
+  languageJourneys LanguageJourney[]
+  ExerciseResult   ExerciseResult[]
+  LessonResult     LessonResult[]
+}
+
+model LanguageJourney {
+  id              String         @id @default(cuid())
+  uid             String
+  user            User           @relation(fields: [uid], references: [uid])
+  languageId      String
+  language        Language       @relation(fields: [languageId], references: [id])
+  learningReasons String[]
+  startingOption  StartingOption
+  placementLevel  String?
+  lastActivity    DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  lessonPlans LessonPlan[]
+}
+
+enum StartingOption {
+  scratch
+  placement
 }
 
 model Assessment {
   id              String           @id @default(uuid())
-  language        String
+  languageId      String
+  language        Language         @relation(fields: [languageId], references: [id])
   questions       Json
   createdAt       DateTime         @default(now())
   userAssessments UserAssessment[]
@@ -54,4 +81,124 @@ model Language {
   rtl        Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  languageJourneys LanguageJourney[]
+  Assessments      Assessment[]
+}
+
+model LessonPlan {
+  id                String          @id @default(cuid())
+  languageJourneyId String
+  languageJourney   LanguageJourney @relation(fields: [languageJourneyId], references: [id])
+
+  startDate   DateTime
+  endDate     DateTime
+  cefrLevel   String // e.g. "A2", "B1"
+  isCompleted Boolean  @default(false)
+
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lesson {
+  id               String     @id @default(cuid())
+  lessonPlanId     String
+  lessonPlan       LessonPlan @relation(fields: [lessonPlanId], references: [id])
+  date             DateTime // What day it is scheduled for
+  focus            String // e.g. ''Practicing common verbs
+  estimatedMinutes Int
+
+  exerciseTypes ExerciseType[]
+  isCompleted   Boolean        @default(false)
+  exercises     Exercise[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lessonResult  LessonResult?
+}
+
+model Exercise {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+
+  type      ExerciseType
+  data      Json // Raw GPT data for rendering this exercise (prompt, options, etc.)
+  status    ExerciseStatus @default(pending)
+  cefrLevel String? // Optional override (e.g., "B1")
+
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ExerciseResult ExerciseResult[]
+}
+
+model ExerciseResult {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [uid])
+
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+
+  lessonResultId String? // Optional
+  lessonResult   LessonResult? @relation(fields: [lessonResultId], references: [id])
+
+  selectedAnswer String?
+  isCorrect      Boolean
+  status         ExerciseStatus
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, exerciseId]) // Prevent duplicates
+}
+
+model LessonResult {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [uid])
+
+  lessonId String @unique
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  exercises ExerciseResult[] // Optional reverse relation
+
+  @@unique([userId, lessonId]) // One result per user per lesson
+}
+
+model AiScenario {
+  id          String             @id
+  title       String
+  description String
+  difficulty  ScenarioDifficulty
+  categories  String[] // learning reason tags
+  prompt      String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum ScenarioDifficulty {
+  easy
+  medium
+  hard
+}
+
+enum ExerciseType {
+  grammar_multiple_choice
+  vocabulary_multiple_choice
+  reading_comprehension
+  listening_comprehension
+  speaking_repetition
+  text_ai_conversation
+  voice_ai_conversation
+}
+
+enum ExerciseStatus {
+  pending
+  completed
+  skipped
+  reviewed
 }

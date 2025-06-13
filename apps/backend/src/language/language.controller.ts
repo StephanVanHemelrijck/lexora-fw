@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { LanguageService } from './language.service';
+import { FirebaseAuthGuard } from '../guards/FirebaseAuthGuard';
 
 @Controller('languages')
 export class LanguageController {
@@ -12,6 +13,14 @@ export class LanguageController {
 
   @Get('supported')
   async getSupportedLanguages() {
+    console.log('[BACKEND] INSIDE getSupportedLanguages');
+
     return this.languagesService.findAllSupported();
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Get(':id')
+  async getSupportedLanguagesIds(@Param('id') id: string) {
+    return this.languagesService.getById(id);
   }
 }
