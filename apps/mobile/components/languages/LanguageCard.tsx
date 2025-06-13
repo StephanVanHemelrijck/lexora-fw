@@ -1,46 +1,31 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { BorderRadius, Colors, FontSizes, Spacing } from '@lexora/styles';
-import RadarChartComponent from '../charts/RadarChart';
-import { Language } from '@lexora/types';
-import { useLanguagesStore } from '@/stores/useLanguagesStore';
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  FontWeights,
+  Spacing,
+} from '@lexora/styles';
+import { Language, LanguageJourney } from '@lexora/types';
 import { getCefrLevelLabel } from '@/utils/levels';
 
 export interface LanguageCardProps {
   onPress?: () => void;
-  languageId: string;
-  placementLevel: string | null;
+  languageJourney: LanguageJourney;
 }
 
 export default function LanguageCard({
   onPress,
-  languageId,
-  placementLevel,
+  languageJourney,
 }: LanguageCardProps) {
   const [language, setLanguage] = useState<Language>();
   const [levelLabel, setLevelLabel] = useState<string>('');
 
-  const { getLanguageById } = useLanguagesStore();
-
   useEffect(() => {
-    if (!placementLevel) return;
-    const l = getCefrLevelLabel(placementLevel);
-    setLevelLabel(l);
-  }, [placementLevel]);
-
-  useEffect(() => {
-    const resolve = async () => {
-      try {
-        const lang = await getLanguageById(languageId);
-        setLanguage(lang);
-      } catch (err) {
-        console.error(err);
-        throw err;
-      }
-    };
-
-    resolve();
-  }, [languageId, getLanguageById]);
+    setLanguage(languageJourney.language);
+    setLevelLabel(getCefrLevelLabel(languageJourney.placementLevel || ''));
+  }, [languageJourney]);
 
   const handleOnPress = () => {
     if (onPress) {
@@ -48,23 +33,48 @@ export default function LanguageCard({
     }
   };
 
+  // Limit visible reasons to fit within ~300px width
+  const MAX_VISIBLE_REASON_WIDTH = 300;
+  let visibleReasons: string[] = [];
+  let totalWidth = 0;
+
+  for (const reason of languageJourney.learningReasons) {
+    const estimatedWidth = reason.length * 7 + 32; // rough estimate
+    if (totalWidth + estimatedWidth <= MAX_VISIBLE_REASON_WIDTH) {
+      visibleReasons.push(reason);
+      totalWidth += estimatedWidth;
+    } else {
+      break;
+    }
+  }
+
+  const remainingCount =
+    languageJourney.learningReasons.length - visibleReasons.length;
+
   return (
     <TouchableOpacity onPress={handleOnPress}>
       <View style={styles.card}>
         <View style={styles.contentRow}>
-          {/* Chart (Left Column) */}
-          <View style={styles.chartWrapper}>
-            <RadarChartComponent size={100} />
-          </View>
-
-          {/* Text + Buttons (Right Column) */}
           <View style={styles.rightColumn}>
             <Text style={styles.cardTitle}>
-              {language?.flagEmoji} {language?.name}
+              {language?.flagEmoji} {language?.name}{' '}
+              <Text style={styles.cardNativeTitle}>{language?.nativeName}</Text>
             </Text>
             <Text style={styles.cardText}>{levelLabel}</Text>
-            <Text style={styles.cardText}>11% Complete</Text>
           </View>
+        </View>
+
+        <View style={styles.reasonsWrapper}>
+          {visibleReasons.map((reason) => (
+            <View key={reason} style={styles.reasonBubble}>
+              <Text style={styles.reasonText}>{reason}</Text>
+            </View>
+          ))}
+          {remainingCount > 0 && (
+            <View style={styles.reasonBubble}>
+              <Text style={styles.reasonText}>+{remainingCount} more</Text>
+            </View>
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -83,27 +93,39 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.m,
   },
-  chartWrapper: {
-    width: 100,
-    height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   rightColumn: {
     flex: 1,
-    justifyContent: 'center',
-    height: 100,
   },
-
   cardTitle: {
     fontSize: FontSizes.h3,
-    fontWeight: 'bold',
+    fontWeight: FontWeights.bold,
     marginBottom: Spacing.s,
     color: Colors.textLight,
+  },
+  cardNativeTitle: {
+    fontSize: FontSizes.body,
+    color: Colors.textLight,
+    fontWeight: FontWeights.regular,
   },
   cardText: {
     fontSize: FontSizes.body,
     marginBottom: Spacing.s,
+    color: Colors.textLight,
+  },
+  reasonsWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.s,
+    marginTop: Spacing.s,
+  },
+  reasonBubble: {
+    backgroundColor: Colors.inputBackground,
+    paddingHorizontal: Spacing.s,
+    paddingVertical: Spacing.s / 1.5,
+    borderRadius: BorderRadius.m,
+  },
+  reasonText: {
+    fontSize: FontSizes.body,
     color: Colors.textLight,
   },
 });

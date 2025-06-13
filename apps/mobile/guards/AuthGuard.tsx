@@ -20,14 +20,6 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, [user, loading, router, mounted]);
 
-  // If user is not logged in, redirect to login page
-  if (loading || !mounted) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
   // If user is logged in, render children
   return <>{children}</>;
 };

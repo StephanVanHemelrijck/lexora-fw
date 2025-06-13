@@ -46,9 +46,9 @@ export default function Home() {
     <ScreenContainer>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Daily Challenge */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <DailyChallengeCard />
-        </View>
+        </View> */}
 
         {/* Welcome Message */}
         <View style={styles.section}>

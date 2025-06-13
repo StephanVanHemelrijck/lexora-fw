@@ -17,17 +17,11 @@ import {
   BorderRadius,
 } from '@lexora/styles';
 import { Button } from '@/components/ui/Button';
-import { useAuth } from '@/providers/AuthProvider';
-import { api } from '@lexora/api-client';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { isAxiosError } from 'axios';
-import { FirebaseError } from 'firebase/app';
 
 export default function Login() {
-  const { setAuth } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,7 +53,7 @@ export default function Login() {
       }
     } finally {
       setLoading(false);
-      router.replace('/(drawer)/home');
+      // router.replace('/(drawer)/home');
     }
   };
 
@@ -76,7 +70,7 @@ export default function Login() {
           <Icon
             name="close"
             size={FontSizes.h1}
-            color={Colors.disabled}
+            color={Colors.textLight}
             library="Ionicons"
           />
         </TouchableOpacity>
@@ -123,11 +117,20 @@ export default function Login() {
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       {loading ? (
-        <Button onPress={() => {}} text="LOGGING IN..." disabled={true} />
+        <Button
+          onPress={() => {}}
+          text="LOGGING IN..."
+          disabled={true}
+          theme="purple"
+        />
       ) : (
-        <Button onPress={handleLogin} text="LOG IN" disabled={!canSignIn} />
+        <Button
+          onPress={handleLogin}
+          text="LOG IN"
+          disabled={!canSignIn}
+          theme="purple"
+        />
       )}
-      <Text style={styles.forgotPasswordText}>FORGOT PASSWORD?</Text>
     </View>
   );
 }
@@ -148,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSizes.h2,
     fontWeight: FontWeights.bold,
-    color: Colors.disabled,
+    color: Colors.textLight,
     textAlign: 'center',
   },
   inputContainer: {
