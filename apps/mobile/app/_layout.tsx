@@ -10,8 +10,11 @@ import {
 import { Colors } from '@lexora/styles';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AuthProvider from '@/providers/AuthProvider';
+import { useDailyTimeTracker } from './hooks/useDailyTimeTracker';
 
 export default function RootLayout() {
+  useDailyTimeTracker();
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>

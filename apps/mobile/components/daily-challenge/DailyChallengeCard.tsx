@@ -1,6 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import { Colors, FontSizes, FontWeights, Spacing } from '@lexora/styles';
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  FontWeights,
+  Spacing,
+} from '@lexora/styles';
 import { Icon } from '../ui/Icon';
 import { useRouter } from 'expo-router';
 
@@ -37,6 +43,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.m,
+    borderRadius: BorderRadius.m,
   },
   textContainer: {
     flex: 1, // ✅ Ensures it takes all available space beside icon

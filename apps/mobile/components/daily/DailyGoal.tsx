@@ -15,6 +15,14 @@ interface DailyGoalProps {
 }
 
 export default function DailyGoalCard({ current = 0, goal }: DailyGoalProps) {
+  const [hasExceeded, setHasExceeded] = React.useState(false);
+
+  React.useEffect(() => {
+    if (current > goal) {
+      setHasExceeded(true);
+    }
+  }, [current, goal]);
+
   return (
     <View style={styles.container}>
       <ProgressIndicator current={current} total={goal} height="thin" />
@@ -22,12 +30,19 @@ export default function DailyGoalCard({ current = 0, goal }: DailyGoalProps) {
         <View style={styles.bodyLeft}>
           <Text style={styles.title}>Daily Goal</Text>
           <Text style={styles.caption}>
-            Just {goal - current} minutes left to hit your daily goal!
+            {hasExceeded
+              ? 'You have exceeded your daily goal'
+              : `Just ${goal - current} minutes left to hit your daily goal!`}
           </Text>
         </View>
         <View style={styles.bodyRight}>
-          <Text style={styles.goalCurrent}>{current}</Text>
-          <Text style={styles.goalDivider}>/</Text>
+          <View style={styles.goalTotalRow}>
+            <Text style={styles.goalCurrent}>
+              {hasExceeded ? goal : current}
+            </Text>
+            <Text style={styles.goalUnit}>min</Text>
+          </View>
+          <View style={styles.dividerLine} />
           <View style={styles.goalTotalRow}>
             <Text style={styles.goalTotal}>{goal}</Text>
             <Text style={styles.goalUnit}>min</Text>
@@ -65,33 +80,24 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
   },
   bodyRight: {
-    flexDirection: 'row',
-    position: 'relative',
-    flex: 1,
-    height: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.s,
   },
   goalCurrent: {
     fontSize: FontSizes.h1,
     fontWeight: FontWeights.regular,
-    position: 'absolute',
-    left: 0,
-    top: 5,
     color: Colors.textLight,
   },
-  goalDivider: {
-    fontSize: FontSizes.h1,
-    fontWeight: FontWeights.bold,
-    position: 'absolute',
-    left: 31,
-    top: 19,
-    color: Colors.textLight,
+  dividerLine: {
+    width: 40,
+    height: 2,
+    backgroundColor: Colors.textLight,
   },
   goalTotalRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    position: 'absolute',
-    right: 0,
-    bottom: 5,
   },
   goalTotal: {
     fontSize: FontSizes.h1,

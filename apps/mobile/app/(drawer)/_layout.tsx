@@ -49,10 +49,10 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           <Text style={styles.mail}>{user?.email}</Text>
 
           <View style={styles.progressContainer}>
-            <Text style={styles.level}>lvl 6.</Text>
+            {/* <Text style={styles.level}>lvl 6.</Text>
             <View style={styles.progressBarBackground}>
               <View style={styles.progressBarFill} />
-            </View>
+            </View> */}
           </View>
 
           <View style={styles.divider} />
@@ -68,12 +68,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           <View style={styles.divider} />
           <TouchableOpacity onPress={handleLogout} style={styles.logoutRow}>
             <Text style={styles.logoutText}>Log out</Text>
-            <Icon
+            {/* <Icon
               library="Feather"
               name="settings"
               size={FontSizes.body}
               color={Colors.textLight}
-            />
+            /> */}
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -107,17 +107,8 @@ export default function DrawerLayout() {
         initialParams={{ screen: 'index' }}
         name="daily-challenge"
         options={{
-          drawerLabel: 'Daily Challenge',
-          title: 'Daily Challenge',
-          drawerActiveTintColor: Colors.accent,
-          drawerInactiveTintColor: Colors.textLight,
-          drawerInactiveBackgroundColor: Colors.main,
-          drawerLabelStyle: {
-            fontSize: FontSizes.body,
-            fontWeight: FontWeights.bold,
-          },
           drawerItemStyle: {
-            borderRadius: BorderRadius.l,
+            display: 'none',
           },
         }}
       />
@@ -162,6 +153,24 @@ export default function DrawerLayout() {
         options={{
           drawerLabel: 'Learn New Language',
           title: 'Learn New Language',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+          drawerItemStyle: {
+            borderRadius: BorderRadius.l,
+          },
+        }}
+      />
+      <Drawer.Screen
+        name="conversation"
+        initialParams={{ screen: 'index' }}
+        options={{
+          drawerLabel: 'AI Practice',
+          title: 'AI Practice',
           drawerActiveTintColor: Colors.accent,
           drawerInactiveTintColor: Colors.textLight,
           drawerInactiveBackgroundColor: Colors.main,
@@ -237,7 +246,7 @@ const styles = StyleSheet.create({
   },
   logoutRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   logoutText: {

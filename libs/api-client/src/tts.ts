@@ -3,13 +3,13 @@ import { apiClient } from './api.ts';
 export const tts = {
   synthesizeSpeechToFile: async (
     text: string,
-    lang: string
+    langCode: string
   ): Promise<string> => {
     try {
       const res = await apiClient.get<{ audioUrl: string }>('/tts', {
         params: {
           text,
-          lang,
+          lang: langCode,
         },
       });
 

@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Colors, FontSizes, Spacing } from '@lexora/styles';
 import LanguageCard from '@/components/languages/LanguageCard';
 import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
@@ -16,6 +16,7 @@ import { Lesson } from '@lexora/types';
 import LessonCard from '@/components/lessons/LessonCard';
 import { useLessonProgressStore } from '@/stores/useLessonProgressStore';
 import DailyGoalCard from '@/components/daily/DailyGoal';
+import { getTodayProgress } from '@/app/hooks/useDailyTimeTracker';
 
 export default function MyLessons() {
   const router = useRouter();
@@ -27,6 +28,19 @@ export default function MyLessons() {
   const updateFromLessons = useLessonProgressStore(
     (state) => state.updateFromLessons
   );
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const update = async () => {
+      const value = await getTodayProgress();
+      setProgress(value);
+    };
+
+    update(); // Initial load
+    const interval = setInterval(update, 30000); // Every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -62,7 +76,7 @@ export default function MyLessons() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dailyGoalWrapper}>
-        <DailyGoalCard current={0} goal={user?.dailyMinutes ?? 0} />
+        <DailyGoalCard current={progress} goal={user?.dailyMinutes ?? 0} />
       </View>
 
       {/* Upcoming Lessons */}
@@ -101,8 +115,7 @@ export default function MyLessons() {
           {user?.languageJourneys?.map((languageJourney) => (
             <LanguageCard
               key={languageJourney.languageId}
-              languageId={languageJourney.languageId}
-              placementLevel={languageJourney.placementLevel}
+              languageJourney={languageJourney}
               onPress={() => {
                 router.push({
                   pathname: '/lessons/language/[languageId]',

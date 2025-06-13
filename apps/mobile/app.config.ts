@@ -1,4 +1,5 @@
 import { ExpoConfig, ConfigContext } from '@expo/config';
+import { Colors } from '@lexora/styles';
 import 'dotenv/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -7,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'lexora-mobile',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/images/icon.png',
+  icon: './assets/images/lex-icon-1.png',
   scheme: 'mobile',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
@@ -18,7 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#242933',
     },
     package: 'com.anonymous.mobile',
   },
@@ -32,10 +33,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        image: './assets/images/splash-icon.png',
-        imageWidth: 200,
-        resizeMode: 'contain',
-        backgroundColor: '#ffffff',
+        // image: './assets/images/lex-icon-1.png',
+        resizeMode: 'cover',
+        backgroundColor: '#242933',
       },
     ],
   ],

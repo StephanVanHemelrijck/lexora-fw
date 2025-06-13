@@ -169,6 +169,23 @@ model LessonResult {
   @@unique([userId, lessonId]) // One result per user per lesson
 }
 
+model AiScenario {
+  id          String             @id
+  title       String
+  description String
+  difficulty  ScenarioDifficulty
+  categories  String[] // learning reason tags
+  prompt      String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum ScenarioDifficulty {
+  easy
+  medium
+  hard
+}
+
 enum ExerciseType {
   grammar_multiple_choice
   vocabulary_multiple_choice

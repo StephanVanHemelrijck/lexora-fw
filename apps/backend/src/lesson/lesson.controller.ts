@@ -35,7 +35,7 @@ export class LessonController {
       const lesson = await this.lessonService.getUpcomingLessonForUser(
         user.uid
       );
-      if (!lesson) throw new NotFoundException('No upcoming lessons found');
+
       return lesson;
     } catch (err) {
       console.error('Failed to fetch upcoming lesson for user:', err);
@@ -48,10 +48,7 @@ export class LessonController {
   async getUpcomingLessonForJourney(@Param('id') id: string) {
     try {
       const lesson = await this.lessonService.getUpcomingLessonForJourney(id);
-      if (!lesson)
-        throw new NotFoundException(
-          'No upcoming lessons found for this journey'
-        );
+
       return lesson;
     } catch (err) {
       console.error('Failed to fetch upcoming lesson for journey:', err);

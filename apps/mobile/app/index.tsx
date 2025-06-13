@@ -1,5 +1,5 @@
-import { View, Image, StyleSheet, Text } from 'react-native';
-import React, { useEffect } from 'react';
+import { View, Image, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import {
   Colors,
   Spacing,
@@ -14,16 +14,24 @@ import { useAuthStore } from '@/stores/useAuthStore';
 export default function Page() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const [isCheckingUser, setIsCheckingUser] = useState(true);
 
   useEffect(() => {
-    console.log('[INDEX]');
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      router.replace('/(drawer)/home');
+    if (user !== undefined) {
+      if (user) {
+        router.replace('/(drawer)/home');
+      }
+      setIsCheckingUser(true);
     }
   }, [user, router]);
+
+  if (isCheckingUser) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -52,7 +60,6 @@ export default function Page() {
           text="GET STARTED"
           theme="purple"
         />
-
         <Button
           onPress={() => router.push('/login')}
           text="I ALREADY HAVE AN ACCOUNT"
@@ -69,6 +76,12 @@ const styles = StyleSheet.create({
     padding: Spacing.screenGutter,
     backgroundColor: Colors.main,
     justifyContent: 'space-between',
+  },
+  loaderContainer: {
+    flex: 1,
+    backgroundColor: Colors.main,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   top: {
     flex: 1,
@@ -89,33 +102,5 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     alignItems: 'center',
     gap: Spacing.l,
-  },
-  getStarted: {
-    backgroundColor: Colors.accent,
-    paddingVertical: Spacing.m,
-    paddingHorizontal: Spacing.l,
-    borderRadius: BorderRadius.l,
-    marginBottom: Spacing.m,
-    width: '100%',
-    alignItems: 'center',
-  },
-  getStartedText: {
-    color: Colors.textDark,
-    fontSize: FontSizes.h3,
-    fontWeight: FontWeights.bold,
-  },
-  loginText: {
-    color: Colors.accent,
-    fontSize: FontSizes.h3,
-    fontWeight: FontWeights.bold,
-  },
-  login: {
-    width: '100%',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.l,
-    paddingVertical: Spacing.m,
-    paddingHorizontal: Spacing.l,
   },
 });

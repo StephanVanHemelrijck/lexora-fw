@@ -19,6 +19,7 @@ export class TtsController {
     @Res() res: Response
   ) {
     console.log('[BACKEND]: IN TEXT SERVICE');
+    console.log('lang', lang);
 
     if (!text) throw new BadRequestException('Text is required');
 

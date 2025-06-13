@@ -21,6 +21,7 @@ export class LanguageJourneyService {
   async findForUserByLanguageId(uid: string, id: string) {
     return await this.prisma.languageJourney.findFirst({
       where: { uid, languageId: id },
+      include: { language: true },
       orderBy: { createdAt: 'desc' },
     });
   }
