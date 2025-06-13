@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        // image: './assets/images/lex-icon-1.png',
+        image: './assets/images/lex-icon-1.png',
         resizeMode: 'cover',
         backgroundColor: '#242933',
       },
