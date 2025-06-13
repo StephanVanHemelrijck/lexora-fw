@@ -36,4 +36,15 @@ export class WhisperController {
       isCorrect,
     };
   }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('transcribe-only')
+  @UseInterceptors(FileInterceptor('file'))
+  async transcribeOnly(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Audio file is required.');
+
+    const transcription = await this.whisperService.transcribeAudio(file);
+
+    return { transcription };
+  }
 }

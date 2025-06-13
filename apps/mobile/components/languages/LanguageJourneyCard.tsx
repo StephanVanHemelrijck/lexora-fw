@@ -58,7 +58,7 @@ export default function LanguageJourneyCard({ lj, width }: Props) {
         upcomingLesson && (
           <View style={styles.wrapper}>
             <Text style={styles.title}>Upcoming Lesson</Text>
-            <LessonCard lesson={upcomingLesson} />
+            <LessonCard lesson={upcomingLesson} theme="light" />
           </View>
         )
       )}

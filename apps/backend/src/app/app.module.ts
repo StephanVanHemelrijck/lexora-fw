@@ -15,6 +15,7 @@ import { LessonPlanModule } from '../lessonPlan/lessonPlan.module';
 import { LessonModule } from '../lesson/lesson.module';
 import { ExerciseResultModule } from '../exerciseResult/exerciseResult.module';
 import { LessonResultModule } from '../lessonResult/lessonResult.module';
+import { AiScenarioModule } from '../aiScenario/ai-scenario.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { LessonResultModule } from '../lessonResult/lessonResult.module';
     LessonModule,
     ExerciseResultModule,
     LessonResultModule,
+    AiScenarioModule,
   ],
 
   controllers: [AppController],

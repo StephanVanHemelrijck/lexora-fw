@@ -174,6 +174,24 @@ export default function DrawerLayout() {
           },
         }}
       />
+      <Drawer.Screen
+        name="conversation"
+        initialParams={{ screen: 'index' }}
+        options={{
+          drawerLabel: 'AI Practice',
+          title: 'AI Practice',
+          drawerActiveTintColor: Colors.accent,
+          drawerInactiveTintColor: Colors.textLight,
+          drawerInactiveBackgroundColor: Colors.main,
+          drawerLabelStyle: {
+            fontSize: FontSizes.body,
+            fontWeight: FontWeights.bold,
+          },
+          drawerItemStyle: {
+            borderRadius: BorderRadius.l,
+          },
+        }}
+      />
     </Drawer>
   );
 }

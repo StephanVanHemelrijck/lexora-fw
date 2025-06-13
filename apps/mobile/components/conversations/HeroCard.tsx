@@ -8,8 +8,11 @@ import {
   FontWeights,
   Spacing,
 } from '@lexora/styles';
+import { useRouter } from 'expo-router';
 
 export default function HeroCard() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <View style={styles.textWrapper}>
@@ -28,7 +31,7 @@ export default function HeroCard() {
       <View style={styles.buttonWrapper}>
         <Button
           text="Try it out"
-          onPress={() => {}}
+          onPress={() => router.push('/(drawer)/conversation')}
           theme="purple"
           style={styles.button}
         />
