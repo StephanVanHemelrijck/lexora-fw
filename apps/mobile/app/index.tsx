@@ -21,7 +21,7 @@ export default function Page() {
       if (user) {
         router.replace('/(drawer)/home');
       }
-      setIsCheckingUser(true);
+      setIsCheckingUser(false);
     }
   }, [user, router]);
 
